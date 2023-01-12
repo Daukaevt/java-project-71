@@ -12,7 +12,7 @@ import picocli.CommandLine.Option;
         version = "1.0",
         description = "Compares two configuration files and shows a difference."
 )
-public class App implements Runnable{
+public class App implements Runnable {
     @Parameters(
             paramLabel = "filepath1",
             index = "0",
@@ -30,15 +30,18 @@ public class App implements Runnable{
             description = "output format [default: stylish]"
     )
     private boolean format = false;
-    
+
+    @Option(names = { "-h", "--help" }, usageHelp = true, description = "display a help message")
+    private boolean helpRequested = false;
 
     public static void main(String[] args) {
-       new CommandLine(new App()).execute("-h");
+        new CommandLine(new App()).execute(args);
     }
 
     @Override
     public void run() {
-        System.out.println("HW!" + filePath1 + filePath2 + format);
+        String content = Differ.generate(filePath1, filePath2);
+        System.out.println(content);
     }
 }
 
