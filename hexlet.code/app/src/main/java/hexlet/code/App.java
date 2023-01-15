@@ -25,13 +25,19 @@ public class App implements Runnable {
             description = "path to second file"
     )
     private String filePath2;
+
+    @Option(
+            names = { "-v", "--version" },
+            description = "Print version information and exit.")
+    private boolean versionRequested = false;
+
     @Option(
             names = {"-f", "--format"},
             description = "output format [default: stylish]"
     )
     private boolean format = false;
 
-    @Option(names = { "-h", "--help" }, usageHelp = true, description = "display a help message")
+    @Option(names = { "-h", "--help" }, usageHelp = true, description = "Show this help message and exit.")
     private boolean helpRequested = false;
 
     public static void main(String[] args) {
