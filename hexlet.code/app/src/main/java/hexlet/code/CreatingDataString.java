@@ -6,8 +6,11 @@ public class CreatingDataString {
     public static String create(String[][] comparedDatas) {
         var tempArr = Arrays.stream(comparedDatas[0]).sorted().toArray();
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("{");
+        stringBuilder.append("{\n");
         for (Object line: tempArr) {
+            if (line.toString().equals("")) {
+                continue;
+            }
             for (int i = 0; i < comparedDatas[0].length; i++) {
                 if (line.toString() == comparedDatas[0][i]) {
                     stringBuilder.append(comparedDatas[1][i]).append("\n");
