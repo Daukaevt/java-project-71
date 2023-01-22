@@ -18278,7 +18278,7 @@ public class CommandLine {
     /**
      * Utility class providing some defensive coding convenience methods.
      */
-    private static final class Assert {
+    public static final class Assert {
         /**
          * Throws a NullPointerException if the specified object is null.
          * @param object the object to verify
