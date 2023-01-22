@@ -7,7 +7,7 @@ import java.util.Map;
 
 public class JacksonObjectMapperMakingHostAddresses {
     public static Map parse(final String contentFile1) {
-        Map<String, String> map;
+        Map<String, Object> map;
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             map = objectMapper.readValue(contentFile1, new TypeReference<>() {
