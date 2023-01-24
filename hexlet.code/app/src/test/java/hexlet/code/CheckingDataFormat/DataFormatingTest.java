@@ -9,19 +9,16 @@ class DataFormatingTest {
     String yamlContent;
     String jsonContent;
     DataFormating dataFormating;
+    YamlJSONTest yamlJSONTest;
     @BeforeEach
     void setUp() {
-        yamlContent = "---\n" +
-                "  host: hexlet.io\n" +
-                "  timeout: 50\n" +
-                "  proxy: 123.234.53.22\n" +
-                "  follow: false";
-        jsonContent = "{\"host\":\"hexlet.io\",\"timeout\":50,\"proxy\":\"123.234.53.22\",\"follow\":false}";
         dataFormating = new DataFormating();
+        yamlJSONTest = new YamlJSONTest();
+
     }
 
     @Test
     void convertYamlToJson() {
-        assertEquals(jsonContent, dataFormating.convertYamlToJson(yamlContent));
+        assertEquals(yamlJSONTest.jsonContent, dataFormating.convertYamlToJson(yamlJSONTest.yamlContent));
     }
 }
