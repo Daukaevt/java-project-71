@@ -1,5 +1,6 @@
 package hexlet.code.data;
 
+import hexlet.code.utils.DeletingFile;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -10,16 +11,16 @@ import java.io.IOException;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ReadFileTest {
-    ReadFile readFile;
+    String tmpFileName;
 
     @BeforeEach
     void setUp() {
-        readFile = new ReadFile();
+        tmpFileName= "tmp.txt";
         try {
-            File myObj = new File("tmp.txt");
+            File myObj = new File(tmpFileName);
             if (myObj.createNewFile()) {
                 try {
-                    FileWriter myWriter = new FileWriter("tmp.txt");
+                    FileWriter myWriter = new FileWriter(tmpFileName);
                     myWriter.write("Some text");
                     myWriter.close();
                 } catch (IOException e) {
@@ -38,9 +39,8 @@ class ReadFileTest {
     @Test
     void read() {
         try {
-            assertNotNull(readFile.read("tmp.txt"));
-            File myObj = new File("tmp.txt");
-            myObj.delete();
+            assertNotNull(ReadFile.read(tmpFileName));
+            DeletingFile.delete(tmpFileName);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
