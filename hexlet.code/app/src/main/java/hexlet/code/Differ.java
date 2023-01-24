@@ -1,5 +1,6 @@
 package hexlet.code;
 
+import hexlet.code.CheckingDataFormat.FileContentFormatToJSON;
 import hexlet.code.data.JSONUtils;
 import hexlet.code.data.JacksonObjectMapperMakingHostAddresses;
 import hexlet.code.data.ReadFile;
@@ -11,8 +12,12 @@ public class Differ {
             final String filePath1,
             final String filePath2
     ) {
-        var parseFile1Content = parsingInit(filePath1);
-        var parseFile2Content = parsingInit(filePath2);
+        var pathToJsonTempFile1
+                = FileContentFormatToJSON.factory(filePath1, "tmpFile1.yaml");
+        var pathToJsonTempFile2
+                = FileContentFormatToJSON.factory(filePath2, "tmpFile2.yaml");
+        var parseFile1Content = parsingInit(pathToJsonTempFile1); //(filePath1);
+        var parseFile2Content = parsingInit(pathToJsonTempFile2); //(filePath2);
         var comparedDatas = ComparingMaps.compare(
                 (Map) parseFile1Content,
                 (Map) parseFile2Content
@@ -21,10 +26,10 @@ public class Differ {
         return CreatingDataString.create(checkDataForNull);
     }
 
-    private static Object parsingInit(final String filePath1) {
+    private static Object parsingInit(final String filePath) {
         String content;
         try {
-            content = ReadFile.read(filePath1);
+            content = ReadFile.read(filePath);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
