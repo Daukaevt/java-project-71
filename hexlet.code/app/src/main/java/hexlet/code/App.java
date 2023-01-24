@@ -37,8 +37,15 @@ public class App implements Runnable {
     )
     private boolean format = false;
 
-    @Option(names = { "-h", "--help" }, usageHelp = true, description = "Show this help message and exit.")
+    @Option(
+            names = { "-h", "--help" },
+            usageHelp = true,
+            description = "Show this help message and exit."
+    )
     private boolean helpRequested = false;
+
+    public App() {
+    }
 
     public static void main(String[] args) {
         new CommandLine(new App()).execute(args);
