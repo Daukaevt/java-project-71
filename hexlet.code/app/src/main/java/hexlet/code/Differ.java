@@ -4,6 +4,7 @@ import hexlet.code.CheckingDataFormat.FileContentFormatToJSON;
 import hexlet.code.data.JSONUtils;
 import hexlet.code.data.JacksonObjectMapperMakingHostAddresses;
 import hexlet.code.data.ReadFile;
+import hexlet.code.utils.DeletingFile;
 
 import java.util.Map;
 
@@ -18,6 +19,8 @@ public class Differ {
                 = FileContentFormatToJSON.factory(filePath2, "tmpFile2.yaml");
         var parseFile1Content = parsingInit(pathToJsonTempFile1); //(filePath1);
         var parseFile2Content = parsingInit(pathToJsonTempFile2); //(filePath2);
+        DeletingFile.delete("tmpFile1.yaml");
+        DeletingFile.delete("tmpFile2.yaml");
         var comparedDatas = ComparingMaps.compare(
                 (Map) parseFile1Content,
                 (Map) parseFile2Content
