@@ -9,7 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class ChangingFormatFromYamlToJson {
-    private static String content;
+    static String content;
     public static boolean changeFormat(final String path, final String s) {
         Path filePath = Path.of(path);
         var fileName = filePath.getFileName();
