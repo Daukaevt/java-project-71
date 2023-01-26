@@ -5,7 +5,6 @@ import hexlet.code.data.JSONUtils;
 import hexlet.code.data.JacksonObjectMapperMakingHostAddresses;
 import hexlet.code.data.ReadFile;
 
-import java.io.IOException;
 import java.util.Map;
 
 public class Differ {
@@ -14,16 +13,18 @@ public class Differ {
             final String filePath2
     ) {
         var parseFile1Content = parsingInit(filePath1);
+        Object file1Content = CreatingNotNullContent.replaceNull(parseFile1Content);
         var parseFile2Content = parsingInit(filePath2);
-        var comparedDatas = ComparingMaps.compare(
-                (Map) parseFile1Content,
-                (Map) parseFile2Content
+        Object file2Content = CreatingNotNullContent.replaceNull(parseFile2Content);
+        var comparedDatas = DataAggregating.agregate(
+                (Map) file1Content,
+                (Map) file2Content
         );
         var checkDataForNull = CheckingForNull.check(comparedDatas);
         return CreatingDataString.create(checkDataForNull);
     }
     //move to new class and rename
-    private static Object parsingInit(final String filePath) {
+    public static Object parsingInit(final String filePath) {
         String content;
         // строка из файла
         try {
