@@ -9,7 +9,7 @@ import picocli.CommandLine.Option;
 @Command(
         name = "gendiff",
         mixinStandardHelpOptions = true,
-        version = "1.0",
+        version = "1.0 beta",
         description = "Compares two configuration files and shows a difference."
 )
 public class App implements Runnable {
@@ -28,6 +28,7 @@ public class App implements Runnable {
 
     @Option(
             names = { "-v", "--version" },
+            versionHelp = true,
             description = "Print version information and exit.")
     private boolean versionRequested = false;
 
@@ -35,7 +36,7 @@ public class App implements Runnable {
             names = {"-f", "--format"},
             description = "output format [default: stylish]"
     )
-    private boolean format = false;
+    private String format = "";
 
     @Option(
             names = { "-h", "--help" },
@@ -53,8 +54,8 @@ public class App implements Runnable {
 
     @Override
     public void run() {
-        String content = Differ.generate(filePath1, filePath2);
-        System.out.println(content);
+            String content = Differ.generate(format, filePath1, filePath2);
+            System.out.println(content);
     }
 }
 
