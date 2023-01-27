@@ -14,7 +14,7 @@ public class DataAggregating {
         String temp;
         for (Object key: parseJson1.keySet()) {
             if (parseJson2.containsKey(key)) {
-                if (parseJson1.get(key).equals(parseJson2.get(key))) {
+                if (parseJson1.get(key) == parseJson2.get(key)) {
                     temp = "  " + key + ": " + parseJson1.get(key);
                 } else {
                     temp = "- " + key + ": " + parseJson1.get(key);
