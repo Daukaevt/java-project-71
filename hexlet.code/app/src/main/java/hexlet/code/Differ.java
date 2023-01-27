@@ -9,22 +9,24 @@ import java.util.Map;
 
 public class Differ {
     public static String generate(
+            String format,
             final String filePath1,
             final String filePath2
-    ) {
+            ) {
+        System.out.println(format);
         var parseFile1Content = parsingInit(filePath1);
-        Object file1Content = CreatingNotNullContent.replaceNull(parseFile1Content);
+        Map file1Content = CreatingNotNullContent.replaceNull(parseFile1Content);
         var parseFile2Content = parsingInit(filePath2);
-        Object file2Content = CreatingNotNullContent.replaceNull(parseFile2Content);
+        Map file2Content = CreatingNotNullContent.replaceNull(parseFile2Content);
         var comparedDatas = DataAggregating.agregate(
-                (Map) file1Content,
-                (Map) file2Content
+                file1Content,
+                file2Content
         );
         var checkDataForNull = CheckingForNull.check(comparedDatas);
         return CreatingDataString.create(checkDataForNull);
     }
     //move to new class and rename
-    public static Object parsingInit(final String filePath) {
+    public static Map parsingInit(final String filePath) {
         String content;
         // строка из файла
         try {
