@@ -15,10 +15,10 @@ public class Differ {
             final String filePath2
             ) {
         var parseFile1Content = parsingInit(filePath1);
-        Map file1Content = CreatingNotNullContent.replaceNull(parseFile1Content, format);
+        Map file1Content = CreatingNotNullContent.replaceNull(parseFile1Content);
 
         var parseFile2Content = parsingInit(filePath2);
-        Map file2Content = CreatingNotNullContent.replaceNull(parseFile2Content, format);
+        Map file2Content = CreatingNotNullContent.replaceNull(parseFile2Content);
 
 
         var comparedDatas = DataAggregating.agregate(
