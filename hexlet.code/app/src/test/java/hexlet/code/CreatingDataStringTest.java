@@ -6,12 +6,12 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CreatingDataStringTest {
-    CreatingDataString creatingDataString;
+    SortingDataString creatingDataString;
     String[][] testArr;
 
     @BeforeEach
     void setUp() {
-        creatingDataString = new CreatingDataString();
+        creatingDataString = new SortingDataString();
         testArr = new String[][]{
                 {"host: ", "host: "},
                 {"- host: jd.com", "+ host: tencentcloud.com"}};
@@ -22,6 +22,6 @@ class CreatingDataStringTest {
         assertEquals("{\n" +
                 "- host: jd.com\n" +
                 "+ host: tencentcloud.com\n" +
-                "}", creatingDataString.create(testArr));
+                "}", creatingDataString.sort(testArr));
     }
 }
