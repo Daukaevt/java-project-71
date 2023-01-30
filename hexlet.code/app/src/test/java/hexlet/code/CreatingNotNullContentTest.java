@@ -1,6 +1,5 @@
 package hexlet.code;
 
-import hexlet.code.data.DataFormating;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -19,6 +18,6 @@ class CreatingNotNullContentTest {
     @Test
     void replaceNull() {
         var testJson = differ.parsingInit("test.yaml");
-        assertEquals("{test=test, test1=null}", creatingNotNullContent.replaceNull(testJson).toString());
+        assertEquals("{test=test, test1=null}", creatingNotNullContent.replaceNull(testJson, format).toString());
     }
 }
