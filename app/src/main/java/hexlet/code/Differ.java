@@ -25,7 +25,6 @@ public class Differ {
                 file1Content,
                 file2Content
         );
-
         var checkDataForNull = CheckingForNull.check(comparedDatas);
         var result = SortingDataString.sort(checkDataForNull);
         if (format.equals("plain")) {
@@ -46,6 +45,7 @@ public class Differ {
         boolean validJSON = JSONUtils.isJSONValid(content);
         Map parseJson1 = null;
         if (validJSON) {
+
             parseJson1 = JacksonObjectMapperMakingHostAddresses
                     .parse(String.valueOf(content));
         } else {
