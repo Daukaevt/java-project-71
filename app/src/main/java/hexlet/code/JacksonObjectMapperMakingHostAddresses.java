@@ -6,8 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
 
 public class JacksonObjectMapperMakingHostAddresses {
-    public static Map parse(String contentFile1) {
-        Map<String, String> map;
+    public static Map getData(final String contentFile1) {
+        Map<String, Object> map;
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             map = objectMapper.readValue(contentFile1, new TypeReference<>() {
