@@ -2,7 +2,6 @@ package hexlet.code;
 
 import hexlet.code.data.DataFormating;
 import hexlet.code.data.JSONUtils;
-import hexlet.code.data.JacksonObjectMapperMakingHostAddresses;
 import hexlet.code.data.ReadFile;
 import hexlet.code.formatters.FormattingPlain;
 
@@ -46,14 +45,15 @@ public class Differ {
         Map parseJson1 = null;
         if (validJSON) {
 
-            parseJson1 = JacksonObjectMapperMakingHostAddresses
-                    .parse(String.valueOf(content));
+            parseJson1 = hexlet.code.JacksonObjectMapperMakingHostAddresses
+                    .getData(String.valueOf(content));
+                    //JacksonObjectMapperMakingHostAddresses
+                    //.parse(String.valueOf(content));
         } else {
             //yaml или нет
             String jsonContent = DataFormating.convertYamlToJson(content);
             try {
-                parseJson1 = JacksonObjectMapperMakingHostAddresses
-                        .parse(jsonContent);
+                parseJson1 = JacksonObjectMapperMakingHostAddresses.getData(String.valueOf(content));
             }  catch (Exception e) {
                 // все остальное
                 System.out.println("Wrong file format"); //+ e.getMessage());
