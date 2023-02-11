@@ -3,6 +3,7 @@ package hexlet.code;
 import hexlet.code.data.DataFormating;
 import hexlet.code.data.JSONUtils;
 import hexlet.code.data.ReadFile;
+import hexlet.code.formatters.FormattingJson;
 import hexlet.code.formatters.FormattingPlain;
 
 import java.util.Map;
@@ -15,11 +16,8 @@ public class Differ {
             ) {
         var parseFile1Content = parsingInit(filePath1);
         Map file1Content = CreatingNotNullContent.replaceNull(parseFile1Content);
-
         var parseFile2Content = parsingInit(filePath2);
         Map file2Content = CreatingNotNullContent.replaceNull(parseFile2Content);
-
-
         var comparedDatas = DataAggregating.agregate(
                 file1Content,
                 file2Content
@@ -28,6 +26,8 @@ public class Differ {
         var result = SortingDataString.sort(checkDataForNull);
         if (format.equals("plain")) {
             result = FormattingPlain.format(result);
+        } else if (format.equals("json")) {
+            result = FormattingJson.format(result);
         }
         return result;
     }
