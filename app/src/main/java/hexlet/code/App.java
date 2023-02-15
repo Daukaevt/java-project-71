@@ -55,7 +55,7 @@ public class App implements Runnable {
 
     @Override
     public void run() {
-            String content = Differ.generate(filePath1, filePath2, format);
+            String content = Differ.generate(format, filePath1, filePath2);
 
             System.out.println(content);
     }
