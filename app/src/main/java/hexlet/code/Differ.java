@@ -11,8 +11,7 @@ import java.util.Map;
 public class Differ {
     public static String generate(
             final String filePath1,
-            final String filePath2,
-            String format
+            final String filePath2
             ) {
         var parseFile1Content = parsingInit(filePath1);
         Map file1Content = CreatingNotNullContent.replaceNull(parseFile1Content);
@@ -24,11 +23,7 @@ public class Differ {
         );
         var checkDataForNull = CheckingForNull.check(comparedDatas);
         var result = SortingDataString.sort(checkDataForNull);
-        if (format.equals("plain")) {
-            result = FormattingPlain.format(result);
-        } else if (format.equals("json")) {
-            result = FormattingJson.format(result);
-        }
+
         return result;
     }
     //move to new class and rename
