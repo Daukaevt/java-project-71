@@ -55,7 +55,7 @@ public class App implements Runnable {
 
     @Override
     public void run() {
-            String content = Differ.generate(filePath1, filePath2);
+            String content = Differ.generate(filePath1, filePath2, format);
         if (format.equals("plain")) {
             content = FormattingPlain.format(content);
         } else if (format.equals("json")) {
