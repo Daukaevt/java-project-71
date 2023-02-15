@@ -10,8 +10,9 @@ import java.util.Map;
 
 public class Differ {
     public static String generate(
+            final String format,
             final String filePath1,
-            final String filePath2, String format) {
+            final String filePath2) {
         var parseFile1Content = parsingInit(filePath1);
         Map file1Content = CreatingNotNullContent.replaceNull(parseFile1Content);
         var parseFile2Content = parsingInit(filePath2);
