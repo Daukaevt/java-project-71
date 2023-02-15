@@ -3,23 +3,20 @@ package hexlet.code;
 import hexlet.code.data.DataFormating;
 import hexlet.code.data.JSONUtils;
 import hexlet.code.data.ReadFile;
-import hexlet.code.formatters.FormattingJson;
-import hexlet.code.formatters.FormattingPlain;
 
 import java.util.Map;
 
 public class Differ {
     public static String generate(
             final String filePath1,
-            final String filePath2) {
+            final String filePath2,
+            String stylish) {
         var parseFile1Content = parsingInit(filePath1);
         Map file1Content = CreatingNotNullContent.replaceNull(parseFile1Content);
         var parseFile2Content = parsingInit(filePath2);
         Map file2Content = CreatingNotNullContent.replaceNull(parseFile2Content);
-        var comparedDatas = DataAggregating.agregate(
-                file1Content,
-                file2Content
-        );
+        var comparedDatas = DataAggregating
+                .agregate(file1Content, file2Content);
         var checkDataForNull = CheckingForNull.check(comparedDatas);
         var result = SortingDataString.sort(checkDataForNull);
      return result;
