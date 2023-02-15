@@ -3,14 +3,15 @@ package hexlet.code;
 import hexlet.code.data.DataFormating;
 import hexlet.code.data.JSONUtils;
 import hexlet.code.data.ReadFile;
+import hexlet.code.formatters.FormattingJson;
+import hexlet.code.formatters.FormattingPlain;
 
 import java.util.Map;
 
 public class Differ {
     public static String generate(
             final String filePath1,
-            final String filePath2,
-            String format) {
+            final String filePath2, String format) {
         var parseFile1Content = parsingInit(filePath1);
         Map file1Content = CreatingNotNullContent.replaceNull(parseFile1Content);
         var parseFile2Content = parsingInit(filePath2);
@@ -21,8 +22,11 @@ public class Differ {
         );
         var checkDataForNull = CheckingForNull.check(comparedDatas);
         var result = SortingDataString.sort(checkDataForNull);
-
-        return result;
+        if (format.equals("plain")) {
+            return FormattingPlain.format(result);
+        } else if (format.equals("json")) {
+            return FormattingJson.format(result);
+        } else return result;
     }
     //move to new class and rename
     public static Map parsingInit(final String filePath) {
