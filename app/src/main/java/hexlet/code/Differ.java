@@ -10,7 +10,6 @@ import java.util.Map;
 
 public class Differ {
     public static String generate(
-            final String format,
             final String filePath1,
             final String filePath2) {
         var parseFile1Content = parsingInit(filePath1);
@@ -23,11 +22,7 @@ public class Differ {
         );
         var checkDataForNull = CheckingForNull.check(comparedDatas);
         var result = SortingDataString.sort(checkDataForNull);
-        if (format.equals("plain")) {
-            return FormattingPlain.format(result);
-        } else if (format.equals("json")) {
-            return FormattingJson.format(result);
-        } else return result;
+     return result;
     }
     //move to new class and rename
     public static Map parsingInit(final String filePath) {
