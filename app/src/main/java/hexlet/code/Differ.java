@@ -10,7 +10,7 @@ public class Differ {
     public static String generate(
             final String filePath1,
             final String filePath2,
-            String stylish) {
+            String stylish) throws Exception {
         var parseFile1Content = parsingInit(filePath1);
         Map file1Content = CreatingNotNullContent.replaceNull(parseFile1Content);
         var parseFile2Content = parsingInit(filePath2);
