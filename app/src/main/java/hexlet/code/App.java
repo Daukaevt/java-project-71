@@ -38,7 +38,9 @@ public class App implements Callable {
 
     @Option(
             names = {"-f", "--format"},
-            description = "output format [default: stylish]"
+            description = "output format [default: stylish]",
+            paramLabel = "format",
+            defaultValue = "stylish"
     )
     private String format = "";
 
@@ -55,7 +57,7 @@ public class App implements Callable {
         new CommandLine(new App()).execute(args);
     }
 
-    public Object call() {
+    public Object call() throws Exception {
         String content = null;
         try {
             content = Differ.generate("stylish");
