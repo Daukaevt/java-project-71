@@ -8,10 +8,10 @@ import java.util.Map;
 
 public class Differ {
     public static String generate(
-            String stylish) throws Exception {
-        var parseFile1Content = parsingInit("/home/timur/IdeaProjects/java-project-71/app/src/test/resources/file1.json");
+            String filePath1, String filePath2, String stylish) throws Exception {
+        var parseFile1Content = parsingInit(filePath1);
         Map file1Content = CreatingNotNullContent.replaceNull(parseFile1Content);
-        var parseFile2Content = parsingInit("/home/timur/IdeaProjects/java-project-71/app/src/test/resources/file2.json");
+        var parseFile2Content = parsingInit(filePath2);
         Map file2Content = CreatingNotNullContent.replaceNull(parseFile2Content);
         var comparedDatas = DataAggregating
                 .agregate(file1Content, file2Content);
