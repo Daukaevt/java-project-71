@@ -58,7 +58,7 @@ public class App implements Callable {
     public Object call() {
         String content = null;
         try {
-            content = Differ.generate(filePath1, filePath2, "stylish");
+            content = Differ.generate("stylish");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
