@@ -60,7 +60,7 @@ public class App implements Callable {
     public Object call() throws Exception {
         String content = null;
         try {
-            content = Differ.generate("stylish");
+            content = Differ.generate(filePath1, filePath2, "stylish");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
