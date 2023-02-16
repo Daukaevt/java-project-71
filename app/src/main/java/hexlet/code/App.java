@@ -8,13 +8,15 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 import picocli.CommandLine.Option;
 
+import java.util.concurrent.Callable;
+
 @Command(
         name = "gendiff",
         mixinStandardHelpOptions = true,
         version = "1.0 beta",
         description = "Compares two configuration files and shows a difference."
 )
-public class App implements Runnable {
+public class App implements Callable {
     @Parameters(
             paramLabel = "filepath1",
             index = "0",
@@ -53,8 +55,7 @@ public class App implements Runnable {
         new CommandLine(new App()).execute(args);
     }
 
-    @Override
-    public void run() {
+    public Object call() {
         String content = null;
         try {
             content = Differ.generate(filePath1, filePath2, "stylish");
@@ -67,6 +68,7 @@ public class App implements Runnable {
             content = FormattingJson.format(content);
         }
             System.out.println(content);
+        return null;
     }
 }
 
