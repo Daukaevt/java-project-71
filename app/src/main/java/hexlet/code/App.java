@@ -42,7 +42,7 @@ public class App implements Callable {
             paramLabel = "format",
             defaultValue = "stylish"
     )
-    private String format = "";
+    private String format = null;
 
     @Option(
             names = { "-h", "--help" },
@@ -60,7 +60,7 @@ public class App implements Callable {
     public Object call() throws Exception {
         String content = null;
         try {
-            content = Differ.generate(filePath1, filePath2, "stylish");
+            content = Differ.generate(filePath1, filePath2, format);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
