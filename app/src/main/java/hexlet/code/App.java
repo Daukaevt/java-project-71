@@ -39,8 +39,8 @@ public class App implements Callable {
     @Option(
             names = {"-f", "--format"},
             description = "output format [default: stylish]",
-            paramLabel = "format",
-            defaultValue = "stylish"
+            paramLabel = "format"//,
+           // defaultValue = "stylish"
     )
     private String format = null;
 
@@ -58,16 +58,19 @@ public class App implements Callable {
     }
 
     public Object call() throws Exception {
+        System.out.println(format + " st");
         String content = null;
         try {
             content = Differ.generate(filePath1, filePath2, format);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        if (format.equals("plain")) {
-            content = FormattingPlain.format(content);
-        } else if (format.equals("json")) {
-            content = FormattingJson.format(content);
+        if (format != null) {
+            if (format.toString() == "plain") {
+                content = FormattingPlain.format(content);
+            } else if (format.toString() == "json") {
+                content = FormattingJson.format(content);
+            }
         }
             System.out.println(content);
         return null;
