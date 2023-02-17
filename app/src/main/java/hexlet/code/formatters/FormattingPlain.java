@@ -8,16 +8,20 @@ public class FormattingPlain {
     public static String format(String result) {
         var tmpText = result.replaceAll("^.|.$", "");
         var tmpLines = tmpText.lines();
+        String secondValue = "";
         ArrayList<String> arrayList = new ArrayList<>();
         ArrayList<String> tmpArrayList = new ArrayList<>();
         tmpLines.forEach(arrayList::add);
         arrayList.remove(0);
-        for (int i = 1; i < arrayList.size(); i++) {
-            String tmpSubstringPlus = null;
+        for (int i = 0; i < arrayList.size(); i++) {
+            String tmpSubstringPlus;
             String line = arrayList.get(i);
             var key = line.substring(2).replaceAll(":\s.*", "");
             String firstValue = MakingStyle.makeStyle(line.replaceAll(".*:\s", ""));
-            String secondValue  = MakingStyle.makeStyle(arrayList.get(i + 1).replaceAll(".*:\s", ""));
+            if (i + 1 < arrayList.size()) {
+                secondValue  = MakingStyle.makeStyle(arrayList.get(i + 1)
+                        .replaceAll(".*:\s", ""));
+            }
             switch (line.charAt(0)) {
                 case '-' -> {
                     if (arrayList.get(i + 1).contains(key)) {
