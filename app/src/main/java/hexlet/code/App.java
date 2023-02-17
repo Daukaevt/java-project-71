@@ -56,24 +56,22 @@ public class App implements Callable {
     public static void main(String[] args) {
         new CommandLine(new App()).execute(args);
     }
-
     public Object call() throws Exception {
-        System.out.println(format + " st");
         String content = null;
-        try {
-            content = Differ.generate(filePath1, filePath2, format);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
         if (format != null) {
-            if (format.toString() == "plain") {
-                content = FormattingPlain.format(content);
-            } else if (format.toString() == "json") {
-                content = FormattingJson.format(content);
+            if (format.equals("plain")) {
+                content = FormattingPlain.format(Differ.generate(filePath1, filePath2, format));
+            } else if (format.equals("json")) {
+                content = FormattingJson.format(Differ.generate(filePath1, filePath2, format));
             }
+        } else {
+            content = generateStylish(filePath1, filePath2);
         }
             System.out.println(content);
         return null;
+    }
+    public static String generateStylish (String firstFilePath, String secondFilePath) throws Exception {
+        return Differ.generate(firstFilePath, secondFilePath, "stylish");
     }
 }
 
