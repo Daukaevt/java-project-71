@@ -65,6 +65,7 @@ public class App implements Callable {
                 content = FormattingJson.format(Differ.generate(filePath1, filePath2, format));
             }
         } else {
+            System.out.println(format);
             content = generateStylish(filePath1, filePath2);
         }
             System.out.println(content);
