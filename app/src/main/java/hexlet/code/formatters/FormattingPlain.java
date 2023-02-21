@@ -13,7 +13,6 @@ public class FormattingPlain {
         ArrayList<String> tmpArrayList = new ArrayList<>();
         tmpLines.forEach(arrayList::add);
         arrayList.remove(0);
-        System.out.println(arrayList);
         for (int i = 0; i < arrayList.size(); i++) {
             String tmpSubstringPlus;
             String line = arrayList.get(i);
@@ -25,7 +24,6 @@ public class FormattingPlain {
             }
             switch (line.charAt(0)) {
                 case '-' -> {
-                    System.out.println(i + " i" + arrayList.get(i));
                     if (i + 1 < arrayList.size()) {
                         if (arrayList.get(i + 1).contains(key)) {
                             String tempStrMinusPlus = "Property '" + key + "' was updated. From "
