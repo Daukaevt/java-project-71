@@ -1,8 +1,6 @@
 package hexlet.code;
 
 
-import hexlet.code.formatters.FormattingJson;
-import hexlet.code.formatters.FormattingPlain;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
@@ -58,17 +56,13 @@ public class App implements Callable {
     }
     public Object call() throws Exception {
         String content = null;
-        if (format != null) {
-            if (format.equals("plain")) {
-                content = FormattingPlain.format(Differ.generate(filePath1, filePath2, format));
-            } else if (format.equals("json")) {
-                content = FormattingJson.format(Differ.generate(filePath1, filePath2, format));
-            }
-        } else {
-            System.out.println(format);
+        if (format == null) {
             content = generateStylish(filePath1, filePath2);
+
+        } else {
+            content = Differ.generate(filePath1, filePath2, format);
         }
-            System.out.println(content);
+        System.out.println(content);
         return null;
     }
     public static String generateStylish (String firstFilePath, String secondFilePath) throws Exception {
