@@ -19,51 +19,6 @@ import java.util.Map;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class JacksonObjectMapperMakingHostAddresses {
 
-
-
-//        YAMLFactory factory = new YAMLFactory();
-//        JsonParser parser = null; // don't be fooled by method name...
-//        try {
-//            parser = factory.createParser(contentFile1);
-//            System.out.println(parser + " parser");
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-//        while (true) {
-//            try {
-//                if (!(parser.nextToken() != null)) break;
-//            } catch (IOException e) {
-//                throw new RuntimeException(e);
-//            }
-//
-//            try {
-//                System.out.println(parser.getText());
-//            } catch (IOException e) {
-//                throw new RuntimeException(e);
-//            }
-//        }
-//        return new HashMap();
-//    }
-
-
-
-
-
-
-//    public static Map getData1(final String contentFile1) {
-//        Map<Object, Object> map;
-//        ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
-//        try {
-//            map = objectMapper.readValue(contentFile1, new TypeReference<>() {
-//            });
-//            System.out.println(map + "   -------    json map");
-//        } catch (JsonProcessingException e) {
-//
-//            System.out.println("ERROR " + e);
-//            throw new RuntimeException(e);
-//        }
-//        return map;
-//    }
     public static Map getData(final String contentFile1) {
         if (contentFile1.startsWith("[")) {
             JSONArray jsonArray;
