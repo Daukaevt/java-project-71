@@ -56,9 +56,8 @@ public class App implements Callable {
     }
     public Object call() throws Exception {
         String content = null;
-        if (format == null) {
+        if (format == null || format.equals("")) {
             content = generateStylish(filePath1, filePath2);
-
         } else {
             content = Differ.generate(filePath1, filePath2, format);
         }
