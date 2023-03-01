@@ -13,13 +13,11 @@ import java.util.Map;
 public class Reader {
     public static Map check(final String filePath) {
         String content;
-        // строка из файла
         try {
             content = hexlet.code.data.ReadFile.read(filePath);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        // строка json или нет
         boolean validJSON = JSONUtils.isJSONValid(content);
         Map parseJson1 = null;
         if (validJSON) {
@@ -27,26 +25,19 @@ public class Reader {
             parseJson1 = hexlet.code.JacksonObjectMapperMakingHostAddresses
                     .getData(String.valueOf(content));
         } else {
-            //yaml или нет
             String jsonContent = DataFormating.convertYamlToJson(content);
             try {
                 parseJson1 = hexlet.code.JacksonObjectMapperMakingHostAddresses
                         .getData(jsonContent);
             }  catch (Exception e) {
-                // все остальное
                 System.out.println("Wrong file format"); //+ e.getMessage());
                 System.exit(0);
             }
         }
         return replaceNull(parseJson1);
     }
-
     public static String read(String filePath1) throws Exception {
-        // Формируем путь абсолютный путь,
-        // если filePath будет содержать относительный путь,
-        // то мы всегда будет работать с абсолютным
         Path path = Paths.get(filePath1).toAbsolutePath().normalize();
-        // Проверяем существование файла
         if (!Files.exists(path)) {
             try {
                 throw new Exception("File '" + path + "' does not exist");
@@ -54,7 +45,6 @@ public class Reader {
                 throw new RuntimeException(e);
             }
         }
-        // Читаем файл
         String content;
         try {
             content = Files.readString(path);
@@ -64,7 +54,6 @@ public class Reader {
         }
         return content;
     }
-
     public static Map<String, Object> replaceNull(Map parseFileContent) {
         Map<String,Object> map = new HashMap<>((Map<? extends String, ?>) parseFileContent);
         for (String key: map.keySet()) {
