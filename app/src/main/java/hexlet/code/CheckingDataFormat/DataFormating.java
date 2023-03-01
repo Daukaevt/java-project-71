@@ -13,13 +13,11 @@ public class DataFormating {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-
         ObjectMapper jsonWriter = new ObjectMapper();
         try {
             return jsonWriter.writeValueAsString(obj);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-
     }
 }
