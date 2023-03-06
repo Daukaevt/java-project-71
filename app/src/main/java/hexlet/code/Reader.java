@@ -1,6 +1,7 @@
 package hexlet.code;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Splitter;
 import hexlet.code.data.DataFormating;
 import hexlet.code.data.JSONUtils;
 import org.json.simple.JSONArray;
@@ -8,22 +9,24 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Reader {
     public static Map check(final String filePath) {
         String content;
         try {
-            content = hexlet.code.data.ReadFile.read(filePath);
+            content = read(filePath);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -40,7 +43,7 @@ public class Reader {
                 System.exit(0);
             }
         }
-        return replaceNull(parseJson1);
+        return replace(parseJson1);
     }
     public static String read(String filePath1) throws Exception {
         Path path = Paths.get(filePath1).toAbsolutePath().normalize();
@@ -57,9 +60,26 @@ public class Reader {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return content;
+        String content1;
+        BufferedReader br = new BufferedReader(new FileReader(filePath1));
+        try {
+
+            StringBuilder sb = new StringBuilder();
+            String line = br.readLine();
+
+            while (line != null) {
+                sb.append(line);
+                sb.append(System.lineSeparator());
+                line = br.readLine();
+            }
+            content1 = sb.toString();
+        } finally {
+            br.close();
+        }
+
+        return content1;
     }
-    public static Map<String, Object> replaceNull(Map parseFileContent) {
+    public static Map<String, Object> replace(Map parseFileContent) {
         Map<String,Object> map = new HashMap<>((Map<? extends String, ?>) parseFileContent);
         for (String key: map.keySet()) {
             if (map.get(key) == null) {
@@ -68,8 +88,32 @@ public class Reader {
             String value = map.get(key).toString();
             if (map.get(key) == null) {
                 map.put(String.valueOf(key), "null");
-            } else if (value.startsWith("[") || value.startsWith("{")) {
-                map.put(key, value.replaceAll("\"", ""));
+            } else if (value.startsWith("[")) {
+               value = value.replaceAll("^\\[", "")
+                        .replaceAll("\\]$", "");
+                Stream<String> stream = Arrays.stream(value.split( "," ));
+                List<String> list = stream.collect(Collectors.toList());
+                for (int i = 0; i < list.size(); i++) {
+                    String str = list.get(i).replaceAll("^\"", "")
+                            .replaceAll("\"$", "");
+                    list.set(i, str);
+                }
+                map.put(key, list);
+            } else if (value.startsWith("{")) {
+                value = value.replaceAll("^[{]", "")
+                        .replaceAll("[}]$", "");
+                Map<String, String> properties = Splitter.on(",")
+                        .withKeyValueSeparator(":")
+                        .split(value);
+                Map newMap = new HashMap();
+                for (Object keyObj: properties.keySet()) {
+                    String keyStr = keyObj.toString().replaceAll("^\"", "")
+                            .replaceAll("\"$", "");
+                    String valueStr = properties.get(keyObj).toString().replaceAll("^\"", "")
+                            .replaceAll("\"$", "");
+                    newMap.put(keyStr, valueStr);
+                }
+                map.put(key, newMap);
             }
         }
         return map;
