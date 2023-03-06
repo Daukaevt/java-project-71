@@ -54,12 +54,6 @@ public class Reader {
                 throw new RuntimeException(e);
             }
         }
-        String content;
-        try {
-            content = Files.readString(path);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
         String content1;
         BufferedReader br = new BufferedReader(new FileReader(filePath1));
         try {
@@ -76,18 +70,19 @@ public class Reader {
         } finally {
             br.close();
         }
-
         return content1;
     }
     public static Map<String, Object> replace(Map parseFileContent) {
         Map<String,Object> map = new HashMap<>((Map<? extends String, ?>) parseFileContent);
+        HashMap hashMap = new HashMap();
         for (String key: map.keySet()) {
+            String value;
             if (map.get(key) == null) {
                 map.put(key, "null");
             }
-            String value = map.get(key).toString();
-            if (map.get(key) == null) {
-                map.put(String.valueOf(key), "null");
+            value = map.get(key).toString();
+            if (value == null) {
+                hashMap.put(key, "null");
             } else if (value.startsWith("[")) {
                value = value.replaceAll("^\\[", "")
                         .replaceAll("\\]$", "");
@@ -98,7 +93,7 @@ public class Reader {
                             .replaceAll("\"$", "");
                     list.set(i, str);
                 }
-                map.put(key, list);
+                hashMap.put(key, list);
             } else if (value.startsWith("{")) {
                 value = value.replaceAll("^[{]", "")
                         .replaceAll("[}]$", "");
@@ -113,10 +108,12 @@ public class Reader {
                             .replaceAll("\"$", "");
                     newMap.put(keyStr, valueStr);
                 }
-                map.put(key, newMap);
+                hashMap.put(key, newMap);
+            } else {
+                hashMap.put(key, map.get(key));
             }
         }
-        return map;
+        return hashMap;
     }
     public static Map getData(final String contentFile1) {
         if (contentFile1.startsWith("[")) {
