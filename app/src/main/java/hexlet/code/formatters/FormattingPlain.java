@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 public class FormattingPlain {
     public static String format(String result) {
-        var tmpText = result.replaceAll("^.|.$", "");
+         var tmpText = result.replaceAll("^.|.$", "");
         var tmpLines = tmpText.lines();
         String secondValue = "";
         ArrayList<String> arrayList = new ArrayList<>();
@@ -16,13 +16,13 @@ public class FormattingPlain {
         for (int i = 0; i < arrayList.size(); i++) {
             String tmpSubstringPlus;
             String line = arrayList.get(i);
-            var key = line.substring(2).replaceAll(":\s.*", "");
+            var key = line.substring(4).replaceAll(":\s.*", "");
             String firstValue = MakingStyle.makeStyle(line.replaceAll(".*:\s", ""));
             if (i + 1 < arrayList.size()) {
                 secondValue  = MakingStyle.makeStyle(arrayList.get(i + 1)
                         .replaceAll(".*:\s", ""));
             }
-            switch (line.charAt(0)) {
+            switch (line.charAt(2)) {
                 case '-' -> {
                     if (i + 1 < arrayList.size()) {
                         if (arrayList.get(i + 1).contains(key)) {
