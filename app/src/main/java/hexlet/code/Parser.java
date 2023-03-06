@@ -4,7 +4,6 @@ import java.util.*;
 
 public class Parser {
     static String[][] agregator;
-
     static int index;
     public static String agregate(
             Map parseJson1, Map parseJson2) {
@@ -38,6 +37,7 @@ public class Parser {
         }
         return sort(checkForNull(agregator));
     }
+
     private static void setValue(int index, String temp, Object key) {
         agregator[0][index] = key.toString();
         agregator[1][index] = temp;
