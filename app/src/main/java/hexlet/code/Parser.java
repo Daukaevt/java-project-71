@@ -15,22 +15,22 @@ public class Parser {
             if (parseJson2.containsKey(key)) {
                 if (parseJson1.get(key).equals(parseJson2.get(key))
                 ) {
-                    temp = "  " + key + ": " + parseJson1.get(key);
+                    temp = "    " + key + ": " + parseJson1.get(key);
                 } else {
-                    temp = "- " + key + ": " + parseJson1.get(key);
+                    temp = "  - " + key + ": " + parseJson1.get(key);
                     setValue(index, temp, key);
                     index++;
-                    temp = "+ " + key + ": " + parseJson2.get(key);
+                    temp = "  + " + key + ": " + parseJson2.get(key);
                 }
             } else {
-                temp = "- " + key + ": " + parseJson1.get(key);
+                temp = "  - " + key + ": " + parseJson1.get(key);
             }
             setValue(index, temp, key);
             index++;
         }
         for (Object key : parseJson2.keySet()) {
             if (!parseJson1.containsKey(key)) {
-                temp = "+ " + key + ": " + parseJson2.get(key);
+                temp = "  + " + key + ": " + parseJson2.get(key);
                 setValue(index, temp, key);
                 index++;
             }
