@@ -54,17 +54,10 @@ public class App implements Callable {
         new CommandLine(new App()).execute(args);
     }
     public Object call() throws Exception {
-        String content = null;
-//        if (format == null || format.equals("")) {
-//            content = generateStylish(filePath1, filePath2);
-//        } else {
+        String content;
             content = Differ.generate(filePath1, filePath2, format);
-//        }
         System.out.println(content);
         return null;
     }
-//    public static String generateStylish (String firstFilePath, String secondFilePath) throws Exception {
-//        return Differ.generate(firstFilePath, secondFilePath, "stylish");
-//    }
 }
 
