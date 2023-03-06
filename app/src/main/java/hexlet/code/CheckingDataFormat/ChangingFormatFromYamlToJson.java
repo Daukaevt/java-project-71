@@ -1,6 +1,6 @@
 package hexlet.code.CheckingDataFormat;
 
-import hexlet.code.data.ReadFile;
+
 
 import java.io.File;
 import java.io.FileWriter;
@@ -19,9 +19,6 @@ public class ChangingFormatFromYamlToJson {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-        //rewrite yaml content into the temp file.
-        ReadFile readFile = new ReadFile();
         try {
             File myObj = new File(s);
             if (myObj.createNewFile()) {
