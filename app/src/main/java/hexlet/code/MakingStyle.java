@@ -1,7 +1,6 @@
 package hexlet.code;
 
 
-import static java.lang.Boolean.parseBoolean;
 import static java.lang.Integer.parseInt;
 
 public class MakingStyle {
@@ -9,7 +8,7 @@ public class MakingStyle {
         var complexValue = str.replaceAll("\\[.*]|\\{.*}", "[complex value]");
         if (!str.equals(complexValue)) {
             return complexValue;
-        } else if (!parseBoolean(str) && !isNumeric(str) && !str.equals("null")) {
+        } else if (!isBoolean(str) && !isNumeric(str) && !str.equals("null")) {
             return "'" + str + "'";
         }
         return str;
@@ -21,6 +20,8 @@ public class MakingStyle {
         } catch (NumberFormatException e) {
             return false;
         }
-
+    }
+    public static boolean isBoolean(String str) {
+        return str.equals("true") || str.equals("false");
     }
 }
