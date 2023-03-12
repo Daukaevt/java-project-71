@@ -16,7 +16,7 @@ class DifferTest {
     String testFilePath2 = "testFile2.txt";
     String testFilePath2Content = "{\"host\": \"tencentcloud.com\"}";
     // add format changing
-    String formate;
+    String format;
 
 
 
@@ -24,7 +24,7 @@ class DifferTest {
     void setUp() {
         createNewTestFile(testFilePath1, testFilePath1Content);
         createNewTestFile(testFilePath2, testFilePath2Content);
-        formate = "plain";
+        format = "plain";
 
     }
 
@@ -51,7 +51,12 @@ class DifferTest {
 
     @Test
     void generate() {
-        var testStr = differ.generate(formate, testFilePath1, testFilePath2);
+        String testStr = null;
+        try {
+            testStr = differ.generate(format, testFilePath1, format);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         assertEquals("{\n" +
                 "- host: jd.com\n" +
                 "+ host: tencentcloud.com\n" +
