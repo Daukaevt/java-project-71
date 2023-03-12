@@ -53,13 +53,13 @@ class DifferTest {
     void generate() {
         String testStr = null;
         try {
-            testStr = differ.generate(format, testFilePath1, format);
+            testStr = differ.generate(testFilePath1, testFilePath2, "styish");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
         assertEquals("{\n" +
-                "- host: jd.com\n" +
-                "+ host: tencentcloud.com\n" +
+                "  - host: jd.com\n" +
+                "  + host: tencentcloud.com\n" +
                 "}", testStr);
         deleteFile(testFilePath1);
         deleteFile(testFilePath2);
