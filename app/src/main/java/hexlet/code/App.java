@@ -57,7 +57,7 @@ public class App implements Callable {
         String content;
             content = Differ.generate(filePath1, filePath2, format);
         System.out.println(content);
-        return null;
+        return content;
     }
 }
 
