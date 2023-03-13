@@ -8,7 +8,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class Reader {
-
     public static String readFile(final String filePath) {
         String content;
         try {
