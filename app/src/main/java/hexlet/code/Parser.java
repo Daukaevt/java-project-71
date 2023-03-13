@@ -55,16 +55,15 @@ public class Parser {
                         .replaceAll("\"$", ""));
                 hashMap.put(key, list);
             } else if (value.startsWith("{")) {
-                Map newMap = new HashMap();
                 for (Object keyObj: parseFileContent.keySet()) {
                     String keyStr = keyObj.toString().replaceAll("^\"", "")
                             .replaceAll("\"$", "");
                     String valueStr = parseFileContent
                             .get(keyObj).toString().replaceAll("^\"", "")
                             .replaceAll("\"$", "");
-                    newMap.put(keyStr, valueStr);
+                    hashMap.remove(key);
+                    hashMap.put(keyStr, valueStr);
                 }
-                hashMap.put(key, newMap);
             } else {
                 hashMap.put(key, map.get(key));
             }
@@ -94,6 +93,8 @@ public class Parser {
             } catch (ParseException e) {
                 throw new RuntimeException(e);
             }
+        } else if (contentFile1.isEmpty()) {
+            return new HashMap<String, String>();
         } else {
             return getJsonObject(contentFile1);
         }
