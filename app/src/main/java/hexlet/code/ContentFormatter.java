@@ -32,7 +32,7 @@ public class ContentFormatter {
         Map<String, String> properties = Splitter.on("\n")
                 .withKeyValueSeparator(": ")
                 .split(trimedRes);
-        HashMap hashMap = new HashMap();
+        HashMap<String, String> hashMap = new HashMap();
         for (String key:properties.keySet()) {
             hashMap.put(key.replaceAll("^.{2}", ""), properties.get(key));
         }
