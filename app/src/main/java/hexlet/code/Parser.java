@@ -37,13 +37,11 @@ public class Parser {
     }
     public static Map<String, String> replace(
             final Map parseFileContent) {
-        Map<String, Object> map =
-                new HashMap<>((Map<? extends String, ?>) parseFileContent);
         HashMap hashMap = new HashMap();
-        for (String key: map.keySet()) {
+        for (Object key: parseFileContent.keySet()) {
             String value;
-            map.putIfAbsent(key, "null");
-            value = map.get(key).toString();
+            parseFileContent.putIfAbsent(key, "null");
+            value = parseFileContent.get(key).toString();
             if (value == null) {
                 hashMap.put(key, "null");
             } else if (value.startsWith("[")) {
@@ -65,7 +63,7 @@ public class Parser {
                     hashMap.put(keyStr, valueStr);
                 }
             } else {
-                hashMap.put(key, map.get(key));
+                hashMap.put(key, parseFileContent.get(key));
             }
         }
         return hashMap;
