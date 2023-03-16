@@ -13,6 +13,7 @@ public class Reader {
         try {
             content = read(filePath);
         } catch (Exception e) {
+            System.out.println("File '" + filePath + "' does not exist.");
             throw new RuntimeException(e);
         }
         return content;
@@ -26,7 +27,7 @@ public class Reader {
                 throw new RuntimeException(e);
             }
         }
-        String content1;
+        String content1 = null;
         try (BufferedReader br =
                      new BufferedReader(new FileReader(filePath1))) {
             StringBuilder sb = new StringBuilder();
@@ -36,7 +37,11 @@ public class Reader {
                 sb.append(System.lineSeparator());
                 line = br.readLine();
             }
-            content1 = sb.toString();
+            if (sb != null) {
+                content1 = sb.toString();
+            } else {
+                System.out.println("null");
+            }
         }
         return content1;
     }
