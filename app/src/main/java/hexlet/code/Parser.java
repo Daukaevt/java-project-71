@@ -35,7 +35,7 @@ public class Parser {
         }
         return replace(parseJsonToMap);
     }
-    public static Map<String, Object> replace(
+    public static Map<String, String> replace(
             final Map parseFileContent) {
         Map<String, Object> map =
                 new HashMap<>((Map<? extends String, ?>) parseFileContent);
