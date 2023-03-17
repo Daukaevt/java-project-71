@@ -2,6 +2,7 @@ package hexlet.code;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.json.simple.JSONArray;
@@ -53,14 +54,14 @@ public class Parser {
                         .replaceAll("\"$", ""));
                 hashMap.put(key, list);
             } else if (value.startsWith("{")) {
-                for (Object keyObj: parseFileContent.keySet()) {
-                    String keyStr = keyObj.toString().replaceAll("^\"", "")
-                            .replaceAll("\"$", "");
-                    String valueStr = parseFileContent
-                            .get(keyObj).toString().replaceAll("^\"", "")
-                            .replaceAll("\"$", "");
-                    hashMap.remove(key);
-                    hashMap.put(keyStr, valueStr);
+                ObjectMapper mapper = new ObjectMapper();
+                TypeReference<HashMap<String, String>> typeRef
+                        = new TypeReference<HashMap<String, String>>() {};
+                try {
+                    Map<String, String> map = mapper.readValue(value, typeRef);
+                    hashMap.put(key,map);
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
                 }
             } else {
                 hashMap.put(key, parseFileContent.get(key));
