@@ -53,9 +53,9 @@ public class App implements Callable {
     public static void main(String[] args) {
         new CommandLine(new App()).execute(args);
     }
-    public Object call() throws Exception {
+    final public Object call() throws Exception {
         String content;
-            content = Differ.generate(filePath1, filePath2, format);
+        content = Differ.generate(filePath1, filePath2, format);
         System.out.println(content);
         return content;
     }

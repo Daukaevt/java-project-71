@@ -56,10 +56,10 @@ public class Parser {
             } else if (value.startsWith("{")) {
                 ObjectMapper mapper = new ObjectMapper();
                 TypeReference<HashMap<String, String>> typeRef
-                        = new TypeReference<HashMap<String, String>>() {};
+                        = new TypeReference<HashMap<String, String>>() { };
                 try {
                     Map<String, String> map = mapper.readValue(value, typeRef);
-                    hashMap.put(key,map);
+                    hashMap.put(key, map);
                 } catch (JsonProcessingException e) {
                     throw new RuntimeException(e);
                 }
