@@ -15,13 +15,43 @@
  */
 package picocli;
 
-import java.io.*;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.Closeable;
+import java.io.Console;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.LineNumberReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.StreamTokenizer;
+import java.io.StringWriter;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.lang.reflect.*;
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.GenericArrayType;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Proxy;
+import java.lang.reflect.Type;
+import java.lang.reflect.WildcardType;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.InetAddress;
@@ -35,7 +65,42 @@ import java.nio.charset.Charset;
 import java.text.BreakIterator;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.AbstractMap;
+import java.util.AbstractSet;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Currency;
+import java.util.Date;
+import java.util.EnumSet;
+import java.util.Enumeration;
+import java.util.Formatter;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.IdentityHashMap;
+import java.util.IllegalFormatException;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.MissingResourceException;
+import java.util.NoSuchElementException;
+import java.util.Properties;
+import java.util.Queue;
+import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.Stack;
+import java.util.TimeZone;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
@@ -44,7 +109,7 @@ import java.util.regex.Pattern;
 import picocli.CommandLine.Help.Ansi.IStyle;
 import picocli.CommandLine.Help.Ansi.Style;
 import picocli.CommandLine.Help.Ansi.Text;
-import picocli.CommandLine.Model.*;
+import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.ParseResult.GroupMatchContainer;
 
 import static java.util.Locale.ENGLISH;
@@ -54,61 +119,81 @@ import static picocli.CommandLine.Help.Column.Overflow.WRAP;
 
 /**
  * <p>
- * CommandLine interpreter that uses reflection to initialize an annotated user object with values obtained from the
+ * CommandLine interpreter that uses reflection to initialize
+ * an annotated user object with values obtained from the
  * command line arguments.
  * </p><p>
- * The full user manual is hosted at <a href="https://picocli.info/">https://picocli.info</a>.
+ * The full user manual is hosted at
+ * <a href="https://picocli.info/">https://picocli.info</a>.
  * </p><h2>Example</h2>
  * <p id="checksum_example">
- * An example that implements {@code Callable} and uses the {@link #execute(String...) CommandLine.execute} convenience API to run in a single line of code:
+ * An example that implements
+ * {@code Callable} and uses the {@link #execute(String...)
+ * CommandLine.execute} convenience API to run in a single line of code:
  * </p>
  * <pre>
- * &#064;Command(name = "checksum", mixinStandardHelpOptions = true, version = "checksum 4.0",
- *          description = "Prints the checksum (SHA-1 by default) of a file to STDOUT.")
+ * &#064;Command(name = "checksum",
+ * mixinStandardHelpOptions = true, version = "checksum 4.0",
+ *          description = "Prints the checksum (SHA-1 by default)
+ *          of a file to STDOUT.")
  * class CheckSum implements Callable&lt;Integer&gt; {
  *
- *     &#064;Parameters(index = "0", description = "The file whose checksum to calculate.")
+ *     &#064;Parameters(index = "0", description =
+ *     "The file whose checksum to calculate.")
  *     private File file;
  *
- *     &#064;Option(names = {"-a", "--algorithm"}, description = "MD5, SHA-1, SHA-256, ...")
+ *     &#064;Option(names = {"-a", "--algorithm"},
+ *     description = "MD5, SHA-1, SHA-256, ...")
  *     private String algorithm = "SHA-1";
  *
  *     &#064;Override
- *     public Integer call() throws Exception { // your business logic goes here...
+ *     public Integer call() throws Exception {
+ *     // your business logic goes here...
  *         byte[] fileContents = Files.readAllBytes(file.toPath());
- *         byte[] digest = MessageDigest.getInstance(algorithm).digest(fileContents);
- *         System.out.printf("%0" + (digest.length*2) + "x%n", new BigInteger(1,digest));
+ *         byte[] digest = MessageDigest
+ *         .getInstance(algorithm).digest(fileContents);
+ *         System.out.printf("%0" + (digest.length*2) +
+ *         "x%n", new BigInteger(1,digest));
  *         return 0;
  *     }
  *
- *     // CheckSum implements Callable, so parsing, error handling and handling user
- *     // requests for usage help or version help can be done with one line of code.
+ *     // CheckSum implements Callable, so parsing,
+ *     error handling and handling user
+ *     // requests for usage help or version help
+ *     can be done with one line of code.
  *     public static void main(String[] args) {
- *         int exitCode = new CommandLine(new CheckSum()).execute(args);
+ *         int exitCode = new CommandLine(
+ *         new CheckSum()).execute(args);
  *         System.exit(exitCode);
  *     }
  * }
  * </pre>
- * <p>Another example where the application calls {@code parseArgs} and takes responsibility
- * for error handling and checking whether the user requested help:</p>
+ * <p>Another example where the application calls
+ * {@code parseArgs} and takes responsibility
+ * for error handling and checking whether
+ * the user requested help:</p>
  * <pre>import static picocli.CommandLine.*;
  *
  * &#064;Command(mixinStandardHelpOptions = true, version = "v3.0.0",
- *         header = "Encrypt FILE(s), or standard input, to standard output or to the output file.")
+ *         header = "Encrypt FILE(s), or standard input,
+ *         to standard output or to the output file.")
  * public class Encrypt {
  *
  *     &#064;Parameters(description = "Any number of input files")
  *     private List&lt;File&gt; files = new ArrayList&lt;File&gt;();
  *
- *     &#064;Option(names = { "-o", "--out" }, description = "Output file (default: print to console)")
+ *     &#064;Option(names = { "-o", "--out" },
+ *     description = "Output file (default: print to console)")
  *     private File outputFile;
- *
- *     &#064;Option(names = { "-v", "--verbose"}, description = "Verbose mode. Helpful for troubleshooting. Multiple -v options increase the verbosity.")
+ *     &#064;Option(names = { "-v", "--verbose"},
+ *     description = "Verbose mode. Helpful for troubleshooting.
+ *     Multiple -v options increase the verbosity.")
  *     private boolean[] verbose;
  * }
  * </pre>
  * <p>
- * Use {@code CommandLine} to initialize a user object as follows:
+ * Use {@code CommandLine} to initialize
+ * a user object as follows:
  * </p><pre>
  * public static void main(String... args) {
  *     Encrypt encrypt = new Encrypt();
@@ -117,13 +202,15 @@ import static picocli.CommandLine.Help.Column.Overflow.WRAP;
  *         if (!CommandLine.printHelpIfRequested(parseResult)) {
  *             runProgram(encrypt);
  *         }
- *     } catch (ParameterException ex) { // command line arguments could not be parsed
+ *     } catch (ParameterException ex) {
+ *     // command line arguments could not be parsed
  *         System.err.println(ex.getMessage());
  *         ex.getCommandLine().usage(System.err);
  *     }
  * }
  * </pre><p>
- * Invoke the above program with some command line arguments. The below are all equivalent:
+ * Invoke the above program with some command line arguments.
+ * The below are all equivalent:
  * </p>
  * <pre>
  * --verbose --out=outfile in1 in2
@@ -138,11 +225,13 @@ import static picocli.CommandLine.Help.Column.Overflow.WRAP;
  * </pre>
  * <h2>Classes and Interfaces for Defining a CommandSpec Model</h2>
  * <p>
- * <img src="doc-files/class-diagram-definition.png" alt="Classes and Interfaces for Defining a CommandSpec Model">
+ * <img src="doc-files/class-diagram-definition.png"
+ * alt="Classes and Interfaces for Defining a CommandSpec Model">
  * </p>
  * <h2>Classes Related to Parsing Command Line Arguments</h2>
  * <p>
- * <img src="doc-files/class-diagram-parsing.png" alt="Classes Related to Parsing Command Line Arguments">
+ * <img src="doc-files/class-diagram-parsing.png" alt=
+ * "Classes Related to Parsing Command Line Arguments">
  * </p>
  */
 public class CommandLine {
@@ -158,18 +247,30 @@ public class CommandLine {
     private Object executionResult;
     private PrintWriter out;
     private PrintWriter err;
-    private Help.ColorScheme colorScheme = Help.defaultColorScheme(Help.Ansi.AUTO);
+    private Help.ColorScheme colorScheme =
+            Help.defaultColorScheme(Help.Ansi.AUTO);
     private IExitCodeExceptionMapper exitCodeExceptionMapper;
-    private IExecutionStrategy executionStrategy = new RunLast();
-    private IParameterExceptionHandler parameterExceptionHandler = new IParameterExceptionHandler() {
-        public int handleParseException(ParameterException ex, String[] args) {
+    private IExecutionStrategy executionStrategy =
+            new RunLast();
+    private IParameterExceptionHandler parameterExceptionHandler =
+            new IParameterExceptionHandler() {
+        public int handleParseException(
+                final ParameterException ex, final String[] args) {
             CommandLine cmd = ex.getCommandLine();
-            DefaultExceptionHandler.internalHandleParseException(ex, cmd.getErr(), cmd.getColorScheme());
-            return mappedExitCode(ex, cmd.getExitCodeExceptionMapper(), cmd.getCommandSpec().exitCodeOnInvalidInput());
+            DefaultExceptionHandler.internalHandleParseException(
+                    ex, cmd.getErr(),
+                    cmd.getColorScheme());
+            return mappedExitCode(ex, cmd.getExitCodeExceptionMapper(),
+                    cmd.getCommandSpec().exitCodeOnInvalidInput());
         }
     };
-    private IExecutionExceptionHandler executionExceptionHandler = new IExecutionExceptionHandler() {
-        public int handleExecutionException(Exception ex, CommandLine commandLine, ParseResult parseResult) throws Exception {
+    private IExecutionExceptionHandler executionExceptionHandler =
+            new IExecutionExceptionHandler() {
+        public int handleExecutionException(
+                final Exception ex,
+                final CommandLine commandLine,
+                final ParseResult parseResult
+        ) throws Exception {
             throw ex;
         }
     };
@@ -383,7 +484,7 @@ public class CommandLine {
      * @since 0.9.7
      */
     public Map<String, CommandLine> getSubcommands() {
-        return new CaseAwareLinkedMap<String, CommandLine>(getCommandSpec().commands);
+        return new Model.CaseAwareLinkedMap<String, CommandLine>(getCommandSpec().commands);
     }
     /**
      * Returns the command that this is a subcommand of, or {@code null} if this is a top-level command.
@@ -460,23 +561,23 @@ public class CommandLine {
      * Returns the section keys in the order that the usage help message should render the sections.
      * This ordering may be modified with {@link #setHelpSectionKeys(List) setSectionKeys}. The default keys are (in order):
      * <ol start="0">
-     *   <li>{@link UsageMessageSpec#SECTION_KEY_HEADER_HEADING SECTION_KEY_HEADER_HEADING}</li>
-     *   <li>{@link UsageMessageSpec#SECTION_KEY_HEADER SECTION_KEY_HEADER}</li>
-     *   <li>{@link UsageMessageSpec#SECTION_KEY_SYNOPSIS_HEADING SECTION_KEY_SYNOPSIS_HEADING}</li>
-     *   <li>{@link UsageMessageSpec#SECTION_KEY_SYNOPSIS SECTION_KEY_SYNOPSIS}</li>
-     *   <li>{@link UsageMessageSpec#SECTION_KEY_DESCRIPTION_HEADING SECTION_KEY_DESCRIPTION_HEADING}</li>
-     *   <li>{@link UsageMessageSpec#SECTION_KEY_DESCRIPTION SECTION_KEY_DESCRIPTION}</li>
-     *   <li>{@link UsageMessageSpec#SECTION_KEY_PARAMETER_LIST_HEADING SECTION_KEY_PARAMETER_LIST_HEADING}</li>
-     *   <li>{@link UsageMessageSpec#SECTION_KEY_AT_FILE_PARAMETER SECTION_KEY_AT_FILE_PARAMETER}</li>
-     *   <li>{@link UsageMessageSpec#SECTION_KEY_PARAMETER_LIST SECTION_KEY_PARAMETER_LIST}</li>
-     *   <li>{@link UsageMessageSpec#SECTION_KEY_OPTION_LIST_HEADING SECTION_KEY_OPTION_LIST_HEADING}</li>
-     *   <li>{@link UsageMessageSpec#SECTION_KEY_OPTION_LIST SECTION_KEY_OPTION_LIST}</li>
-     *   <li>{@link UsageMessageSpec#SECTION_KEY_COMMAND_LIST_HEADING SECTION_KEY_COMMAND_LIST_HEADING}</li>
-     *   <li>{@link UsageMessageSpec#SECTION_KEY_COMMAND_LIST SECTION_KEY_COMMAND_LIST}</li>
-     *   <li>{@link UsageMessageSpec#SECTION_KEY_EXIT_CODE_LIST_HEADING SECTION_KEY_EXIT_CODE_LIST_HEADING}</li>
-     *   <li>{@link UsageMessageSpec#SECTION_KEY_EXIT_CODE_LIST SECTION_KEY_EXIT_CODE_LIST}</li>
-     *   <li>{@link UsageMessageSpec#SECTION_KEY_FOOTER_HEADING SECTION_KEY_FOOTER_HEADING}</li>
-     *   <li>{@link UsageMessageSpec#SECTION_KEY_FOOTER SECTION_KEY_FOOTER}</li>
+     *   <li>{@link Model.UsageMessageSpec#SECTION_KEY_HEADER_HEADING SECTION_KEY_HEADER_HEADING}</li>
+     *   <li>{@link Model.UsageMessageSpec#SECTION_KEY_HEADER SECTION_KEY_HEADER}</li>
+     *   <li>{@link Model.UsageMessageSpec#SECTION_KEY_SYNOPSIS_HEADING SECTION_KEY_SYNOPSIS_HEADING}</li>
+     *   <li>{@link Model.UsageMessageSpec#SECTION_KEY_SYNOPSIS SECTION_KEY_SYNOPSIS}</li>
+     *   <li>{@link Model.UsageMessageSpec#SECTION_KEY_DESCRIPTION_HEADING SECTION_KEY_DESCRIPTION_HEADING}</li>
+     *   <li>{@link Model.UsageMessageSpec#SECTION_KEY_DESCRIPTION SECTION_KEY_DESCRIPTION}</li>
+     *   <li>{@link Model.UsageMessageSpec#SECTION_KEY_PARAMETER_LIST_HEADING SECTION_KEY_PARAMETER_LIST_HEADING}</li>
+     *   <li>{@link Model.UsageMessageSpec#SECTION_KEY_AT_FILE_PARAMETER SECTION_KEY_AT_FILE_PARAMETER}</li>
+     *   <li>{@link Model.UsageMessageSpec#SECTION_KEY_PARAMETER_LIST SECTION_KEY_PARAMETER_LIST}</li>
+     *   <li>{@link Model.UsageMessageSpec#SECTION_KEY_OPTION_LIST_HEADING SECTION_KEY_OPTION_LIST_HEADING}</li>
+     *   <li>{@link Model.UsageMessageSpec#SECTION_KEY_OPTION_LIST SECTION_KEY_OPTION_LIST}</li>
+     *   <li>{@link Model.UsageMessageSpec#SECTION_KEY_COMMAND_LIST_HEADING SECTION_KEY_COMMAND_LIST_HEADING}</li>
+     *   <li>{@link Model.UsageMessageSpec#SECTION_KEY_COMMAND_LIST SECTION_KEY_COMMAND_LIST}</li>
+     *   <li>{@link Model.UsageMessageSpec#SECTION_KEY_EXIT_CODE_LIST_HEADING SECTION_KEY_EXIT_CODE_LIST_HEADING}</li>
+     *   <li>{@link Model.UsageMessageSpec#SECTION_KEY_EXIT_CODE_LIST SECTION_KEY_EXIT_CODE_LIST}</li>
+     *   <li>{@link Model.UsageMessageSpec#SECTION_KEY_FOOTER_HEADING SECTION_KEY_FOOTER_HEADING}</li>
+     *   <li>{@link Model.UsageMessageSpec#SECTION_KEY_FOOTER SECTION_KEY_FOOTER}</li>
      * </ol>
      * @since 3.9
      */
@@ -488,7 +589,7 @@ public class CommandLine {
      * subcommands and nested sub-subcommands <em>at the moment this method is called</em>. Subcommands added
      * later will have the default setting. To ensure a setting is applied to all
      * subcommands, call the setter last, after adding subcommands.</p>
-     * <p>Use {@link UsageMessageSpec#sectionKeys(List)} to customize a command without affecting its subcommands.</p>
+     * <p>Use {@link Model.UsageMessageSpec#sectionKeys(List)} to customize a command without affecting its subcommands.</p>
      * @see #getHelpSectionKeys
      * @since 3.9
      */
@@ -519,7 +620,7 @@ public class CommandLine {
      * subcommands and nested sub-subcommands <em>at the moment this method is called</em>. Subcommands added
      * later will have the default setting. To ensure a setting is applied to all
      * subcommands, call the setter last, after adding subcommands.</p>
-     * <p>Use {@link UsageMessageSpec#sectionMap(Map)} to customize a command without affecting its subcommands.</p>
+     * <p>Use {@link Model.UsageMessageSpec#sectionMap(Map)} to customize a command without affecting its subcommands.</p>
      * @see #getHelpSectionMap
      * @since 3.9
      */
@@ -686,7 +787,7 @@ public class CommandLine {
      *   For arguments with nested quotes, quotes are removed later in the processing pipeline, after {@code split} operations are applied.</li>
      * </ul>
      * @return {@code true} if the parser should trim quotes from command line arguments before processing them, {@code false} otherwise;
-     * @see ParserSpec#trimQuotes()
+     * @see Model.ParserSpec#trimQuotes()
      * @since 3.7 */
     public boolean isTrimQuotes() { return getCommandSpec().parser().trimQuotes(); }
 
@@ -708,7 +809,7 @@ public class CommandLine {
      * <p>Calling this method will cause the "picocli.trimQuotes" property to have no effect.</p>
      * @param newValue the new setting
      * @return this {@code CommandLine} object, to allow method chaining
-     * @see ParserSpec#trimQuotes(boolean)
+     * @see Model.ParserSpec#trimQuotes(boolean)
      * @since 3.7
      */
     public CommandLine setTrimQuotes(boolean newValue) {
@@ -729,10 +830,10 @@ public class CommandLine {
      * the first is {@code "a}, the second is {@code b"}, the third is {@code "x}, and the last part is {@code y"}. This is generally not what you want.
      * </p>
      * @deprecated Most applications should not change the default. The rare application that <em>does</em> need to split parameter values
-     * without respecting quotes should use {@link ParserSpec#splitQuotedStrings(boolean)}.
+     * without respecting quotes should use {@link Model.ParserSpec#splitQuotedStrings(boolean)}.
      * @return {@code true} if the parser is allowed to split quoted Strings, {@code false} otherwise;
-     * @see ArgSpec#splitRegex()
-     * @see ParserSpec#splitQuotedStrings()
+     * @see Model.ArgSpec#splitRegex()
+     * @see Model.ParserSpec#splitQuotedStrings()
      * @since 3.7 */
     @Deprecated public boolean isSplitQuotedStrings() { return getCommandSpec().parser().splitQuotedStrings(); }
 
@@ -750,11 +851,11 @@ public class CommandLine {
      * later will have the default setting. To ensure a setting is applied to all
      * subcommands, call the setter last, after adding subcommands.</p>
      * @deprecated Most applications should not change the default. The rare application that <em>does</em> need to split parameter values
-     * without respecting quotes should use {@link ParserSpec#splitQuotedStrings(boolean)}.
+     * without respecting quotes should use {@link Model.ParserSpec#splitQuotedStrings(boolean)}.
      * @param newValue the new setting
      * @return this {@code CommandLine} object, to allow method chaining
-     * @see ArgSpec#splitRegex()
-     * @see ParserSpec#splitQuotedStrings(boolean)
+     * @see Model.ArgSpec#splitRegex()
+     * @see Model.ParserSpec#splitQuotedStrings(boolean)
      * @since 3.7
      */
     @Deprecated public CommandLine setSplitQuotedStrings(boolean newValue) {
@@ -890,7 +991,7 @@ public class CommandLine {
      * @since 3.6
      * @see Command#defaultValueProvider()
      * @see CommandSpec#defaultValueProvider()
-     * @see ArgSpec#defaultValueString()
+     * @see Model.ArgSpec#defaultValueString()
      */
     public IDefaultValueProvider getDefaultValueProvider() {
         return getCommandSpec().defaultValueProvider();
@@ -980,7 +1081,7 @@ public class CommandLine {
      * The default is {@code false}, so by default input like {@code -x=subcommand} is rejected if {@code -x} is an option that takes a String parameter, and {@code subcommand} is a subcommand of this command.
      * @return {@code true} when options can have parameter values that match subcommand names or aliases, {@code false} when such values should be rejected with a missing parameter exception
      * @since 4.7.1-SNAPSHOT
-     * @see ParserSpec#allowSubcommandsAsOptionParameters()
+     * @see Model.ParserSpec#allowSubcommandsAsOptionParameters()
      */
     public boolean isAllowSubcommandsAsOptionParameters() {
         return getCommandSpec().parser().allowSubcommandsAsOptionParameters();
@@ -995,7 +1096,7 @@ public class CommandLine {
      * @param newValue the new setting. When {@code true}, options can have parameter values that match subcommand names or aliases, when {@code false}, such values are rejected with a missing parameter exception
      * @return this {@code CommandLine} object, to allow method chaining
      * @since 4.7.1-SNAPSHOT
-     * @see ParserSpec#allowSubcommandsAsOptionParameters(boolean)
+     * @see Model.ParserSpec#allowSubcommandsAsOptionParameters(boolean)
      */
     public CommandLine setAllowSubcommandsAsOptionParameters(boolean newValue) {
         getCommandSpec().parser().allowSubcommandsAsOptionParameters(newValue);
@@ -1011,7 +1112,7 @@ public class CommandLine {
      * @return {@code true} when options can have parameter values that match the name of an option in this command, {@code false} when such values should be rejected with a missing parameter exception
      * @since 4.7.1-SNAPSHOT
      * @see #isUnmatchedOptionsAllowedAsOptionParameters()
-     * @see ParserSpec#allowOptionsAsOptionParameters()
+     * @see Model.ParserSpec#allowOptionsAsOptionParameters()
      */
     public boolean isAllowOptionsAsOptionParameters() {
         return getCommandSpec().parser().allowOptionsAsOptionParameters();
@@ -1031,7 +1132,7 @@ public class CommandLine {
      * @return this {@code CommandLine} object, to allow method chaining
      * @since 4.7.1-SNAPSHOT
      * @see #setUnmatchedOptionsAllowedAsOptionParameters(boolean)
-     * @see ParserSpec#allowOptionsAsOptionParameters(boolean)
+     * @see Model.ParserSpec#allowOptionsAsOptionParameters(boolean)
      */
     public CommandLine setAllowOptionsAsOptionParameters(boolean newValue) {
         getCommandSpec().parser().allowOptionsAsOptionParameters(newValue);
@@ -1047,7 +1148,7 @@ public class CommandLine {
      * @return {@code true} when options can have parameter values that resemble an option, {@code false} when such values should be rejected as unknown options
      * @since 4.4
      * @see #isAllowOptionsAsOptionParameters()
-     * @see ParserSpec#unmatchedOptionsAllowedAsOptionParameters()
+     * @see Model.ParserSpec#unmatchedOptionsAllowedAsOptionParameters()
      */
     public boolean isUnmatchedOptionsAllowedAsOptionParameters() {
         return getCommandSpec().parser().unmatchedOptionsAllowedAsOptionParameters();
@@ -1065,7 +1166,7 @@ public class CommandLine {
      * @return this {@code CommandLine} object, to allow method chaining
      * @since 4.4
      * @see #setAllowOptionsAsOptionParameters(boolean)
-     * @see ParserSpec#unmatchedOptionsAllowedAsOptionParameters(boolean)
+     * @see Model.ParserSpec#unmatchedOptionsAllowedAsOptionParameters(boolean)
      */
     public CommandLine setUnmatchedOptionsAllowedAsOptionParameters(boolean newValue) {
         getCommandSpec().parser().unmatchedOptionsAllowedAsOptionParameters(newValue);
@@ -2753,7 +2854,7 @@ public class CommandLine {
      * for ultimate control over which aspects of an Option or Field are displayed where.</p>
      * @param out the {@code PrintStream} to print the usage help message to
      * @param colorScheme the {@code ColorScheme} defining the styles for options, parameters and commands when ANSI is enabled
-     * @see UsageMessageSpec
+     * @see Model.UsageMessageSpec
      */
     public void usage(PrintStream out, Help.ColorScheme colorScheme) {
         out.print(usage(new StringBuilder(), getHelpFactory().create(getCommandSpec(), colorScheme)));
@@ -3393,7 +3494,7 @@ public class CommandLine {
 
     /** Returns the String that separates option names from option values when parsing command line options.
      * @return the String the parser uses to separate option names from option values
-     * @see ParserSpec#separator() */
+     * @see Model.ParserSpec#separator() */
     public String getSeparator() { return getCommandSpec().parser().separator(); }
 
     /** Sets the String the parser uses to separate option names from option values to the specified value.
@@ -3403,7 +3504,7 @@ public class CommandLine {
      * later will have the default setting. To ensure a setting is applied to all
      * subcommands, call the setter last, after adding subcommands.</p>
      * @param separator the String that separates option names from option values
-     * @see ParserSpec#separator(String)
+     * @see Model.ParserSpec#separator(String)
      * @return this {@code CommandLine} object, to allow method chaining */
     public CommandLine setSeparator(String separator) {
         getCommandSpec().parser().separator(Assert.notNull(separator, "separator"));
@@ -3438,7 +3539,7 @@ public class CommandLine {
     }
 
     /** Returns the maximum width of the usage help message. The default is 80.
-     * @see UsageMessageSpec#width() */
+     * @see Model.UsageMessageSpec#width() */
     public int getUsageHelpWidth() { return getCommandSpec().usageMessage().width(); }
 
     /** Sets the maximum width of the usage help message. Longer lines are wrapped.
@@ -3447,7 +3548,7 @@ public class CommandLine {
      * later will have the default setting. To ensure a setting is applied to all
      * subcommands, call the setter last, after adding subcommands.</p>
      * @param width the maximum width of the usage help message
-     * @see UsageMessageSpec#width(int)
+     * @see Model.UsageMessageSpec#width(int)
      * @return this {@code CommandLine} object, to allow method chaining */
     public CommandLine setUsageHelpWidth(int width) {
         getCommandSpec().usageMessage().width(width);
@@ -3461,7 +3562,7 @@ public class CommandLine {
      * This value controls the maximum width of the long options column: any positional parameter
      * labels or long options that are longer than the specified value will overflow into
      * the description column, and cause the description to be displayed on the next line.
-     * @see UsageMessageSpec#longOptionsMaxWidth()
+     * @see Model.UsageMessageSpec#longOptionsMaxWidth()
      * @since 4.2*/
     public int getUsageHelpLongOptionsMaxWidth() { return getCommandSpec().usageMessage().longOptionsMaxWidth(); }
 
@@ -3474,7 +3575,7 @@ public class CommandLine {
      * later will have the default setting. To ensure a setting is applied to all
      * subcommands, call the setter last, after adding subcommands.</p>
      * @param columnWidth the new maximum usage help long options column max width. Must be 20 or greater.
-     * @see UsageMessageSpec#longOptionsMaxWidth(int)
+     * @see Model.UsageMessageSpec#longOptionsMaxWidth(int)
      * @return this {@code CommandLine} object, to allow method chaining
      * @since 4.2 */
     public CommandLine setUsageHelpLongOptionsMaxWidth(int columnWidth) {
@@ -3487,9 +3588,9 @@ public class CommandLine {
 
     /** Returns whether picocli should attempt to detect the terminal size and adjust the usage help message width
      * to take the full terminal width. End users may enable this by setting system property {@code "picocli.usage.width"} to {@code AUTO},
-     * and may disable this by setting this system property to a {@linkplain UsageMessageSpec#width() numeric value}.
+     * and may disable this by setting this system property to a {@linkplain Model.UsageMessageSpec#width() numeric value}.
      * This feature requires Java 7 or greater. The default is {@code false}.
-     * @see UsageMessageSpec#autoWidth()
+     * @see Model.UsageMessageSpec#autoWidth()
      * @since 4.0 */
     public boolean isUsageHelpAutoWidth() { return getCommandSpec().usageMessage().autoWidth(); }
 
@@ -3500,7 +3601,7 @@ public class CommandLine {
      * later will have the default setting. To ensure a setting is applied to all
      * subcommands, call the setter last, after adding subcommands.</p>
      * @param detectTerminalSize whether picocli should attempt to detect the terminal size
-     * @see UsageMessageSpec#autoWidth(boolean)
+     * @see Model.UsageMessageSpec#autoWidth(boolean)
      * @return this {@code CommandLine} object, to allow method chaining
      * @since 4.0 */
     public CommandLine setUsageHelpAutoWidth(boolean detectTerminalSize) {
@@ -3533,7 +3634,7 @@ public class CommandLine {
      * contents should be expanded into separate arguments for each line in the specified file.
      * This property is {@code true} by default.
      * @return whether "argument files" or {@code @files} should be expanded into their content
-     * @see ParserSpec#expandAtFiles()
+     * @see Model.ParserSpec#expandAtFiles()
      * @since 2.1 */
     public boolean isExpandAtFiles() { return getCommandSpec().parser().expandAtFiles(); }
 
@@ -3541,7 +3642,7 @@ public class CommandLine {
      * contents should be expanded into separate arguments for each line in the specified file. ({@code true} by default.)
      * @param expandAtFiles whether "argument files" or {@code @files} should be expanded into their content
      * @return this {@code CommandLine} object, to allow method chaining
-     * @see ParserSpec#expandAtFiles(boolean)
+     * @see Model.ParserSpec#expandAtFiles(boolean)
      * @since 2.1 */
     public CommandLine setExpandAtFiles(boolean expandAtFiles) {
         getCommandSpec().parser().expandAtFiles(expandAtFiles);
@@ -3552,7 +3653,7 @@ public class CommandLine {
      * be interpreted as arguments (without comments).
      * If specified, all characters from the comment character to the end of the line are ignored.
      * @return the character that starts a single-line comment or {@code null}. The default is {@code '#'}.
-     * @see ParserSpec#atFileCommentChar()
+     * @see Model.ParserSpec#atFileCommentChar()
      * @since 3.5 */
     public Character getAtFileCommentChar() { return getCommandSpec().parser().atFileCommentChar(); }
 
@@ -3561,7 +3662,7 @@ public class CommandLine {
      * If specified, all characters from the comment character to the end of the line are ignored.
      * @param atFileCommentChar the character that starts a single-line comment or {@code null}. The default is {@code '#'}.
      * @return this {@code CommandLine} object, to allow method chaining
-     * @see ParserSpec#atFileCommentChar(Character)
+     * @see Model.ParserSpec#atFileCommentChar(Character)
      * @since 3.5 */
     public CommandLine setAtFileCommentChar(Character atFileCommentChar) {
         getCommandSpec().parser().atFileCommentChar(atFileCommentChar);
@@ -3576,7 +3677,7 @@ public class CommandLine {
      * is interpreted as a single argument. Arguments containing whitespace do not need to be quoted.
      * When system property {@code "picocli.useSimplifiedAtFiles"} is defined, the system property value overrides the programmatically set value.
      * @return whether to use a simplified argument file format. The default is {@code false}.
-     * @see ParserSpec#useSimplifiedAtFiles()
+     * @see Model.ParserSpec#useSimplifiedAtFiles()
      * @since 3.9 */
     public boolean isUseSimplifiedAtFiles() { return getCommandSpec().parser().useSimplifiedAtFiles(); }
 
@@ -3586,7 +3687,7 @@ public class CommandLine {
      * When system property {@code "picocli.useSimplifiedAtFiles"} is defined, the system property value overrides the programmatically set value.
      * @param simplifiedAtFiles whether to use a simplified argument file format. The default is {@code false}.
      * @return this {@code CommandLine} object, to allow method chaining
-     * @see ParserSpec#useSimplifiedAtFiles(boolean)
+     * @see Model.ParserSpec#useSimplifiedAtFiles(boolean)
      * @since 3.9 */
     public CommandLine setUseSimplifiedAtFiles(boolean simplifiedAtFiles) {
         getCommandSpec().parser().useSimplifiedAtFiles(simplifiedAtFiles);
@@ -3705,7 +3806,7 @@ public class CommandLine {
          * @see Option#fallbackValue()
          * @see Option#mapFallbackValue()
          * @since 4.6 */
-        public static final String NULL_VALUE = ArgSpec.NULL_VALUE;
+        public static final String NULL_VALUE = Model.ArgSpec.NULL_VALUE;
         /**
          * One or more option names. At least one option name is required.
          * <p>
@@ -4037,7 +4138,7 @@ public class CommandLine {
          * If {@code echo = true}, the user input is echoed to the console.
          * This attribute is ignored when {@code interactive = false} (the default).
          * @return whether the user input for an interactive option should be echoed to the console or not
-         * @see OptionSpec#echo()
+         * @see Model.OptionSpec#echo()
          * @since 4.6 */
         boolean echo() default false;
 
@@ -4045,13 +4146,13 @@ public class CommandLine {
          * When omitted, the displayed text is derived from the option name and the first description line.
          * This attribute is ignored when {@code interactive = false} (the default).
          * @return the text to display to the end user for an interactive option when asking for user input
-         * @see OptionSpec#prompt()
+         * @see Model.OptionSpec#prompt()
          * @since 4.6 */
         String prompt() default "";
 
         /** ResourceBundle key for this option. If not specified, (and a ResourceBundle {@linkplain Command#resourceBundle() exists for this command}) an attempt
          * is made to find the option description using any of the option names (without leading hyphens) as key.
-         * @see OptionSpec#description()
+         * @see Model.OptionSpec#description()
          * @since 3.6
          */
         String descriptionKey() default "";
@@ -4102,7 +4203,7 @@ public class CommandLine {
          * <p>Use the special value {@link Option#NULL_VALUE} to specify {@code null} -
          * for options of type {@code Optional<T>} that will result in the {@code Optional.empty()}
          * value being assigned when the option name is specified without a parameter on the command line.</p>
-         * @see OptionSpec#fallbackValue()
+         * @see Model.OptionSpec#fallbackValue()
          * @since 4.0 */
         String fallbackValue() default "";
 
@@ -4114,9 +4215,9 @@ public class CommandLine {
          * values in the map when only the key is specified.</p>
          * <p>If no {@code mapFallbackValue} is set, key-only Map parameters like {@code -Dkey}
          * are considered invalid user input and cause a {@link ParameterException} to be thrown.</p>
-         * @see ArgSpec#mapFallbackValue()
+         * @see Model.ArgSpec#mapFallbackValue()
          * @since 4.6 */
-        String mapFallbackValue() default ArgSpec.UNSPECIFIED;
+        String mapFallbackValue() default Model.ArgSpec.UNSPECIFIED;
 
         /**
          * Optionally specify a custom {@code IParameterConsumer} to temporarily suspend picocli's parsing logic
@@ -4162,7 +4263,7 @@ public class CommandLine {
          * @see Parameters#defaultValue()
          * @see Parameters#mapFallbackValue()
          * @since 4.6 */
-        public static final String NULL_VALUE = ArgSpec.NULL_VALUE;
+        public static final String NULL_VALUE = Model.ArgSpec.NULL_VALUE;
         /** Specify an index ("0", or "1", etc.) to pick which of the command line arguments should be assigned to this
          * field. For array or Collection fields, you can also specify an index range ("0..3", or "2..*", etc.) to assign
          * a subset of the command line arguments to this field. The default is "*", meaning all command line arguments.
@@ -4327,7 +4428,7 @@ public class CommandLine {
          * If {@code echo = true}, the user input is echoed to the console.
          * This attribute is ignored when {@code interactive = false} (the default).
          * @return whether the user input for an interactive positional parameter should be echoed to the console or not
-         * @see PositionalParamSpec#echo()
+         * @see Model.PositionalParamSpec#echo()
          * @since 4.6 */
         boolean echo() default false;
 
@@ -4336,14 +4437,14 @@ public class CommandLine {
          * position (index) and the first description line.
          * This attribute is ignored when {@code interactive = false} (the default).
          * @return the text to display to the end user for an interactive positional parameter when asking for user input
-         * @see PositionalParamSpec#prompt()
+         * @see Model.PositionalParamSpec#prompt()
          * @since 4.6 */
         String prompt() default "";
 
         /** ResourceBundle key for this option. If not specified, (and a ResourceBundle {@linkplain Command#resourceBundle() exists for this command}) an attempt
          * is made to find the positional parameter description using {@code paramLabel() + "[" + index() + "]"} as key.
          *
-         * @see PositionalParamSpec#description()
+         * @see Model.PositionalParamSpec#description()
          * @since 3.6
          */
         String descriptionKey() default "";
@@ -4367,9 +4468,9 @@ public class CommandLine {
          * values in the map when only the key is specified.</p>
          * <p>If no {@code mapFallbackValue} is set, key-only Map parameters like {@code -Dkey}
          * are considered invalid user input and cause a {@link ParameterException} to be thrown.</p>
-         * @see ArgSpec#mapFallbackValue()
+         * @see Model.ArgSpec#mapFallbackValue()
          * @since 4.6 */
-        String mapFallbackValue() default ArgSpec.UNSPECIFIED;
+        String mapFallbackValue() default Model.ArgSpec.UNSPECIFIED;
 
         /** Returns the preprocessor for this positional parameter.
          * @see IParameterPreprocessor
@@ -4666,14 +4767,14 @@ public class CommandLine {
         /** Set the heading preceding the header section.
          * <p>May contain embedded {@linkplain java.util.Formatter format specifiers} like {@code %n} line separators. Literal percent {@code '%'} characters must be escaped with another {@code %}.</p>
          * @return the heading preceding the header section
-         * @see UsageMessageSpec#headerHeading()
+         * @see Model.UsageMessageSpec#headerHeading()
          * @see Help#headerHeading(Object...)  */
         String headerHeading() default "";
 
         /** Optional summary description of the command, shown before the synopsis. Each element of the array is rendered on a separate line.
          * <p>May contain embedded {@linkplain java.util.Formatter format specifiers} like {@code %n} line separators. Literal percent {@code '%'} characters must be escaped with another {@code %}.</p>
          * @return summary description of the command
-         * @see UsageMessageSpec#header()
+         * @see Model.UsageMessageSpec#header()
          * @see Help#header(Object...)  */
         String[] header() default {};
 
@@ -4800,27 +4901,27 @@ public class CommandLine {
         boolean hidden() default false;
 
         /** Set the base name of the ResourceBundle to find option and positional parameters descriptions, as well as
-         * usage help message sections and section headings. <p>See {@link Messages} for more details and an example.</p>
+         * usage help message sections and section headings. <p>See {@link Model.Messages} for more details and an example.</p>
          * @return the base name of the ResourceBundle for usage help strings
-         * @see ArgSpec#messages()
-         * @see UsageMessageSpec#messages()
+         * @see Model.ArgSpec#messages()
+         * @see Model.UsageMessageSpec#messages()
          * @see CommandSpec#resourceBundle()
          * @see CommandLine#setResourceBundle(ResourceBundle)
          * @since 3.6
          */
         String resourceBundle() default "";
 
-        /** Set the {@link UsageMessageSpec#width(int) usage help message width}. The default is 80.
-         * @see UsageMessageSpec#width()
+        /** Set the {@link Model.UsageMessageSpec#width(int) usage help message width}. The default is 80.
+         * @see Model.UsageMessageSpec#width()
          * @since 3.7
          */
         int usageHelpWidth() default 80;
 
         /** If {@code true}, picocli will attempt to detect the terminal width and adjust the usage help message accordingly.
          * End users may enable this by setting system property {@code "picocli.usage.width"} to {@code AUTO},
-         * and may disable this by setting this system property to a {@linkplain UsageMessageSpec#width() numeric value}.
+         * and may disable this by setting this system property to a {@linkplain Model.UsageMessageSpec#width() numeric value}.
          * This feature requires Java 7 or greater. The default is {@code false}
-         * @see UsageMessageSpec#autoWidth()
+         * @see Model.UsageMessageSpec#autoWidth()
          * @since 4.0 */
         boolean usageHelpAutoWidth() default false;
 
@@ -4919,7 +5020,7 @@ public class CommandLine {
      *         &#064;Option(names = "-c", required = true) int c;
      *     }
      * }</pre>
-     * @see ArgGroupSpec
+     * @see Model.ArgGroupSpec
      * @since 4.0 */
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER})
@@ -5095,10 +5196,10 @@ public class CommandLine {
          *       this provider has no default value for the specified option or positional parameter
          * @throws Exception when there was a problem obtaining the default value
          */
-        String defaultValue(ArgSpec argSpec) throws Exception;
+        String defaultValue(Model.ArgSpec argSpec) throws Exception;
     }
     private static class NoDefaultProvider implements IDefaultValueProvider {
-        public String defaultValue(ArgSpec argSpec) { throw new UnsupportedOperationException(); }
+        public String defaultValue(Model.ArgSpec argSpec) { throw new UnsupportedOperationException(); }
     }
 
     /**
@@ -5138,17 +5239,17 @@ public class CommandLine {
     public interface IParameterConsumer {
         /**
          * Consumes as many of the specified command line arguments as needed by popping them off
-         * the specified Stack. Implementors are free to ignore the {@linkplain ArgSpec#arity() arity}
+         * the specified Stack. Implementors are free to ignore the {@linkplain Model.ArgSpec#arity() arity}
          * of the option or positional parameter, they are free to consume arguments that would
          * normally be matched as other options of the command, and they are free to consume
          * arguments that would normally be matched as an end-of-options delimiter.
          * <p>Implementors are responsible for saving the consumed values;
          * if the user object of the option or positional parameter is a Collection
          * or a Map, a common approach would be to obtain the current instance via the
-         * {@link ArgSpec#getValue()}, and add to this instance. If the user object is an
+         * {@link Model.ArgSpec#getValue()}, and add to this instance. If the user object is an
          * array, the implementation would need to create a new array that contains the
          * old values as well as the newly consumed values, and store this array in the
-         * user object via the {@link ArgSpec#setValue(Object)}.
+         * user object via the {@link Model.ArgSpec#setValue(Object)}.
          * </p><p>
          * If the user input is invalid, implementations should throw a {@link ParameterException}
          * with a message to display to the user.
@@ -5160,10 +5261,10 @@ public class CommandLine {
          * @param commandSpec the command that the option or positional parameter belongs to
          * @throws ParameterException if the user input is invalid
          */
-        void consumeParameters(Stack<String> args, ArgSpec argSpec, CommandSpec commandSpec);
+        void consumeParameters(Stack<String> args, Model.ArgSpec argSpec, CommandSpec commandSpec);
     }
     private static class NullParameterConsumer implements IParameterConsumer {
-        public void consumeParameters(Stack<String> args, ArgSpec argSpec, CommandSpec commandSpec) { throw new UnsupportedOperationException(); }
+        public void consumeParameters(Stack<String> args, Model.ArgSpec argSpec, CommandSpec commandSpec) { throw new UnsupportedOperationException(); }
     }
     /**
      * Options, positional parameters and commands can be assigned a {@code IParameterPreprocessor} that
@@ -5282,10 +5383,10 @@ public class CommandLine {
          *          false if picocli should continue processing the stack for this option or positional parameter
          * @throws ParameterException if the user input is invalid
          */
-        boolean preprocess(Stack<String> args, CommandSpec commandSpec, ArgSpec argSpec, Map<String, Object> info);
+        boolean preprocess(Stack<String> args, CommandSpec commandSpec, Model.ArgSpec argSpec, Map<String, Object> info);
     }
     private static class NoOpParameterPreprocessor implements IParameterPreprocessor {
-        public boolean preprocess(Stack<String> args, CommandSpec commandSpec, ArgSpec argSpec, Map<String, Object> info) { return false; }
+        public boolean preprocess(Stack<String> args, CommandSpec commandSpec, Model.ArgSpec argSpec, Map<String, Object> info) { return false; }
         public boolean equals(Object obj) { return obj instanceof NoOpParameterPreprocessor; }
         public int hashCode() { return NoOpParameterPreprocessor.class.hashCode() + 7; }
     }
@@ -5491,8 +5592,8 @@ public class CommandLine {
              * </table>
              *
              * @param regex regular expression to match an option name
-             * @param negativeReplacement the replacement to use to generate a {@linkplain RegexTransformer#makeNegative(String, CommandLine.Model.CommandSpec) negative name} when the option name matches
-             * @param synopsisReplacement the replacement to use to generate a {@linkplain RegexTransformer#makeSynopsis(String, CommandLine.Model.CommandSpec) documentation string} when the option name matches
+             * @param negativeReplacement the replacement to use to generate a {@linkplain RegexTransformer#makeNegative(String, CommandSpec) negative name} when the option name matches
+             * @param synopsisReplacement the replacement to use to generate a {@linkplain RegexTransformer#makeSynopsis(String, CommandSpec) documentation string} when the option name matches
              * @return this {@code RegexTransformer} for method chaining
              */
             public RegexTransformer.Builder addPattern(String regex, String negativeReplacement, String synopsisReplacement) {
@@ -5729,8 +5830,8 @@ public class CommandLine {
          * or the field type's default arity if no arity was specified.
          * @param field the field whose Option annotation to inspect
          * @return a new {@code Range} based on the Option arity annotation on the specified field */
-        public static Range optionArity(Field field) { return optionArity(new TypedMember(field)); }
-        private static Range optionArity(IAnnotatedElement member) {
+        public static Range optionArity(Field field) { return optionArity(new Model.TypedMember(field)); }
+        private static Range optionArity(Model.IAnnotatedElement member) {
             return member.isAnnotationPresent(Option.class)
                     ? adjustForType(Range.valueOf(member.getAnnotation(Option.class).arity()), member)
                     : new Range(0, 0, false, true, "0");
@@ -5739,8 +5840,8 @@ public class CommandLine {
          * or the field type's default arity if no arity was specified.
          * @param field the field whose Parameters annotation to inspect
          * @return a new {@code Range} based on the Parameters arity annotation on the specified field */
-        public static Range parameterArity(Field field) { return parameterArity(new TypedMember(field)); }
-        private static Range parameterArity(IAnnotatedElement member) {
+        public static Range parameterArity(Field field) { return parameterArity(new Model.TypedMember(field)); }
+        private static Range parameterArity(Model.IAnnotatedElement member) {
             if (member.isAnnotationPresent(Parameters.class)) {
                 return adjustForType(Range.valueOf(member.getAnnotation(Parameters.class).arity()), member);
             } else {
@@ -5752,8 +5853,8 @@ public class CommandLine {
         /** Returns a new {@code Range} based on the {@link Parameters#index()} annotation on the specified field.
          * @param field the field whose Parameters annotation to inspect
          * @return a new {@code Range} based on the Parameters index annotation on the specified field */
-        public static Range parameterIndex(Field field) { return parameterIndex(new TypedMember(field)); }
-        private static Range parameterIndex(IAnnotatedElement member) {
+        public static Range parameterIndex(Field field) { return parameterIndex(new Model.TypedMember(field)); }
+        private static Range parameterIndex(Model.IAnnotatedElement member) {
             if (member.isAnnotationPresent(Parameters.class)) {
                 Range result = Range.valueOf(member.getAnnotation(Parameters.class).index());
                 if (!result.isUnspecified) { return result; }
@@ -5765,10 +5866,10 @@ public class CommandLine {
             }
             return defaultParameterIndex(member.getTypeInfo());
         }
-        private static Range defaultParameterIndex(ITypeInfo typeInfo) {
+        private static Range defaultParameterIndex(Model.ITypeInfo typeInfo) {
             return Range.valueOf(typeInfo.isMultiValue() ? "*" : "0+"); // the default
         }
-        static Range adjustForType(Range result, IAnnotatedElement member) {
+        static Range adjustForType(Range result, Model.IAnnotatedElement member) {
             return result.isUnspecified ? defaultArity(member) : result;
         }
         /** Returns the default arity {@code Range}: for interactive options/positional parameters,
@@ -5783,10 +5884,10 @@ public class CommandLine {
          * @param field the field whose default arity to return
          * @return a new {@code Range} indicating the default arity of the specified field
          * @since 2.0 */
-        public static Range defaultArity(Field field) { return defaultArity(new TypedMember(field)); }
-        private static Range defaultArity(IAnnotatedElement member) {
+        public static Range defaultArity(Field field) { return defaultArity(new Model.TypedMember(field)); }
+        private static Range defaultArity(Model.IAnnotatedElement member) {
             if (member.isInteractive()) { return Range.valueOf("0").unspecified(true); }
-            ITypeInfo info = member.getTypeInfo();
+            Model.ITypeInfo info = member.getTypeInfo();
             if (member.isAnnotationPresent(Option.class)) {
                 boolean zeroArgs = info.isBoolean() || (info.isMultiValue() && info.getAuxiliaryTypeInfos().get(0).isBoolean());
                 return zeroArgs ? Range.valueOf("0").unspecified(true)
@@ -5805,7 +5906,7 @@ public class CommandLine {
             return isBoolean(type) ? Range.valueOf("0").unspecified(true) : Range.valueOf("1").unspecified(true);
         }
         private int size() { return isRelative() ? 1 : 1 + max - min; }
-        static Range parameterCapacity(IAnnotatedElement member) {
+        static Range parameterCapacity(Model.IAnnotatedElement member) {
             Range arity = parameterArity(member);
             if (!member.isMultiValue()) { return arity; }
             Range index = parameterIndex(member);
@@ -5951,13 +6052,13 @@ public class CommandLine {
             return contains(index.min) || contains(index.max) || index.contains(min) || index.contains(max);
         }
     }
-    private static void validatePositionalParameters(List<PositionalParamSpec> positionals) {
+    private static void validatePositionalParameters(List<Model.PositionalParamSpec> positionals) {
         int min = 0;
-        for (PositionalParamSpec positional : positionals) {
+        for (Model.PositionalParamSpec positional : positionals) {
             Range index = positional.index();
             if (index.min > min && !index.isRelative()) {
                 List<String> indices = new ArrayList<String>();
-                for (PositionalParamSpec pos : positionals) {indices.add(pos.index().internalToString());}
+                for (Model.PositionalParamSpec pos : positionals) {indices.add(pos.index().internalToString());}
                 throw new ParameterIndexGapException("Command definition should have a positional parameter with index=" + min +
                         ". Nearest positional parameter '" + positional.paramLabel() + "' has index=" + index + ". (Full list: " + indices + ")");
             }
@@ -7077,7 +7178,7 @@ public class CommandLine {
 
             /** Returns a map of the mixin names to mixin {@code IAnnotatedElement} objects for this command.
              * @return an immutable map of `{@literal @}Mixin`-annotated elements added to this command.
-             * @see #addMixin(String, CommandLine.Model.CommandSpec, CommandLine.Model.IAnnotatedElement)
+             * @see #addMixin(String, CommandSpec, CommandLine.Model.IAnnotatedElement)
              * @since 4.1 */
             public Map<String, IAnnotatedElement> mixinAnnotatedElements() { return Collections.unmodifiableMap(mixinAnnotatedElements); }
 
@@ -12430,15 +12531,15 @@ public class CommandLine {
      * @since 3.0 */
     public static class ParseResult {
         private final CommandSpec commandSpec;
-        private final Set<OptionSpec> matchedUniqueOptions;
-        private final Set<PositionalParamSpec> matchedUniquePositionals;
-        private final List<ArgSpec> matchedArgs;
-        private final List<OptionSpec> matchedOptions;
-        private final List<PositionalParamSpec> matchedPositionals;
+        private final Set<Model.OptionSpec> matchedUniqueOptions;
+        private final Set<Model.PositionalParamSpec> matchedUniquePositionals;
+        private final List<Model.ArgSpec> matchedArgs;
+        private final List<Model.OptionSpec> matchedOptions;
+        private final List<Model.PositionalParamSpec> matchedPositionals;
         private final List<String> originalArgs;
         private final List<String> expandedArgs;
         private final List<String> unmatched;
-        private final List<List<PositionalParamSpec>> matchedPositionalParams;
+        private final List<List<Model.PositionalParamSpec>> matchedPositionalParams;
         private final List<Exception> errors;
         private final GroupMatchContainer groupMatchContainer;
         private final List<ParseResult> subcommands;
@@ -12450,15 +12551,15 @@ public class CommandLine {
         private ParseResult(ParseResult.Builder builder) {
             commandSpec = builder.commandSpec;
             subcommands = builder.subcommands;
-            matchedOptions = new ArrayList<OptionSpec>(builder.matchedOptionsList);
-            matchedUniqueOptions = new LinkedHashSet<OptionSpec>(builder.options);
+            matchedOptions = new ArrayList<Model.OptionSpec>(builder.matchedOptionsList);
+            matchedUniqueOptions = new LinkedHashSet<Model.OptionSpec>(builder.options);
             unmatched = new ArrayList<String>(builder.unmatched);
             originalArgs = new ArrayList<String>(builder.originalArgList);
             expandedArgs = new ArrayList<String>(builder.expandedArgList);
-            matchedArgs = new ArrayList<ArgSpec>(builder.matchedArgsList);
-            matchedUniquePositionals = new LinkedHashSet<PositionalParamSpec>(builder.positionals);
-            matchedPositionals = new ArrayList<PositionalParamSpec>(builder.matchedPositionalsList);
-            matchedPositionalParams = new ArrayList<List<PositionalParamSpec>>(builder.positionalParams);
+            matchedArgs = new ArrayList<Model.ArgSpec>(builder.matchedArgsList);
+            matchedUniquePositionals = new LinkedHashSet<Model.PositionalParamSpec>(builder.positionals);
+            matchedPositionals = new ArrayList<Model.PositionalParamSpec>(builder.matchedPositionalsList);
+            matchedPositionalParams = new ArrayList<List<Model.PositionalParamSpec>>(builder.positionalParams);
             errors = new ArrayList<Exception>(builder.errors);
             usageHelpRequested = builder.usageHelpRequested;
             versionHelpRequested = builder.versionHelpRequested;
@@ -12471,12 +12572,12 @@ public class CommandLine {
         /**
          * Returns the matches for the specified argument group.
          * @since 4.0 */
-        public List<GroupMatchContainer> findMatches(ArgGroupSpec group) {
+        public List<GroupMatchContainer> findMatches(Model.ArgGroupSpec group) {
             return groupMatchContainer.findMatchContainers(group, new ArrayList<GroupMatchContainer>());
         }
 
         /**
-         * Returns the top-level container for the {@link ArgGroupSpec ArgGroupSpec} match or matches found.
+         * Returns the top-level container for the {@link Model.ArgGroupSpec ArgGroupSpec} match or matches found.
          * <p>
          * If the user input was a valid combination of group arguments, the returned list should contain a single
          * {@linkplain GroupMatch match}. Details of the {@linkplain GroupMatchContainer matched groups} encountered
@@ -12486,7 +12587,7 @@ public class CommandLine {
          * If the returned list contains more than one {@linkplain GroupMatch match}, the user input was invalid:
          * the maximum {@linkplain ArgGroup#multiplicity() multiplicity} of a group was exceeded, and the parser created an extra
          * {@code match} to capture the values. Usually this results in a {@link ParameterException ParameterException}
-         * being thrown by the {@code parse} method, unless the parser is configured to {@linkplain ParserSpec#collectErrors() collect errors}.
+         * being thrown by the {@code parse} method, unless the parser is configured to {@linkplain Model.ParserSpec#collectErrors() collect errors}.
          * </p>
          * @since 4.0 */
         public List<GroupMatch> getGroupMatches() {
@@ -12494,41 +12595,41 @@ public class CommandLine {
         }
         /** Returns the option with the specified short name, or {@code null} if no option with that name was matched
          * on the command line.
-         * <p>Use {@link OptionSpec#getValue() getValue} on the returned {@code OptionSpec} to get the matched value (or values),
-         * converted to the type of the option. Alternatively, use {@link OptionSpec#stringValues() stringValues}
-         * to get the matched String values after they were {@linkplain OptionSpec#splitRegex() split} into parts, or
-         * {@link OptionSpec#originalStringValues() originalStringValues} to get the original String values that were
+         * <p>Use {@link Model.OptionSpec#getValue() getValue} on the returned {@code OptionSpec} to get the matched value (or values),
+         * converted to the type of the option. Alternatively, use {@link Model.OptionSpec#stringValues() stringValues}
+         * to get the matched String values after they were {@linkplain Model.OptionSpec#splitRegex() split} into parts, or
+         * {@link Model.OptionSpec#originalStringValues() originalStringValues} to get the original String values that were
          * matched on the command line, before any processing.
-         * </p><p>To get the {@linkplain OptionSpec#defaultValue() default value} of an option that was
+         * </p><p>To get the {@linkplain Model.OptionSpec#defaultValue() default value} of an option that was
          * {@linkplain #hasMatchedOption(char) <em>not</em> matched} on the command line, use
          * {@code parseResult.commandSpec().findOption(shortName).getValue()}. </p>
          * @see CommandSpec#findOption(char)  */
-        public OptionSpec matchedOption(char shortName) { return CommandSpec.findOption(shortName, matchedOptions); }
+        public Model.OptionSpec matchedOption(char shortName) { return CommandSpec.findOption(shortName, matchedOptions); }
 
         /** Returns the option with the specified name, or {@code null} if no option with that name was matched on the command line.
-         * <p>Use {@link OptionSpec#getValue() getValue} on the returned {@code OptionSpec} to get the matched value (or values),
-         * converted to the type of the option. Alternatively, use {@link OptionSpec#stringValues() stringValues}
-         * to get the matched String values after they were {@linkplain OptionSpec#splitRegex() split} into parts, or
-         * {@link OptionSpec#originalStringValues() originalStringValues} to get the original String values that were
+         * <p>Use {@link Model.OptionSpec#getValue() getValue} on the returned {@code OptionSpec} to get the matched value (or values),
+         * converted to the type of the option. Alternatively, use {@link Model.OptionSpec#stringValues() stringValues}
+         * to get the matched String values after they were {@linkplain Model.OptionSpec#splitRegex() split} into parts, or
+         * {@link Model.OptionSpec#originalStringValues() originalStringValues} to get the original String values that were
          * matched on the command line, before any processing.
-         * </p><p>To get the {@linkplain OptionSpec#defaultValue() default value} of an option that was
+         * </p><p>To get the {@linkplain Model.OptionSpec#defaultValue() default value} of an option that was
          * {@linkplain #hasMatchedOption(String) <em>not</em> matched} on the command line, use
          * {@code parseResult.commandSpec().findOption(String).getValue()}. </p>
          * @see CommandSpec#findOption(String)
          * @param name used to search the matched options. May be an alias of the option name that was actually specified on the command line.
          *      The specified name may include option name prefix characters or not. */
-        public OptionSpec matchedOption(String name) { return CommandSpec.findOption(name, matchedOptions); }
+        public Model.OptionSpec matchedOption(String name) { return CommandSpec.findOption(name, matchedOptions); }
 
         /** Returns the first {@code PositionalParamSpec} that matched an argument at the specified position, or {@code null} if no positional parameters were matched at that position. */
-        public PositionalParamSpec matchedPositional(int position) {
+        public Model.PositionalParamSpec matchedPositional(int position) {
             if (matchedPositionalParams.size() <= position || matchedPositionalParams.get(position).isEmpty()) { return null; }
             return matchedPositionalParams.get(position).get(0);
         }
 
         /** Returns all {@code PositionalParamSpec} objects that matched an argument at the specified position, or an empty list if no positional parameters were matched at that position. */
-        public List<PositionalParamSpec> matchedPositionals(int position) {
+        public List<Model.PositionalParamSpec> matchedPositionals(int position) {
             if (matchedPositionalParams.size() <= position) { return Collections.emptyList(); }
-            return matchedPositionalParams.get(position) == null ? Collections.<PositionalParamSpec>emptyList() : matchedPositionalParams.get(position);
+            return matchedPositionalParams.get(position) == null ? Collections.<Model.PositionalParamSpec>emptyList() : matchedPositionalParams.get(position);
         }
         /** Returns the {@code CommandSpec} for the matched command. */
         public CommandSpec commandSpec()                    { return commandSpec; }
@@ -12541,35 +12642,35 @@ public class CommandLine {
          *      The specified name may include option name prefix characters or not. */
         public boolean hasMatchedOption(String name)        { return matchedOption(name) != null; }
         /** Returns whether the specified option was matched on the command line. */
-        public boolean hasMatchedOption(OptionSpec option)  { return matchedOptions.contains(option); }
+        public boolean hasMatchedOption(Model.OptionSpec option)  { return matchedOptions.contains(option); }
 
         /** Returns whether a positional parameter was matched at the specified position. */
         public boolean hasMatchedPositional(int position)   { return matchedPositional(position) != null; }
         /** Returns whether the specified positional parameter was matched on the command line. */
-        public boolean hasMatchedPositional(PositionalParamSpec positional) { return matchedUniquePositionals.contains(positional); }
+        public boolean hasMatchedPositional(Model.PositionalParamSpec positional) { return matchedUniquePositionals.contains(positional); }
 
         /** Returns a set of matched options.
          * @since 4.0 */
-        public Set<OptionSpec> matchedOptionsSet() { return Collections.unmodifiableSet(matchedUniqueOptions); }
+        public Set<Model.OptionSpec> matchedOptionsSet() { return Collections.unmodifiableSet(matchedUniqueOptions); }
 
         /** Returns a list of matched options, in order they were matched on the command line.
          * The returned list may contain the same {@code OptionSpec} multiple times, if the option was matched multiple times on the command line.
          */
-        public List<OptionSpec> matchedOptions() { return Collections.unmodifiableList(matchedOptions); }
+        public List<Model.OptionSpec> matchedOptions() { return Collections.unmodifiableList(matchedOptions); }
 
         /** Returns a set of matched positional parameters.
          * @since 4.0 */
-        public Set<PositionalParamSpec> matchedPositionalsSet() { return Collections.unmodifiableSet(matchedUniquePositionals); }
+        public Set<Model.PositionalParamSpec> matchedPositionalsSet() { return Collections.unmodifiableSet(matchedUniquePositionals); }
 
         /** Returns a list of matched positional parameters, in order they were matched on the command line.
          * The returned list may contain the same {@code PositionalParamSpec} multiple times, if the parameter was matched multiple times on the command line.
          */
-        public List<PositionalParamSpec> matchedPositionals() { return Collections.unmodifiableList(matchedPositionals); }
+        public List<Model.PositionalParamSpec> matchedPositionals() { return Collections.unmodifiableList(matchedPositionals); }
 
         /** Returns a list of matched options and positional parameters, in order they were matched on the command line.
          * The returned list may contain an {@code OptionSpec} or {@code PositionalParamSpec} multiple times, if the option or parameter was matched multiple times on the command line.
          * @since 4.0 */
-        public List<ArgSpec> matchedArgs() { return Collections.unmodifiableList(matchedArgs); }
+        public List<Model.ArgSpec> matchedArgs() { return Collections.unmodifiableList(matchedArgs); }
 
         /** Returns a list of command line arguments that did not match any options or positional parameters. */
         public List<String> unmatched()                     { return Collections.unmodifiableList(unmatched); }
@@ -12584,23 +12685,23 @@ public class CommandLine {
          * @since 4.4 */
         public List<String> expandedArgs()                  { return Collections.unmodifiableList(expandedArgs); }
 
-        /** If {@link ParserSpec#collectErrors} is {@code true}, returns the list of exceptions that were encountered during parsing, otherwise, returns an empty list.
+        /** If {@link Model.ParserSpec#collectErrors} is {@code true}, returns the list of exceptions that were encountered during parsing, otherwise, returns an empty list.
          * @since 3.2 */
         public List<Exception> errors()                     { return Collections.unmodifiableList(errors); }
 
-        /** Returns the command line argument value of the option with the specified name, converted to the {@linkplain OptionSpec#type() type} of the option, or the specified default value if no option with the specified name was matched. */
+        /** Returns the command line argument value of the option with the specified name, converted to the {@linkplain Model.OptionSpec#type() type} of the option, or the specified default value if no option with the specified name was matched. */
         public <T> T matchedOptionValue(char shortName, T defaultValue)    { return matchedOptionValue(matchedOption(shortName), defaultValue); }
-        /** Returns the command line argument value of the option with the specified name, converted to the {@linkplain OptionSpec#type() type} of the option, or the specified default value if no option with the specified name was matched. */
+        /** Returns the command line argument value of the option with the specified name, converted to the {@linkplain Model.OptionSpec#type() type} of the option, or the specified default value if no option with the specified name was matched. */
         public <T> T matchedOptionValue(String name, T defaultValue)       { return matchedOptionValue(matchedOption(name), defaultValue); }
-        /** Returns the command line argument value of the specified option, converted to the {@linkplain OptionSpec#type() type} of the option, or the specified default value if the specified option is {@code null}. */
+        /** Returns the command line argument value of the specified option, converted to the {@linkplain Model.OptionSpec#type() type} of the option, or the specified default value if the specified option is {@code null}. */
         @SuppressWarnings("unchecked")
-        private <T> T matchedOptionValue(OptionSpec option, T defaultValue) { return option == null ? defaultValue : (T) option.getValue(); }
+        private <T> T matchedOptionValue(Model.OptionSpec option, T defaultValue) { return option == null ? defaultValue : (T) option.getValue(); }
 
-        /** Returns the command line argument value of the positional parameter at the specified position, converted to the {@linkplain PositionalParamSpec#type() type} of the positional parameter, or the specified default value if no positional parameter was matched at that position. */
+        /** Returns the command line argument value of the positional parameter at the specified position, converted to the {@linkplain Model.PositionalParamSpec#type() type} of the positional parameter, or the specified default value if no positional parameter was matched at that position. */
         public <T> T matchedPositionalValue(int position, T defaultValue)  { return matchedPositionalValue(matchedPositional(position), defaultValue); }
-        /** Returns the command line argument value of the specified positional parameter, converted to the {@linkplain PositionalParamSpec#type() type} of the positional parameter, or the specified default value if the specified positional parameter is {@code null}. */
+        /** Returns the command line argument value of the specified positional parameter, converted to the {@linkplain Model.PositionalParamSpec#type() type} of the positional parameter, or the specified default value if the specified positional parameter is {@code null}. */
         @SuppressWarnings("unchecked")
-        private <T> T matchedPositionalValue(PositionalParamSpec positional, T defaultValue) { return positional == null ? defaultValue : (T) positional.getValue(); }
+        private <T> T matchedPositionalValue(Model.PositionalParamSpec positional, T defaultValue) { return positional == null ? defaultValue : (T) positional.getValue(); }
 
         /** Returns {@code true} if a subcommand was matched on the command line, {@code false} otherwise. */
         public boolean hasSubcommand()          { return !subcommands.isEmpty(); }
@@ -12614,10 +12715,10 @@ public class CommandLine {
          * @since 4.2 */
         public List<ParseResult> subcommands()  { return Collections.unmodifiableList(subcommands); }
 
-        /** Returns {@code true} if one of the options that was matched on the command line is a {@link OptionSpec#usageHelp() usageHelp} option. */
+        /** Returns {@code true} if one of the options that was matched on the command line is a {@link Model.OptionSpec#usageHelp() usageHelp} option. */
         public boolean isUsageHelpRequested()   { return usageHelpRequested; }
 
-        /** Returns {@code true} if one of the options that was matched on the command line is a {@link OptionSpec#versionHelp() versionHelp} option. */
+        /** Returns {@code true} if one of the options that was matched on the command line is a {@link Model.OptionSpec#versionHelp() versionHelp} option. */
         public boolean isVersionHelpRequested() { return versionHelpRequested; }
 
         /** Returns this {@code ParseResult} as a list of {@code CommandLine} objects, one for each matched command/subcommand.
@@ -12633,7 +12734,7 @@ public class CommandLine {
         }
 
         void validateGroups() {
-            for (ArgGroupSpec group : commandSpec.argGroups()) {
+            for (Model.ArgGroupSpec group : commandSpec.argGroups()) {
                 groupMatchContainer.updateUnmatchedGroups(group);
             }
             groupMatchContainer.validate(commandSpec.commandLine());
@@ -12642,16 +12743,16 @@ public class CommandLine {
         /** Builds immutable {@code ParseResult} instances. */
         public static class Builder {
             private final CommandSpec commandSpec;
-            private final List<ArgSpec> matchedArgsList = new ArrayList<ArgSpec>();
-            private final List<OptionSpec> matchedOptionsList = new ArrayList<OptionSpec>();
-            private final List<PositionalParamSpec> matchedPositionalsList = new ArrayList<PositionalParamSpec>();
-            private final Set<OptionSpec> options = new LinkedHashSet<OptionSpec>();
-            private final Set<PositionalParamSpec> positionals = new LinkedHashSet<PositionalParamSpec>();
+            private final List<Model.ArgSpec> matchedArgsList = new ArrayList<Model.ArgSpec>();
+            private final List<Model.OptionSpec> matchedOptionsList = new ArrayList<Model.OptionSpec>();
+            private final List<Model.PositionalParamSpec> matchedPositionalsList = new ArrayList<Model.PositionalParamSpec>();
+            private final Set<Model.OptionSpec> options = new LinkedHashSet<Model.OptionSpec>();
+            private final Set<Model.PositionalParamSpec> positionals = new LinkedHashSet<Model.PositionalParamSpec>();
             private final List<String> unmatched = new ArrayList<String>();
             private int firstUnmatchedPosition = Integer.MAX_VALUE;
             private final List<String> originalArgList = new ArrayList<String>();
             private final List<String> expandedArgList = new ArrayList<String>();
-            private final List<List<PositionalParamSpec>> positionalParams = new ArrayList<List<PositionalParamSpec>>();
+            private final List<List<Model.PositionalParamSpec>> positionalParams = new ArrayList<List<Model.PositionalParamSpec>>();
             private final List<ParseResult> subcommands = new ArrayList<ParseResult>();
             private boolean usageHelpRequested;
             private boolean versionHelpRequested;
@@ -12666,7 +12767,7 @@ public class CommandLine {
                 return new ParseResult(this);
             }
 
-            private void nowProcessing(ArgSpec spec, Object value) {
+            private void nowProcessing(Model.ArgSpec spec, Object value) {
                 if (nowProcessing != null && !isInitializingDefaultValues) {
                     nowProcessing.add(spec.isPositional() ? spec : value);
                 }
@@ -12677,17 +12778,17 @@ public class CommandLine {
              * @param arg the matched {@code OptionSpec} or {@code PositionalParamSpec}
              * @param position the command line position at which the  {@code PositionalParamSpec} was matched. Ignored for {@code OptionSpec}s.
              * @return this builder for method chaining */
-            public Builder add(ArgSpec arg, int position) {
+            public Builder add(Model.ArgSpec arg, int position) {
                 if (arg.isOption()) {
-                    addOption((OptionSpec) arg);
+                    addOption((Model.OptionSpec) arg);
                 } else {
-                    addPositionalParam((PositionalParamSpec) arg, position);
+                    addPositionalParam((Model.PositionalParamSpec) arg, position);
                 }
                 return this;
             }
 
             /** Adds the specified {@code OptionSpec} to the list of options that were matched on the command line. */
-            public Builder addOption(OptionSpec option) {
+            public Builder addOption(Model.OptionSpec option) {
                 if (!isInitializingDefaultValues) {
                     options.add(option);
                     matchedOptionsList.add(option);
@@ -12699,12 +12800,12 @@ public class CommandLine {
              * @param positionalParam the matched {@code PositionalParamSpec}
              * @param position the command line position at which the  {@code PositionalParamSpec} was matched.
              * @return this builder for method chaining */
-            public Builder addPositionalParam(PositionalParamSpec positionalParam, int position) {
+            public Builder addPositionalParam(Model.PositionalParamSpec positionalParam, int position) {
                 if (isInitializingDefaultValues) { return this; }
                 positionals.add(positionalParam);
                 matchedPositionalsList.add(positionalParam);
                 matchedArgsList.add(positionalParam);
-                while (positionalParams.size() <= position) { positionalParams.add(new ArrayList<PositionalParamSpec>()); }
+                while (positionalParams.size() <= position) { positionalParams.add(new ArrayList<Model.PositionalParamSpec>()); }
                 positionalParams.get(position).add(positionalParam);
                 return this;
             }
@@ -12744,8 +12845,8 @@ public class CommandLine {
              * @since 4.4 */
             public Builder expandedArgs(Collection<String> expandedArgs) { expandedArgList.addAll(expandedArgs); return this; }
 
-            void addStringValue        (ArgSpec argSpec, String value) { if (!isInitializingDefaultValues) { argSpec.stringValues.add(value);} }
-            void addOriginalStringValue(ArgSpec argSpec, String value) {
+            void addStringValue        (Model.ArgSpec argSpec, String value) { if (!isInitializingDefaultValues) { argSpec.stringValues.add(value);} }
+            void addOriginalStringValue(Model.ArgSpec argSpec, String value) {
                 if (!isInitializingDefaultValues) {
                     argSpec.originalStringValues.add(value);
                     if (argSpec.group() != null) {
@@ -12755,7 +12856,7 @@ public class CommandLine {
                 }
             }
 
-            void addTypedValues(ArgSpec argSpec, int position, Object typedValue) {
+            void addTypedValues(Model.ArgSpec argSpec, int position, Object typedValue) {
                 if (!isInitializingDefaultValues) {
                     argSpec.typedValues.add(typedValue);
                     if (argSpec.group() == null) {
@@ -12771,15 +12872,15 @@ public class CommandLine {
                 errors.add(Assert.notNull(ex, "exception"));
             }
 
-            void beforeMatchingGroupElement(ArgSpec argSpec) throws Exception {
-                ArgGroupSpec group = argSpec.group();
+            void beforeMatchingGroupElement(Model.ArgSpec argSpec) throws Exception {
+                Model.ArgGroupSpec group = argSpec.group();
                 if (group == null || isInitializingDefaultValues) { return; }
                 Tracer tracer = CommandLine.tracer();
                 GroupMatchContainer foundGroupMatchContainer = this.groupMatchContainer.findOrCreateMatchingGroup(argSpec, commandSpec.commandLine);
                 GroupMatch match = foundGroupMatchContainer.lastMatch();
                 boolean greedy = true; // commandSpec.parser().greedyMatchMultiValueArgsInGroup(); // or @Option(multiplicity=0..*) to control min/max matches
                 boolean allowMultipleMatchesInGroup = greedy && argSpec.isMultiValue(); // https://github.com/remkop/picocli/issues/815
-                String elementDescription = ArgSpec.describe(argSpec, "=");
+                String elementDescription = Model.ArgSpec.describe(argSpec, "=");
                 if (match.matchedMinElements() &&
                         (argSpec.required() || match.matchCount(argSpec) > 0) && !allowMultipleMatchesInGroup) {
                     // we need to create a new match; if maxMultiplicity has been reached, we need to add a new GroupMatchContainer.
@@ -12834,16 +12935,16 @@ public class CommandLine {
          * </p>
          * @since 4.0 */
         public static class GroupMatchContainer {
-            private final ArgGroupSpec group;
+            private final Model.ArgGroupSpec group;
             private GroupMatchContainer parentContainer;
-            private final List<ArgGroupSpec> unmatchedSubgroups = new ArrayList<ArgGroupSpec>();
+            private final List<Model.ArgGroupSpec> unmatchedSubgroups = new ArrayList<Model.ArgGroupSpec>();
             private final List<GroupMatch> matches = new ArrayList<GroupMatch>();
             private GroupValidationResult validationResult;
 
-            GroupMatchContainer(ArgGroupSpec group, CommandLine cmd) { this.group = group; addMatch(cmd);}
+            GroupMatchContainer(Model.ArgGroupSpec group, CommandLine cmd) { this.group = group; addMatch(cmd);}
 
             /** Returns the {@code ArgGroupSpec} whose matches are captured in this {@code GroupMatchContainer}. */
-            public ArgGroupSpec group() { return group; }
+            public Model.ArgGroupSpec group() { return group; }
 //            /** Returns the {@code GroupMatchContainer} of the parent {@code ArgGroupSpec}, or {@code null} if this group has no parent. */
 //            public GroupMatchContainer parentContainer() { return parentContainer; }
             /** Returns the list of {@code GroupMatch} instances: {@code ArgGroupSpec}s with a multiplicity greater than one may be matched multiple times. */
@@ -12892,17 +12993,17 @@ public class CommandLine {
                 return allRequired ? isMaxMultiplicityReached() : isMinMultiplicityReached();
             }
 
-            private GroupMatchContainer findOrCreateMatchingGroup(ArgSpec argSpec, CommandLine commandLine) {
-                ArgGroupSpec searchGroup = Assert.notNull(argSpec.group(), "group for " + argSpec);
+            private GroupMatchContainer findOrCreateMatchingGroup(Model.ArgSpec argSpec, CommandLine commandLine) {
+                Model.ArgGroupSpec searchGroup = Assert.notNull(argSpec.group(), "group for " + argSpec);
                 GroupMatchContainer container = this;
                 if (searchGroup == container.group()) { return container; }
-                List<ArgGroupSpec> keys = new ArrayList<ArgGroupSpec>();
+                List<Model.ArgGroupSpec> keys = new ArrayList<Model.ArgGroupSpec>();
                 while (searchGroup != null) {
                     keys.add(searchGroup);
                     searchGroup = searchGroup.parentGroup();
                 }
                 Collections.reverse(keys);
-                for (ArgGroupSpec key : keys) {
+                for (Model.ArgGroupSpec key : keys) {
                     GroupMatchContainer sub = container.lastMatch().matchedSubgroups().get(key);
                     if (sub == null) {
                         sub = createGroupMatchContainer(key, container, commandLine);
@@ -12911,7 +13012,7 @@ public class CommandLine {
                 }
                 return container;
             }
-            private GroupMatchContainer createGroupMatchContainer(ArgGroupSpec group, GroupMatchContainer parent, CommandLine commandLine) {
+            private GroupMatchContainer createGroupMatchContainer(Model.ArgGroupSpec group, GroupMatchContainer parent, CommandLine commandLine) {
                 GroupMatchContainer result = new GroupMatchContainer(group, commandLine);
                 result.parentContainer = parent;
                 parent.lastMatch().matchedSubgroups.put(group, result);
@@ -12926,7 +13027,7 @@ public class CommandLine {
                 return this;
             }
 
-            List<GroupMatchContainer> findMatchContainers(ArgGroupSpec group, List<GroupMatchContainer> result) {
+            List<GroupMatchContainer> findMatchContainers(Model.ArgGroupSpec group, List<GroupMatchContainer> result) {
                 if (this.group == group) { result.add(this); return result; }
                 for (GroupMatch multiple : matches()) {
                     for (GroupMatchContainer mg : multiple.matchedSubgroups.values()) {
@@ -12935,7 +13036,7 @@ public class CommandLine {
                 }
                 return result;
             }
-            GroupMatchContainer findLastMatchContainer(ArgGroupSpec group) {
+            GroupMatchContainer findLastMatchContainer(Model.ArgGroupSpec group) {
                 List<GroupMatchContainer> all = findMatchContainers(group, new ArrayList<GroupMatchContainer>());
                 return all.isEmpty() ? null : all.get(all.size() - 1);
             }
@@ -12960,7 +13061,7 @@ public class CommandLine {
                 return result.append(suffix);
 
             }
-            void updateUnmatchedGroups(final ArgGroupSpec group) {
+            void updateUnmatchedGroups(final Model.ArgGroupSpec group) {
                 Assert.assertTrue(Assert.equals(group(), group.parentGroup()), new IHelpSectionRenderer() {public String render(Help h) {
                     return "Internal error: expected " + group.parentGroup() + " (the parent of " + group + "), but was " + group(); }});
 
@@ -12969,7 +13070,7 @@ public class CommandLine {
                     this.unmatchedSubgroups.add(group);
                 }
                 for (GroupMatchContainer groupMatchContainer : groupMatchContainers) {
-                    for (ArgGroupSpec subGroup : group.subgroups()) {
+                    for (Model.ArgGroupSpec subGroup : group.subgroups()) {
                         groupMatchContainer.updateUnmatchedGroups(subGroup);
                     }
                 }
@@ -12985,7 +13086,7 @@ public class CommandLine {
                 }
 
                 validationResult = matches.isEmpty() ? GroupValidationResult.SUCCESS_ABSENT : GroupValidationResult.SUCCESS_PRESENT;
-                for (ArgGroupSpec missing : unmatchedSubgroups) {
+                for (Model.ArgGroupSpec missing : unmatchedSubgroups) {
                     if (missing.validate() && missing.multiplicity().min > 0) {
                         int presentCount = 0;
                         boolean haveMissing = true;
@@ -13017,13 +13118,13 @@ public class CommandLine {
             }
 
             private void failGroupMultiplicityExceeded(List<ParseResult.GroupMatch> groupMatches, CommandLine commandLine) {
-                Map<ArgGroupSpec, List<List<ParseResult.GroupMatch>>> matchesPerGroup = new LinkedHashMap<ArgGroupSpec, List<List<GroupMatch>>>();
+                Map<Model.ArgGroupSpec, List<List<ParseResult.GroupMatch>>> matchesPerGroup = new LinkedHashMap<Model.ArgGroupSpec, List<List<GroupMatch>>>();
                 String msg = "";
                 for (ParseResult.GroupMatch match : groupMatches) {
                     if (msg.length() > 0) { msg += " and "; }
                     msg += match;
-                    Map<ArgGroupSpec, GroupMatchContainer> subgroups = match.matchedSubgroups();
-                    for (ArgGroupSpec group : subgroups.keySet()) {
+                    Map<Model.ArgGroupSpec, GroupMatchContainer> subgroups = match.matchedSubgroups();
+                    for (Model.ArgGroupSpec group : subgroups.keySet()) {
                         if (group.validate()) { // don't raise errors for non-validating groups: https://github.com/remkop/picocli/issues/810
                             addValueToListInMap(matchesPerGroup, group, subgroups.get(group).matches());
                         }
@@ -13036,10 +13137,10 @@ public class CommandLine {
                 }
             }
 
-            private boolean simplifyErrorMessageForSingleGroup(Map<ArgGroupSpec, List<List<ParseResult.GroupMatch>>> matchesPerGroup, CommandLine commandLine) {
-                for (ArgGroupSpec group : matchesPerGroup.keySet()) {
+            private boolean simplifyErrorMessageForSingleGroup(Map<Model.ArgGroupSpec, List<List<ParseResult.GroupMatch>>> matchesPerGroup, CommandLine commandLine) {
+                for (Model.ArgGroupSpec group : matchesPerGroup.keySet()) {
                     List<ParseResult.GroupMatch> flat = flatList(matchesPerGroup.get(group));
-                    Set<ArgSpec> matchedArgs = new LinkedHashSet<ArgSpec>();
+                    Set<Model.ArgSpec> matchedArgs = new LinkedHashSet<Model.ArgSpec>();
                     for (ParseResult.GroupMatch match : flat) {
                         if (!match.matchedSubgroups().isEmpty()) { return false; }
                         matchedArgs.addAll(match.matchedValues.keySet());
@@ -13077,7 +13178,7 @@ public class CommandLine {
                 }
             }
 
-            boolean canMatchPositionalParam(PositionalParamSpec positionalParam) {
+            boolean canMatchPositionalParam(Model.PositionalParamSpec positionalParam) {
                 boolean mayCreateNewMatch = !matches.isEmpty() && lastMatch().matchedMinElements();
                 boolean mustCreateNewMatch = !matches.isEmpty() && lastMatch().matchedMaxElements();
                 if (mustCreateNewMatch && isMaxMultiplicityReached()) {
@@ -13104,10 +13205,10 @@ public class CommandLine {
             final int startPosition;
             final GroupMatchContainer container;
 
-            Map<ArgGroupSpec, GroupMatchContainer> matchedSubgroups = new LinkedHashMap<ArgGroupSpec, GroupMatchContainer>(2); // preserve order: used in toString()
-            Map<ArgSpec, List<Object>> matchedValues         = new IdentityHashMap<ArgSpec, List<Object>>(); // identity map for performance
-            Map<ArgSpec, List<String>> originalStringValues  = new LinkedHashMap<ArgSpec, List<String>>(); // preserve order: used in toString()
-            Map<ArgSpec, Map<Integer, List<Object>>> matchedValuesAtPosition = new IdentityHashMap<ArgSpec, Map<Integer, List<Object>>>();
+            Map<Model.ArgGroupSpec, GroupMatchContainer> matchedSubgroups = new LinkedHashMap<Model.ArgGroupSpec, GroupMatchContainer>(2); // preserve order: used in toString()
+            Map<Model.ArgSpec, List<Object>> matchedValues         = new IdentityHashMap<Model.ArgSpec, List<Object>>(); // identity map for performance
+            Map<Model.ArgSpec, List<String>> originalStringValues  = new LinkedHashMap<Model.ArgSpec, List<String>>(); // preserve order: used in toString()
+            Map<Model.ArgSpec, Map<Integer, List<Object>>> matchedValuesAtPosition = new IdentityHashMap<Model.ArgSpec, Map<Integer, List<Object>>>();
             private GroupValidationResult validationResult;
 
             GroupMatch(GroupMatchContainer container) {
@@ -13121,18 +13222,18 @@ public class CommandLine {
             /** Returns {@code true} if this match has no matched arguments and no matched subgroups. */
             public boolean isEmpty() { return originalStringValues.isEmpty() && matchedSubgroups.isEmpty(); }
             /** Returns the {@code ArgGroupSpec} of the container {@code GroupMatchContainer} of this match. */
-            public ArgGroupSpec group() { return container.group; }
+            public Model.ArgGroupSpec group() { return container.group; }
             /** Returns the container {@code GroupMatchContainer} of this match. */
             public GroupMatchContainer container() { return container; }
             /** Returns matches for the subgroups, if any. */
-            public Map<ArgGroupSpec, GroupMatchContainer> matchedSubgroups() { return Collections.unmodifiableMap(matchedSubgroups); }
-            int matchCount(ArgSpec argSpec)                    { return matchedValues.get(argSpec) == null ? 0 : matchedValues.get(argSpec).size(); }
+            public Map<Model.ArgGroupSpec, GroupMatchContainer> matchedSubgroups() { return Collections.unmodifiableMap(matchedSubgroups); }
+            int matchCount(Model.ArgSpec argSpec)                    { return matchedValues.get(argSpec) == null ? 0 : matchedValues.get(argSpec).size(); }
             /** Returns the values matched for the specified argument, converted to the type of the argument. */
-            public List<Object> matchedValues(ArgSpec argSpec) { return matchedValues.get(argSpec) == null ? Collections.emptyList() : Collections.unmodifiableList(matchedValues.get(argSpec)); }
-            void addOriginalStringValue(ArgSpec argSpec, String value) {
+            public List<Object> matchedValues(Model.ArgSpec argSpec) { return matchedValues.get(argSpec) == null ? Collections.emptyList() : Collections.unmodifiableList(matchedValues.get(argSpec)); }
+            void addOriginalStringValue(Model.ArgSpec argSpec, String value) {
                 addValueToListInMap(originalStringValues, argSpec, value);
             }
-            void addMatchedValue(ArgSpec argSpec, int matchPosition, Object stronglyTypedValue, Tracer tracer) {
+            void addMatchedValue(Model.ArgSpec argSpec, int matchPosition, Object stronglyTypedValue, Tracer tracer) {
                 addValueToListInMap(matchedValues, argSpec, stronglyTypedValue);
 
                 Map<Integer, List<Object>> positionalValues = matchedValuesAtPosition.get(argSpec);
@@ -13142,7 +13243,7 @@ public class CommandLine {
                 }
                 addValueToListInMap(positionalValues, matchPosition, stronglyTypedValue);
             }
-            boolean hasMatchedValueAtPosition(ArgSpec arg, int position) { Map<Integer, List<Object>> atPos = matchedValuesAtPosition.get(arg); return atPos != null && atPos.containsKey(position); }
+            boolean hasMatchedValueAtPosition(Model.ArgSpec arg, int position) { Map<Integer, List<Object>> atPos = matchedValuesAtPosition.get(arg); return atPos != null && atPos.containsKey(position); }
 
             /** Returns {@code true} if the minimum number of elements have been reached for this match:
              * all required arguments have been matched, and for each subgroup,
@@ -13154,10 +13255,10 @@ public class CommandLine {
             boolean matchedMaxElements() { return matchedFully(true); }
             private boolean matchedFully(boolean allRequired) {
                 if (group().exclusive()) { return !matchedValues.isEmpty() || hasFullyMatchedSubgroup(allRequired); }
-                for (ArgSpec arg : group().args()) {
+                for (Model.ArgSpec arg : group().args()) {
                     if (matchedValues.get(arg) == null && (arg.required() || allRequired)) { return false; }
                 }
-                for (ArgGroupSpec subgroup : group().subgroups()) {
+                for (Model.ArgGroupSpec subgroup : group().subgroups()) {
                     GroupMatchContainer groupMatchContainer = matchedSubgroups.get(subgroup);
                     if (groupMatchContainer != null) {
                         if (!groupMatchContainer.matchedFully(allRequired)) { return false; }
@@ -13176,11 +13277,11 @@ public class CommandLine {
             }
             private StringBuilder toString(StringBuilder result) {
                 int originalLength = result.length();
-                for (ArgSpec arg : originalStringValues.keySet()) {
+                for (Model.ArgSpec arg : originalStringValues.keySet()) {
                     List<String> values = originalStringValues.get(arg);
                     for (String value : values) {
                         if (result.length() != originalLength) { result.append(" "); }
-                        result.append(ArgSpec.describe(arg, "=", value));
+                        result.append(Model.ArgSpec.describe(arg, "=", value));
                     }
                 }
                 for (GroupMatchContainer sub : matchedSubgroups.values()) {
@@ -13218,19 +13319,19 @@ public class CommandLine {
                     // now validate the args combined with subgroups:
                     // some groups may consist of a required option + a required subgroup:
                     // the presence of either means that the other must occur
-                    Set<ArgSpec> intersection = new LinkedHashSet<ArgSpec>(group().args());
-                    Set<ArgSpec> missing = new LinkedHashSet<ArgSpec>(group().requiredArgs());
-                    Set<ArgSpec> found = new LinkedHashSet<ArgSpec>(matchedValues.keySet());
+                    Set<Model.ArgSpec> intersection = new LinkedHashSet<Model.ArgSpec>(group().args());
+                    Set<Model.ArgSpec> missing = new LinkedHashSet<Model.ArgSpec>(group().requiredArgs());
+                    Set<Model.ArgSpec> found = new LinkedHashSet<Model.ArgSpec>(matchedValues.keySet());
                     missing.removeAll(matchedValues.keySet());
                     intersection.retainAll(found);
-                    String exclusiveElements = ArgSpec.describe(intersection);
-                    String requiredElements = ArgSpec.describe(group().requiredArgs());
-                    String missingElements = ArgSpec.describe(missing);
+                    String exclusiveElements = Model.ArgSpec.describe(intersection);
+                    String requiredElements = Model.ArgSpec.describe(group().requiredArgs());
+                    String missingElements = Model.ArgSpec.describe(missing);
 
-                    Set<ArgGroupSpec> missingSubgroups = new LinkedHashSet<ArgGroupSpec>(group().subgroups());
+                    Set<Model.ArgGroupSpec> missingSubgroups = new LinkedHashSet<Model.ArgGroupSpec>(group().subgroups());
                     missingSubgroups.removeAll(matchedSubgroups.keySet());
                     int missingRequiredSubgroupCount = 0;
-                    for (ArgGroupSpec missingSubgroup : missingSubgroups) {
+                    for (Model.ArgGroupSpec missingSubgroup : missingSubgroups) {
                         if (missingSubgroup.multiplicity().min() > 0) {
                             missingRequiredSubgroupCount++;
                             if (missingElements.length() > 0) { missingElements += " and "; }
@@ -13238,7 +13339,7 @@ public class CommandLine {
                         }
                     }
 
-                    for (ArgGroupSpec subgroup : group().subgroups()) {
+                    for (Model.ArgGroupSpec subgroup : group().subgroups()) {
                         if (exclusiveElements.length() > 0) { exclusiveElements += " and "; }
                         exclusiveElements += subgroup.synopsisUnit();
                         if (subgroup.multiplicity().min > 0) {
@@ -13361,7 +13462,7 @@ public class CommandLine {
         private void reg(Class<?> timeClass, BuiltIn.ISO8601TimeConverter converter) {
             converterRegistry.put(timeClass, converter);
         }
-        private ParserSpec config() { return commandSpec.parser(); }
+        private Model.ParserSpec config() { return commandSpec.parser(); }
         /**
          * Entry point into parsing command line arguments.
          * @param args the command line arguments
@@ -13385,7 +13486,7 @@ public class CommandLine {
             Stack<String> arguments = new Stack<String>();
             arguments.addAll(reverseList(expanded));
             List<CommandLine> result = new ArrayList<CommandLine>();
-            parse(result, arguments, args, new ArrayList<Object>(), new HashSet<ArgSpec>());
+            parse(result, arguments, args, new ArrayList<Object>(), new HashSet<Model.ArgSpec>());
             return result;
         }
 
@@ -13460,12 +13561,12 @@ public class CommandLine {
             endOfOptions = false;
             isHelpRequested = false;
             parseResultBuilder = ParseResult.builder(getCommandSpec());
-            for (OptionSpec option : getCommandSpec().options())                            { clear(option); }
-            for (PositionalParamSpec positional : getCommandSpec().positionalParameters())  { clear(positional); }
-            for (ArgGroupSpec group : getCommandSpec().argGroups())                         { clear(group); }
-            for (UnmatchedArgsBinding unmatched : getCommandSpec().unmatchedArgsBindings()) { unmatched.clear(); }
+            for (Model.OptionSpec option : getCommandSpec().options())                            { clear(option); }
+            for (Model.PositionalParamSpec positional : getCommandSpec().positionalParameters())  { clear(positional); }
+            for (Model.ArgGroupSpec group : getCommandSpec().argGroups())                         { clear(group); }
+            for (Model.UnmatchedArgsBinding unmatched : getCommandSpec().unmatchedArgsBindings()) { unmatched.clear(); }
         }
-        private void clear(ArgSpec argSpec) {
+        private void clear(Model.ArgSpec argSpec) {
             argSpec.resetStringValues();
             argSpec.resetOriginalStringValues();
             argSpec.typedValues.clear();
@@ -13476,9 +13577,9 @@ public class CommandLine {
                 if (argSpec.group() == null) { argSpec.applyInitialValue(); }
             }
         }
-        private void clear(ArgGroupSpec group) {
-            for (ArgSpec arg : group.args()) { clear(arg); }
-            for (ArgGroupSpec sub : group.subgroups()) { clear(sub); }
+        private void clear(Model.ArgGroupSpec group) {
+            for (Model.ArgSpec arg : group.args()) { clear(arg); }
+            for (Model.ArgGroupSpec sub : group.subgroups()) { clear(sub); }
         }
 
         void maybeThrow(PicocliException ex) throws PicocliException {
@@ -13489,21 +13590,21 @@ public class CommandLine {
             }
         }
 
-        private void parse(List<CommandLine> parsedCommands, Stack<String> argumentStack, String[] originalArgs, List<Object> nowProcessing, Collection<ArgSpec> inheritedRequired) {
-            parse(parsedCommands, argumentStack, originalArgs, nowProcessing, inheritedRequired, new LinkedHashSet<ArgSpec>());
+        private void parse(List<CommandLine> parsedCommands, Stack<String> argumentStack, String[] originalArgs, List<Object> nowProcessing, HashSet<Model.ArgSpec> inheritedRequired) {
+            parse(parsedCommands, argumentStack, originalArgs, nowProcessing, inheritedRequired, new LinkedHashSet<>());
         }
 
-        private void parse(List<CommandLine> parsedCommands, Stack<String> argumentStack, String[] originalArgs, List<Object> nowProcessing, Collection<ArgSpec> inheritedRequired, Set<ArgSpec> initialized) {
+        private void parse(List<CommandLine> parsedCommands, Stack<String> argumentStack, String[] originalArgs, List<Object> nowProcessing, Collection<Model.ArgSpec> inheritedRequired, Set<Model.ArgSpec> initialized) {
             Tracer tracer = CommandLine.tracer();
             if (tracer.isDebug()) {
                 tracer.debug("Initializing %s: %d options, %d positional parameters, %d required, %d groups, %d subcommands.",
-                        commandSpec.toString(), new HashSet<ArgSpec>(commandSpec.optionsMap().values()).size(),
+                        commandSpec.toString(), new HashSet<Model.ArgSpec>(commandSpec.optionsMap().values()).size(),
                         commandSpec.positionalParameters().size(), commandSpec.requiredArgs().size(),
                         commandSpec.argGroups().size(), commandSpec.subcommands().size());
             }
             clear(); // first reset any state in case this CommandLine instance is being reused
             parsedCommands.add(CommandLine.this);
-            List<ArgSpec> required = new ArrayList<ArgSpec>(commandSpec.requiredArgs());
+            List<Model.ArgSpec> required = new ArrayList<Model.ArgSpec>(commandSpec.requiredArgs());
             addPostponedRequiredArgs(inheritedRequired, required);
             Collections.sort(required, new PositionalParametersSorter());
 
@@ -13549,15 +13650,15 @@ public class CommandLine {
             }
         }
 
-        private void addPostponedRequiredArgs(Collection<ArgSpec> inheritedRequired, List<ArgSpec> required) {
-            for (ArgSpec postponed : inheritedRequired) {
+        private void addPostponedRequiredArgs(Collection<Model.ArgSpec> inheritedRequired, List<Model.ArgSpec> required) {
+            for (Model.ArgSpec postponed : inheritedRequired) {
                 if (postponed.isOption()) {
-                    OptionSpec inherited = commandSpec.findOption(((OptionSpec) postponed).longestName());
+                    Model.OptionSpec inherited = commandSpec.findOption(((Model.OptionSpec) postponed).longestName());
                     Assert.notNull(inherited, "inherited option " + postponed);
                     required.add(inherited);
                 } else {
-                    PositionalParamSpec positional = (PositionalParamSpec) postponed;
-                    for (PositionalParamSpec existing : commandSpec.positionalParameters()) {
+                    Model.PositionalParamSpec positional = (Model.PositionalParamSpec) postponed;
+                    for (Model.PositionalParamSpec existing : commandSpec.positionalParameters()) {
                         if (existing.inherited()
                                 && existing.index().equals(positional.index())
                                 && existing.arity().equals(positional.arity())
@@ -13577,9 +13678,9 @@ public class CommandLine {
             }
         }
 
-        private void validateConstraints(Stack<String> argumentStack, List<ArgSpec> required, Set<ArgSpec> matched) {
+        private void validateConstraints(Stack<String> argumentStack, List<Model.ArgSpec> required, Set<Model.ArgSpec> matched) {
             if (!required.isEmpty()) {
-                for (ArgSpec missing : required) {
+                for (Model.ArgSpec missing : required) {
                     Assert.assertTrue(missing.group() == null, "Arguments in a group are not necessarily required for the command");
                     if (missing.isOption()) {
                         maybeThrow(MissingParameterException.create(CommandLine.this, required, config().separator()));
@@ -13590,7 +13691,7 @@ public class CommandLine {
             }
             if (!parseResultBuilder.unmatched.isEmpty()) {
                 String[] unmatched = parseResultBuilder.unmatched.toArray(new String[0]);
-                for (UnmatchedArgsBinding unmatchedArgsBinding : getCommandSpec().unmatchedArgsBindings()) {
+                for (Model.UnmatchedArgsBinding unmatchedArgsBinding : getCommandSpec().unmatchedArgsBindings()) {
                     unmatchedArgsBinding.addAll(unmatched.clone());
                 }
                 if (!isUnmatchedArgumentsAllowed()) { maybeThrow(new UnmatchedArgumentException(CommandLine.this, Collections.unmodifiableList(parseResultBuilder.unmatched))); }
@@ -13601,11 +13702,11 @@ public class CommandLine {
             pr.validateGroups();
         }
 
-        private void applyDefaultValues(List<ArgSpec> required, Set<ArgSpec> initialized) throws Exception {
+        private void applyDefaultValues(List<Model.ArgSpec> required, Set<Model.ArgSpec> initialized) throws Exception {
             parseResultBuilder.isInitializingDefaultValues = true;
             Tracer tracer = CommandLine.tracer();
             tracer.debug("Applying default values for command '%s'", CommandLine.this.commandSpec.qualifiedName());
-            for (ArgSpec arg : commandSpec.args()) {
+            for (Model.ArgSpec arg : commandSpec.args()) {
                 if (arg.group() == null && !initialized.contains(arg)) {
                     if (arg.inherited()) {
                         tracer.debug("Not applying default value for inherited %s", optionDescription("", arg, -1));
@@ -13614,15 +13715,15 @@ public class CommandLine {
                     }
                 }
             }
-            for (ArgGroupSpec group : commandSpec.argGroups()) {
+            for (Model.ArgGroupSpec group : commandSpec.argGroups()) {
                 applyGroupDefaults(commandSpec.defaultValueProvider(), group, required, initialized);
             }
             parseResultBuilder.isInitializingDefaultValues = false;
         }
-        private void applyGroupDefaults(IDefaultValueProvider defaultValueProvider, ArgGroupSpec group, List<ArgSpec> required, Set<ArgSpec> initialized) throws Exception {
+        private void applyGroupDefaults(IDefaultValueProvider defaultValueProvider, Model.ArgGroupSpec group, List<Model.ArgSpec> required, Set<Model.ArgSpec> initialized) throws Exception {
             Tracer tracer = CommandLine.tracer();
             tracer.debug("Applying default values for group '%s'", group.synopsis());
-            for (ArgSpec arg : group.args()) {
+            for (Model.ArgSpec arg : group.args()) {
                 if (arg.scope().get() != null && !initialized.contains(arg)) {
                     if (arg.inherited()) {
                         tracer.debug("Not applying default value for inherited %s", optionDescription("", arg, -1));
@@ -13631,11 +13732,11 @@ public class CommandLine {
                     }
                 }
             }
-            for (ArgGroupSpec sub : group.subgroups()) {
+            for (Model.ArgGroupSpec sub : group.subgroups()) {
                 applyGroupDefaults(defaultValueProvider, sub, required, initialized);
             }
         }
-        private boolean applyDefault(IDefaultValueProvider defaultValueProvider, ArgSpec arg) throws Exception {
+        private boolean applyDefault(IDefaultValueProvider defaultValueProvider, Model.ArgSpec arg) throws Exception {
 
             // Default value provider return value is only used if provider exists and if value
             // is not null otherwise the original default or initial value are used
@@ -13644,21 +13745,21 @@ public class CommandLine {
             String provider = defaultValueProvider == null ? "" : (" from " + defaultValueProvider.toString());
 
             Tracer tracer = CommandLine.tracer();
-            if (defaultValue != null && !ArgSpec.NULL_VALUE.equals(defaultValue)) {
+            if (defaultValue != null && !Model.ArgSpec.NULL_VALUE.equals(defaultValue)) {
                 if (tracer.isDebug()) {
                     tracer.debug("Applying defaultValue (%s)%s to %s on %s", defaultValue, provider, arg, arg.scopeString());}
                 Range arity = arg.arity().min(Math.max(1, arg.arity().min));
-                applyOption(arg, false, LookBehind.SEPARATE, false, arity, stack(defaultValue), new HashSet<ArgSpec>(), arg.toString);
+                applyOption(arg, false, LookBehind.SEPARATE, false, arity, stack(defaultValue), new HashSet<Model.ArgSpec>(), arg.toString);
             } else {
                 if (arg.typeInfo().isOptional()) {
                     if (tracer.isDebug()) {
                         tracer.debug("Applying Optional.empty() to %s on %s", arg, arg.scopeString());}
                     arg.setValue(getOptionalEmpty());
-                } else if (ArgSpec.UNSPECIFIED.equals(arg.originalDefaultValue)) {
+                } else if (Model.ArgSpec.UNSPECIFIED.equals(arg.originalDefaultValue)) {
                     tracer.debug("defaultValue not defined for %s", arg);
                     return false;
                 } else {
-                    if (ArgSpec.NULL_VALUE.equals(arg.originalDefaultValue)) {
+                    if (Model.ArgSpec.NULL_VALUE.equals(arg.originalDefaultValue)) {
                         defaultValue = null;
                         if (tracer.isDebug()) {
                             tracer.debug("Applying defaultValue (%s)%s to %s on %s", defaultValue, provider, arg, arg.scopeString());}
@@ -13675,8 +13776,8 @@ public class CommandLine {
 
         private void processArguments(List<CommandLine> parsedCommands,
                                       Stack<String> args,
-                                      Collection<ArgSpec> required,
-                                      Set<ArgSpec> initialized,
+                                      Collection<Model.ArgSpec> required,
+                                      Set<Model.ArgSpec> initialized,
                                       String[] originalArgs,
                                       List<Object> nowProcessing) throws Exception {
             // arg must be one of:
@@ -13739,13 +13840,13 @@ public class CommandLine {
                     if (subcommand != null) {
                         tracer.debug("'%s' is a repeatable subcommand of %s", arg,
                                 commandSpec.parent().qualifiedName()); // #454 repeatable subcommands
-                        Set<ArgSpec> inheritedInitialized = initialized;
+                        Set<Model.ArgSpec> inheritedInitialized = initialized;
                         if (subcommand.interpreter.parseResultBuilder != null) {
                             tracer.debug("Subcommand '%s' has been matched before. Making a copy...",
                                     subcommand.getCommandName());
                             subcommand = subcommand.copy();
                             subcommand.getCommandSpec().parent(commandSpec.parent()); // hook it up with its parent
-                            inheritedInitialized = new LinkedHashSet<ArgSpec>(inheritedInitialized);
+                            inheritedInitialized = new LinkedHashSet<Model.ArgSpec>(inheritedInitialized);
                         }
                         processSubcommand(subcommand, getParent().interpreter.parseResultBuilder, parsedCommands, args,
                                 required, inheritedInitialized, originalArgs, nowProcessing, separator, arg);
@@ -13757,7 +13858,7 @@ public class CommandLine {
                 // A single option may be without option parameters, like "-v" or "--verbose" (a boolean value),
                 // or an option may have one or more option parameters.
                 // A parameter may be attached to the option.
-                LinkedHashMap<String, OptionSpec> aggregatedOptions = new LinkedHashMap<String, OptionSpec>();
+                LinkedHashMap<String, Model.OptionSpec> aggregatedOptions = new LinkedHashMap<String, Model.OptionSpec>();
                 if (commandSpec.parser().abbreviatedOptionsAllowed()) {
                     aggregatedOptions.putAll(commandSpec.optionsMap());
                     aggregatedOptions.putAll(commandSpec.negatedOptionsMap());
@@ -13808,18 +13909,18 @@ public class CommandLine {
             }
         }
 
-        private void processSubcommand(CommandLine subcommand, ParseResult.Builder builder, List<CommandLine> parsedCommands, Stack<String> args, Collection<ArgSpec> required, Set<ArgSpec> initialized, String[] originalArgs, List<Object> nowProcessing, String separator, String arg) {
+        private void processSubcommand(CommandLine subcommand, ParseResult.Builder builder, List<CommandLine> parsedCommands, Stack<String> args, Collection<Model.ArgSpec> required, Set<Model.ArgSpec> initialized, String[] originalArgs, List<Object> nowProcessing, String separator, String arg) {
             Tracer tracer = CommandLine.tracer();
             if (tracer.isDebug()) {
                 tracer.debug("Found subcommand '%s' (%s)", arg, subcommand.commandSpec.toString());}
             nowProcessing.add(subcommand.commandSpec);
             updateHelpRequested(subcommand.commandSpec);
-            List<ArgSpec> inheritedRequired = new ArrayList<ArgSpec>();
+            List<Model.ArgSpec> inheritedRequired = new ArrayList<Model.ArgSpec>();
             if (tracer.isDebug()) {
                 tracer.debug("Checking required args for parent %s...", subcommand.commandSpec.parent());}
-            Iterator<ArgSpec> requiredIter = required.iterator();
+            Iterator<Model.ArgSpec> requiredIter = required.iterator();
             while (requiredIter.hasNext()) {
-                ArgSpec requiredArg = requiredIter.next();
+                Model.ArgSpec requiredArg = requiredIter.next();
                 if (requiredArg.scopeType() == ScopeType.INHERIT || requiredArg.inherited()) {
                     if (tracer.isDebug()) {
                         tracer.debug("Postponing validation for required %s: scopeType=%s, inherited=%s", optionDescription("", requiredArg, -1), requiredArg.scopeType(), requiredArg.inherited());}
@@ -13830,7 +13931,7 @@ public class CommandLine {
             if (!isAnyHelpRequested() && !required.isEmpty()) { // ensure current command portion is valid
                 throw MissingParameterException.create(CommandLine.this, required, separator);
             }
-            Set<ArgSpec> inheritedInitialized = new LinkedHashSet<ArgSpec>();
+            Set<Model.ArgSpec> inheritedInitialized = new LinkedHashSet<Model.ArgSpec>();
             subcommand.interpreter.parse(parsedCommands, args, originalArgs, nowProcessing, inheritedRequired, inheritedInitialized);
             initialized.addAll(inheritedInitialized);
             builder.subcommand(subcommand.interpreter.parseResultBuilder.build());
@@ -13846,12 +13947,12 @@ public class CommandLine {
             if (config().stopAtUnmatched()) { parseResultBuilder.addUnmatched(args); }
         }
 
-        private void processRemainderAsPositionalParameters(Collection<ArgSpec> required, Set<ArgSpec> initialized, Stack<String> args) throws Exception {
+        private void processRemainderAsPositionalParameters(Collection<Model.ArgSpec> required, Set<Model.ArgSpec> initialized, Stack<String> args) throws Exception {
             while (!args.empty()) {
                 processPositionalParameter(required, initialized, false, args);
             }
         }
-        private void processPositionalParameter(Collection<ArgSpec> required, Set<ArgSpec> initialized, boolean alreadyUnquoted, Stack<String> args) throws Exception {
+        private void processPositionalParameter(Collection<Model.ArgSpec> required, Set<Model.ArgSpec> initialized, boolean alreadyUnquoted, Stack<String> args) throws Exception {
             final Tracer tracer = CommandLine.tracer();
             String arg = args.peek();
             if (!endOfOptions && commandSpec.resemblesOption(arg)) {
@@ -13877,7 +13978,7 @@ public class CommandLine {
             int originalNowProcessingSize = parseResultBuilder.nowProcessing.size();
             List<Runnable> bookKeeping = new ArrayList<Runnable>();
             for (int i = 0; i < commandSpec.positionalParameters().size(); i++) {
-                PositionalParamSpec positionalParam = commandSpec.positionalParameters().get(i);
+                Model.PositionalParamSpec positionalParam = commandSpec.positionalParameters().get(i);
                 Range indexRange = positionalParam.index();
                 int localPosition = getPosition(positionalParam);
                 if (positionalParam.group() != null) { // does the positionalParam's index range contain the current position in the currently matching group
@@ -13949,13 +14050,13 @@ public class CommandLine {
             }
         }
 
-        private void processStandaloneOption(Collection<ArgSpec> required,
-                                             Set<ArgSpec> initialized,
+        private void processStandaloneOption(Collection<Model.ArgSpec> required,
+                                             Set<Model.ArgSpec> initialized,
                                              String arg,
                                              boolean alreadyUnquoted,
                                              Stack<String> args,
                                              LookBehind lookBehind) throws Exception {
-            ArgSpec argSpec = commandSpec.optionsMap().get(arg);
+            Model.ArgSpec argSpec = commandSpec.optionsMap().get(arg);
             boolean negated = argSpec == null;
             if (negated) { argSpec = commandSpec.negatedOptionsMap().get(arg); }
             required.remove(argSpec);
@@ -13970,8 +14071,8 @@ public class CommandLine {
             applyOption(argSpec, negated, lookBehind, alreadyUnquoted, arity, args, initialized, "option " + arg);
         }
 
-        private void processClusteredShortOptions(Collection<ArgSpec> required,
-                                                  Set<ArgSpec> initialized,
+        private void processClusteredShortOptions(Collection<Model.ArgSpec> required,
+                                                  Set<Model.ArgSpec> initialized,
                                                   String arg,
                                                   boolean alreadyUnquoted,
                                                   Stack<String> args) throws Exception {
@@ -13982,7 +14083,7 @@ public class CommandLine {
             Tracer tracer = CommandLine.tracer();
             do {
                 if (cluster.length() > 0 && commandSpec.posixOptionsMap().containsKey(cluster.charAt(0))) {
-                    ArgSpec argSpec = commandSpec.posixOptionsMap().get(cluster.charAt(0));
+                    Model.ArgSpec argSpec = commandSpec.posixOptionsMap().get(cluster.charAt(0));
                     Range arity = argSpec.arity();
                     String argDescription = "option " + prefix + cluster.charAt(0);
                     if (tracer.isDebug()) {
@@ -14052,13 +14153,13 @@ public class CommandLine {
             } while (true);
         }
 
-        private int applyOption(ArgSpec argSpec,
+        private int applyOption(Model.ArgSpec argSpec,
                                 boolean negated,
                                 LookBehind lookBehind,
                                 boolean alreadyUnquoted,
                                 Range arity,
                                 Stack<String> args,
-                                Set<ArgSpec> initialized,
+                                Set<Model.ArgSpec> initialized,
                                 String argDescription) throws Exception {
             updateHelpRequested(argSpec);
 
@@ -14110,21 +14211,21 @@ public class CommandLine {
             return result;
         }
 
-        private void addToInitialized(ArgSpec argSpec, Set<ArgSpec> initialized) {
+        private void addToInitialized(Model.ArgSpec argSpec, Set<Model.ArgSpec> initialized) {
             initialized.add(argSpec);
-            ArgSpec rootArgSpec = argSpec.root();
+            Model.ArgSpec rootArgSpec = argSpec.root();
             if (rootArgSpec != null) {
                 initialized.add(rootArgSpec);
             }
         }
 
-        private int applyValueToSingleValuedField(ArgSpec argSpec,
+        private int applyValueToSingleValuedField(Model.ArgSpec argSpec,
                                                   boolean negated,
                                                   LookBehind lookBehind,
                                                   boolean alreadyUnquoted,
                                                   Range derivedArity,
                                                   Stack<String> args,
-                                                  Set<ArgSpec> initialized,
+                                                  Set<Model.ArgSpec> initialized,
                                                   String argDescription) throws Exception {
             Tracer tracer = CommandLine.tracer();
             boolean noMoreValues = args.isEmpty();
@@ -14159,8 +14260,8 @@ public class CommandLine {
                     boolean optionalWithBooleanValue = arity.max > 0 && ("true".equalsIgnoreCase(value) || "false".equalsIgnoreCase(value));
                     if (!optionalWithBooleanValue && lookBehind != LookBehind.ATTACHED_WITH_SEPARATOR) { // if attached, try converting the value to boolean (and fail if invalid value)
                         Boolean defaultValue = booleanValue(argSpec, argSpec.calcDefaultValue(true)); // #712 flip the default value
-                        if (argSpec.isOption() && !empty(((OptionSpec) argSpec).fallbackValue())) {
-                            defaultValue = !booleanValue(argSpec, ((OptionSpec) argSpec).fallbackValue()); // #754 Allow boolean options to get value from fallback instead of defaultProvider
+                        if (argSpec.isOption() && !empty(((Model.OptionSpec) argSpec).fallbackValue())) {
+                            defaultValue = !booleanValue(argSpec, ((Model.OptionSpec) argSpec).fallbackValue()); // #754 Allow boolean options to get value from fallback instead of defaultProvider
                         }
                         // don't process cmdline arg: it's okay to ignore value if not attached to option
                         Boolean oppositeValue = commandSpec.parser().toggleBooleanFlags()
@@ -14168,14 +14269,14 @@ public class CommandLine {
                                 : defaultValue; // #712 flip the default value
                         if (oppositeValue == null) { oppositeValue = false; }
                         actualValue = String.valueOf(!oppositeValue);
-                        if (argSpec.isOption() && ((OptionSpec) argSpec).negatable() && negated) {
+                        if (argSpec.isOption() && ((Model.OptionSpec) argSpec).negatable() && negated) {
                             actualValue = String.valueOf(oppositeValue);
                         }
                         optionalValueExists = false;
                         consumed = 0;
                     }
                 } else { // non-boolean option with optional value #325, #279
-                    String fallbackValue = argSpec.isOption() ? ((OptionSpec) argSpec).fallbackValue() : "";
+                    String fallbackValue = argSpec.isOption() ? ((Model.OptionSpec) argSpec).fallbackValue() : "";
                     // #828 #1125 use varargCanConsumeNextValue(argSpec, value) to detect if value can be a parameter
                     if (!varargCanConsumeNextValue(argSpec, value) // not a parameter
                             || value == null) { // stack is empty, option with arity=0..1 was the last arg
@@ -14220,7 +14321,7 @@ public class CommandLine {
                 if ((cls == Boolean.class || cls == Boolean.TYPE) && arity.min >= 1) {
                     Boolean boolValue = booleanValue(argSpec, value);
                     // note: we ignore commandSpec.parser().toggleBooleanFlags() for explicit non-optional params
-                    if (argSpec.isOption() && ((OptionSpec) argSpec).negatable() && negated) {
+                    if (argSpec.isOption() && ((Model.OptionSpec) argSpec).negatable() && negated) {
                         actualValue = String.valueOf(!boolValue);
                     } else {
                         actualValue = String.valueOf(boolValue);
@@ -14263,12 +14364,12 @@ public class CommandLine {
             parseResultBuilder.add(argSpec, pos);
             return consumed;
         }
-        private int applyValuesToMapField(ArgSpec argSpec,
+        private int applyValuesToMapField(Model.ArgSpec argSpec,
                                           LookBehind lookBehind,
                                           boolean alreadyUnquoted,
                                           Range arity,
                                           Stack<String> args,
-                                          Set<ArgSpec> initialized,
+                                          Set<Model.ArgSpec> initialized,
                                           String argDescription) throws Exception {
             if (argSpec.auxiliaryTypes().length < 2) { throw new ParameterException(CommandLine.this, argSpec.toString() + " needs two types (one for the map key, one for the value) but only has " + argSpec.auxiliaryTypes().length + " types configured.",argSpec, null); }
             Map<Object, Object> map = argSpec.getValue();
@@ -14287,7 +14388,7 @@ public class CommandLine {
             return map.size() - originalSize;
         }
 
-        private void consumeMapArguments(ArgSpec argSpec,
+        private void consumeMapArguments(Model.ArgSpec argSpec,
                                          LookBehind lookBehind,
                                          boolean alreadyUnquoted,
                                          Range arity,
@@ -14318,8 +14419,8 @@ public class CommandLine {
                 alreadyUnquoted = false;
             }
             // now process the varargs if any
-            String fallback = consumed == 0 && argSpec.isOption() && !OptionSpec.DEFAULT_FALLBACK_VALUE.equals(((OptionSpec) argSpec).fallbackValue())
-                    ? ((OptionSpec) argSpec).fallbackValue()
+            String fallback = consumed == 0 && argSpec.isOption() && !Model.OptionSpec.DEFAULT_FALLBACK_VALUE.equals(((Model.OptionSpec) argSpec).fallbackValue())
+                    ? ((Model.OptionSpec) argSpec).fallbackValue()
                     : null;
             if (fallback != null && (args.isEmpty() || !varargCanConsumeNextValue(argSpec, args.peek()))) {
                 args.push(fallback);
@@ -14343,7 +14444,7 @@ public class CommandLine {
             }
         }
 
-        private void consumeOneMapArgument(ArgSpec argSpec,
+        private void consumeOneMapArgument(Model.ArgSpec argSpec,
                                            LookBehind lookBehind,
                                            boolean alreadyUnquoted, Range arity, int consumed,
                                            String arg,
@@ -14369,13 +14470,13 @@ public class CommandLine {
             parseResultBuilder.addOriginalStringValue(argSpec, arg);
         }
 
-        private String[] unquoteAndSplit(ArgSpec argSpec, LookBehind lookBehind, boolean alreadyUnquoted, Range arity, int consumed, String arg) {
+        private String[] unquoteAndSplit(Model.ArgSpec argSpec, LookBehind lookBehind, boolean alreadyUnquoted, Range arity, int consumed, String arg) {
             String raw = lookBehind.isAttached() && alreadyUnquoted ? arg : smartUnquoteIfEnabled(arg); // if attached, we already trimmed quotes once
 //            String raw = smartUnquoteIfEnabled(arg);
             return argSpec.splitValue(raw, commandSpec.parser(), arity, consumed);
         }
 
-        private boolean canConsumeOneMapArgument(ArgSpec argSpec, LookBehind lookBehind, boolean alreadyUnquoted, Range arity, int consumed,
+        private boolean canConsumeOneMapArgument(Model.ArgSpec argSpec, LookBehind lookBehind, boolean alreadyUnquoted, Range arity, int consumed,
                                                  String arg, Class<?>[] classes,
                                                  ITypeConverter<?> keyConverter, ITypeConverter<?> valueConverter,
                                                  String argDescription) {
@@ -14394,12 +14495,12 @@ public class CommandLine {
             }
         }
 
-        private String[] splitKeyValue(ArgSpec argSpec, String value) {
-            String[] keyValue = ArgSpec.splitRespectingQuotedStrings(value, 2, config(), argSpec, "=");
+        private String[] splitKeyValue(Model.ArgSpec argSpec, String value) {
+            String[] keyValue = Model.ArgSpec.splitRespectingQuotedStrings(value, 2, config(), argSpec, "=");
 
             // #1214: support for -Dkey map options
             // validation is disabled if `mapFallbackValue` is specified
-            if (keyValue.length < 2 && ArgSpec.UNSPECIFIED.equals(argSpec.mapFallbackValue())) {
+            if (keyValue.length < 2 && Model.ArgSpec.UNSPECIFIED.equals(argSpec.mapFallbackValue())) {
                 String splitRegex = argSpec.splitRegex();
                 if (splitRegex.length() == 0) {
                     throw new ParameterException(CommandLine.this, "Value for option " + optionDescription("",
@@ -14412,7 +14513,7 @@ public class CommandLine {
             return keyValue;
         }
 
-        private boolean assertNoMissingMandatoryParameter(ArgSpec argSpec, Stack<String> args, int i, Range arity) {
+        private boolean assertNoMissingMandatoryParameter(Model.ArgSpec argSpec, Stack<String> args, int i, Range arity) {
             if (!varargCanConsumeNextValue(argSpec, args.peek())) {
                 String msg = createMissingParameterMessageFoundOtherOption(argSpec, args, i, arity);
                 maybeThrow(new MissingParameterException(CommandLine.this, argSpec, msg));
@@ -14421,12 +14522,12 @@ public class CommandLine {
             return false;
         }
 
-        private String createMissingParameterMessageFoundOtherOption(ArgSpec argSpec, Stack<String> args, int i, Range arity) {
+        private String createMissingParameterMessageFoundOtherOption(Model.ArgSpec argSpec, Stack<String> args, int i, Range arity) {
             String desc = arity.min > 1 ? (i + 1) + " (of " + arity.min + " mandatory parameters) " : "";
             return "Expected parameter " + desc + "for " + optionDescription("", argSpec, -1) + " but found '" + args.peek() + "'";
         }
 
-        private boolean isArgResemblesOptionThereforeDiscontinue(ArgSpec argSpec, Stack<String> args, int i, Range arity) throws Exception {
+        private boolean isArgResemblesOptionThereforeDiscontinue(Model.ArgSpec argSpec, Stack<String> args, int i, Range arity) throws Exception {
             boolean result = false;
             String arg = args.peek();
             if (commandSpec.resemblesOption(arg)) {
@@ -14444,13 +14545,13 @@ public class CommandLine {
             }
             return result;
         }
-        private int applyValuesToArrayField(ArgSpec argSpec,
+        private int applyValuesToArrayField(Model.ArgSpec argSpec,
                                             boolean negated,
                                             LookBehind lookBehind,
                                             boolean alreadyUnquoted,
                                             Range arity,
                                             Stack<String> args,
-                                            Set<ArgSpec> initialized,
+                                            Set<Model.ArgSpec> initialized,
                                             String argDescription) throws Exception {
             Object existing = argSpec.getValue();
             int length = existing == null ? 0 : Array.getLength(existing);
@@ -14479,13 +14580,13 @@ public class CommandLine {
             return converted.size(); // return how many args were consumed
         }
 
-        private int applyValuesToCollectionField(ArgSpec argSpec,
+        private int applyValuesToCollectionField(Model.ArgSpec argSpec,
                                                  boolean negated,
                                                  LookBehind lookBehind,
                                                  boolean alreadyUnquoted,
                                                  Range arity,
                                                  Stack<String> args,
-                                                 Set<ArgSpec> initialized,
+                                                 Set<Model.ArgSpec> initialized,
                                                  String argDescription) throws Exception {
             Collection<Object> collection = argSpec.getValue();
             int pos = getPosition(argSpec);
@@ -14508,7 +14609,7 @@ public class CommandLine {
             return converted.size();
         }
 
-        private List<Object> consumeArguments(ArgSpec argSpec,
+        private List<Object> consumeArguments(Model.ArgSpec argSpec,
                                               boolean negated,
                                               LookBehind lookBehind,
                                               boolean alreadyUnquoted,
@@ -14539,8 +14640,8 @@ public class CommandLine {
                 consumed = addUserInputToList(argSpec, result, consumed, argDescription);
             }
             // now process the varargs if any
-            String fallback = consumed == 0 && argSpec.isOption() && !OptionSpec.DEFAULT_FALLBACK_VALUE.equals(((OptionSpec) argSpec).fallbackValue())
-                    ? ((OptionSpec) argSpec).fallbackValue()
+            String fallback = consumed == 0 && argSpec.isOption() && !Model.OptionSpec.DEFAULT_FALLBACK_VALUE.equals(((Model.OptionSpec) argSpec).fallbackValue())
+                    ? ((Model.OptionSpec) argSpec).fallbackValue()
                     : null;
             if (fallback != null && (args.isEmpty() || !varargCanConsumeNextValue(argSpec, args.peek()))) {
                 args.push(fallback);
@@ -14567,7 +14668,7 @@ public class CommandLine {
                 }
             }
             if (result.isEmpty() && arity.min == 0 && arity.max <= 1 && isBoolean(argSpec.auxiliaryTypes())) {
-                if (argSpec.isOption() && ((OptionSpec) argSpec).negatable()) {
+                if (argSpec.isOption() && ((Model.OptionSpec) argSpec).negatable()) {
                     Object defaultValue = argSpec.calcDefaultValue(true);
                     boolean booleanDefault = false;
                     if (defaultValue instanceof String) {
@@ -14585,15 +14686,15 @@ public class CommandLine {
             return result;
         }
 
-        private int consumedCount(int i, int initialSize, ArgSpec arg) {
+        private int consumedCount(int i, int initialSize, Model.ArgSpec arg) {
             return commandSpec.parser().splitFirst() ? arg.stringValues().size() - initialSize : i;
         }
 
-        private int consumedCountMap(int i, int initialSize, ArgSpec arg) {
+        private int consumedCountMap(int i, int initialSize, Model.ArgSpec arg) {
             return commandSpec.parser().splitFirst() ? (arg.stringValues().size() - initialSize) / 2 : i;
         }
 
-        private int addUserInputToList(ArgSpec argSpec, List<Object> result, int consumed, String argDescription) {
+        private int addUserInputToList(Model.ArgSpec argSpec, List<Object> result, int consumed, String argDescription) {
             char[] input = readUserInput(argSpec);
             String inputString = new String(input);
             if (tracer().isInfo()) {
@@ -14612,10 +14713,10 @@ public class CommandLine {
             consumed++;
             return consumed;
         }
-        private String getMaskedValue(ArgSpec argSpec, String input) {
+        private String getMaskedValue(Model.ArgSpec argSpec, String input) {
             return argSpec.echo() ? input : "***";
         }
-        private int consumeOneArgument(ArgSpec argSpec,
+        private int consumeOneArgument(Model.ArgSpec argSpec,
                                        LookBehind lookBehind,
                                        boolean alreadyUnquoted, Range arity,
                                        int consumed,
@@ -14637,7 +14738,7 @@ public class CommandLine {
             parseResultBuilder.addOriginalStringValue(argSpec, arg);
             return ++index;
         }
-        private boolean canConsumeOneArgument(ArgSpec argSpec, LookBehind lookBehind, boolean alreadyUnquoted, Range arity, int consumed, String arg, String argDescription) {
+        private boolean canConsumeOneArgument(Model.ArgSpec argSpec, LookBehind lookBehind, boolean alreadyUnquoted, Range arity, int consumed, String arg, String argDescription) {
             if (char[].class.equals(argSpec.auxiliaryTypes()[0]) || char[].class.equals(argSpec.type())) { return true; }
             ITypeConverter<?> converter = getTypeConverter(argSpec.auxiliaryTypes(), argSpec, 0);
             try {
@@ -14660,7 +14761,7 @@ public class CommandLine {
          * <p>
          * Usually, we stop if we encounter '--', a command, or another option.
          * However, if end-of-options has been reached, positional parameters may consume all remaining arguments. </p>*/
-        private boolean varargCanConsumeNextValue(ArgSpec argSpec, String nextValue) {
+        private boolean varargCanConsumeNextValue(Model.ArgSpec argSpec, String nextValue) {
             if (endOfOptions && argSpec.isPositional()) { return true; }
             if (isEndOfOptionsDelimiter(nextValue)) { return false; } // never consume EOO delim, regardless of parser config
             boolean isCommand = isCommand(nextValue);
@@ -14709,7 +14810,7 @@ public class CommandLine {
             return commandSpec.parser().endOfOptionsDelimiter().equals(arg);
         }
 
-        private Object tryConvert(ArgSpec argSpec, int index, ITypeConverter<?> converter, String value, int typeIndex)
+        private Object tryConvert(Model.ArgSpec argSpec, int index, ITypeConverter<?> converter, String value, int typeIndex)
                 throws ParameterException {
             try {
                 return converter.convert(value);
@@ -14732,15 +14833,15 @@ public class CommandLine {
         private void updateHelpRequested(CommandSpec command) {
             isHelpRequested |= command.helpCommand();
         }
-        private void updateHelpRequested(ArgSpec argSpec) {
+        private void updateHelpRequested(Model.ArgSpec argSpec) {
             if (!parseResultBuilder.isInitializingDefaultValues && argSpec.isOption()) {
-                OptionSpec option = (OptionSpec) argSpec;
+                Model.OptionSpec option = (Model.OptionSpec) argSpec;
                 isHelpRequested                  |= is(argSpec, "help", option.help());
                 parseResultBuilder.versionHelpRequested |= is(argSpec, "versionHelp", option.versionHelp());
                 parseResultBuilder.usageHelpRequested   |= is(argSpec, "usageHelp", option.usageHelp());
             }
         }
-        private boolean is(ArgSpec p, String attribute, boolean value) {
+        private boolean is(Model.ArgSpec p, String attribute, boolean value) {
             if (value) { if (tracer().isInfo()) {
                 tracer().info("%s has '%s' annotation: not validating required fields", p.toString(), attribute); }}
             return value;
@@ -14757,7 +14858,7 @@ public class CommandLine {
         @SuppressWarnings("unchecked") private Map<Object, Object> createMap(Class<?> mapClass) throws Exception {
             return (Map<Object, Object>) factory.create(mapClass);
         }
-        private ITypeConverter<?> getTypeConverter(Class<?>[] types, final ArgSpec argSpec, int index) {
+        private ITypeConverter<?> getTypeConverter(Class<?>[] types, final Model.ArgSpec argSpec, int index) {
             if (argSpec.converters().length > index && !argSpec.converters()[index].getClass().equals(UseDefaultConverter.class)) { return argSpec.converters()[index]; } // use custom converters if defined
             Class<?> type = types[index];
             if (isOptional(type)) { // #1214 #1108
@@ -14772,7 +14873,7 @@ public class CommandLine {
             return getActualTypeConverter(type, argSpec);
         }
 
-        private ITypeConverter<?> getActualTypeConverter(final Class<?> type, ArgSpec argSpec) {
+        private ITypeConverter<?> getActualTypeConverter(final Class<?> type, Model.ArgSpec argSpec) {
             // https://github.com/remkop/picocli/pull/648
             // consider adding ParserSpec.charArraysCanCaptureStrings() to allow non-interactive options to capture multi-char values in a char[] array
             // Note that this will require special logic for char[] types in CommandLine$Interpreter.applyValuesToArrayField;
@@ -14816,7 +14917,7 @@ public class CommandLine {
             };
         }
 
-        private boolean booleanValue(ArgSpec argSpec, Object value) {
+        private boolean booleanValue(Model.ArgSpec argSpec, Object value) {
             if (value == null) { return false; }
             if (isOptional(value.getClass())) {
                 try {
@@ -14831,15 +14932,15 @@ public class CommandLine {
             return (Boolean) tryConvert(argSpec, -1, converter, stringValue, 0);
         }
 
-        private boolean assertNoMissingParameters(ArgSpec argSpec, Range arity, Stack<String> args) {
+        private boolean assertNoMissingParameters(Model.ArgSpec argSpec, Range arity, Stack<String> args) {
             if (argSpec.interactive()) { return true; }
             int available = args.size();
             if (available > 0 && commandSpec.parser().splitFirst() && argSpec.splitRegex().length() > 0) {
                 available += argSpec.splitValue(args.peek(), commandSpec.parser(), arity, 0).length - 1;
             }
             if (arity.min > available) {
-                List<PositionalParamSpec> missingList = Collections.emptyList();
-                List<PositionalParamSpec> positionals = commandSpec.positionalParameters();
+                List<Model.PositionalParamSpec> missingList = Collections.emptyList();
+                List<Model.PositionalParamSpec> positionals = commandSpec.positionalParameters();
                 if (argSpec.isPositional() && positionals.contains(argSpec)) {
                     missingList = positionals.subList(positionals.indexOf(argSpec), positionals.size());
                 }
@@ -14850,8 +14951,8 @@ public class CommandLine {
             return true;
         }
 
-        char[] readUserInput(ArgSpec argSpec) {
-            String name = argSpec.isOption() ? ((OptionSpec) argSpec).longestName() : "position " + position;
+        char[] readUserInput(Model.ArgSpec argSpec) {
+            String name = argSpec.isOption() ? ((Model.OptionSpec) argSpec).longestName() : "position " + position;
             String desc = str(argSpec.description(), 0);
             String standardPrompt = empty(desc) ? String.format("Enter value for %s: ", name) : String.format("Enter value for %s (%s): ", name, desc);
             String prompt = empty(argSpec.prompt()) ? standardPrompt : argSpec.prompt();
@@ -14867,7 +14968,7 @@ public class CommandLine {
                 interactiveCount++;
             }
         }
-        private String createUserInputDebugString(ArgSpec argSpec, char[] result, String name) {
+        private String createUserInputDebugString(Model.ArgSpec argSpec, char[] result, String name) {
             return argSpec.echo() ?
                     String.format("User entered %s for %s.%n", new String(result), name) :
                     String.format("User entered %d characters for %s.%n", result.length, name);
@@ -14892,21 +14993,21 @@ public class CommandLine {
                 throw new IllegalStateException(e);
             }
         }
-        int getPosition(ArgSpec arg) {
+        int getPosition(Model.ArgSpec arg) {
             if (arg.group() == null) { return position; }
             GroupMatchContainer container = parseResultBuilder.groupMatchContainer.findLastMatchContainer(arg.group());
             return container == null ? 0 : container.lastMatch().position;
         }
-        String positionDesc(ArgSpec arg) {
+        String positionDesc(Model.ArgSpec arg) {
             int pos = getPosition(arg);
             return (arg.group() == null) ? pos + " (command-local)" : pos + " (in group " + arg.group().synopsis() + ")";
         }
     }
 
-    private static String optionDescription(String prefix, ArgSpec argSpec, int optionParamIndex) {
+    private static String optionDescription(String prefix, Model.ArgSpec argSpec, int optionParamIndex) {
         String desc;
         if (argSpec.isOption()) {
-            desc = prefix + "option '" + ((OptionSpec) argSpec).longestName() + "'";
+            desc = prefix + "option '" + ((Model.OptionSpec) argSpec).longestName() + "'";
             if (optionParamIndex >= 0) { // we are describing an option parameter
                 if (argSpec.arity().max > 1) {
                     desc += " at index " + optionParamIndex;
@@ -14916,12 +15017,12 @@ public class CommandLine {
                 }
             }
         } else {
-            desc = prefix + "positional parameter at index " + ((PositionalParamSpec) argSpec).index() + " (" + argSpec.paramLabel() + ")";
+            desc = prefix + "positional parameter at index " + ((Model.PositionalParamSpec) argSpec).index() + " (" + argSpec.paramLabel() + ")";
         }
         return desc;
     }
 
-    private static String createMissingParameterMessage(ArgSpec argSpec, Range arity, List<PositionalParamSpec> missingList, Stack<String> args, int available) {
+    private static String createMissingParameterMessage(Model.ArgSpec argSpec, Range arity, List<Model.PositionalParamSpec> missingList, Stack<String> args, int available) {
         if (arity.min == 1) {
             if (argSpec.isOption()) {
                 return "Missing required parameter for " + optionDescription("", argSpec, 0);
@@ -14931,7 +15032,7 @@ public class CommandLine {
             String indices = "";
             String infix = " at index ";
             int count = 0;
-            for (PositionalParamSpec missing : missingList) {
+            for (Model.PositionalParamSpec missing : missingList) {
                 if (missing.arity().min > 0) {
                     names += sep + "'" + missing.paramLabel() + "'";
                     indices += sep + missing.index();
@@ -15011,13 +15112,13 @@ public class CommandLine {
     static PrintWriter newPrintWriter(OutputStream stream, Charset charset) {
         return new PrintWriter(new BufferedWriter(new OutputStreamWriter(stream, charset)), true);
     }
-    static class PositionalParametersSorter implements Comparator<ArgSpec> {
+    static class PositionalParametersSorter implements Comparator<Model.ArgSpec> {
         private static final Range OPTION_INDEX = new Range(0, 0, false, true, "0");
-        public int compare(ArgSpec p1, ArgSpec p2) {
+        public int compare(Model.ArgSpec p1, Model.ArgSpec p2) {
             int result = index(p1).compareTo(index(p2));
             return (result == 0) ? p1.arity().compareTo(p2.arity()) : result;
         }
-        private Range index(ArgSpec arg) { return arg.isOption() ? OPTION_INDEX : ((PositionalParamSpec) arg).index(); }
+        private Range index(Model.ArgSpec arg) { return arg.isOption() ? OPTION_INDEX : ((Model.PositionalParamSpec) arg).index(); }
     }
     /**
      * Inner class to group the built-in {@link ITypeConverter} implementations.
@@ -15247,7 +15348,7 @@ public class CommandLine {
      * // print help for command
      * command help
      * </pre>
-     * For {@linkplain Messages internationalization}: this command has a {@code --help} option with {@code descriptionKey = "helpCommand.help"},
+     * For {@linkplain Model.Messages internationalization}: this command has a {@code --help} option with {@code descriptionKey = "helpCommand.help"},
      * and a {@code COMMAND} positional parameter with {@code descriptionKey = "helpCommand.command"}.
      * @since 3.0
      */
@@ -15370,7 +15471,7 @@ public class CommandLine {
      * is responsible for all aspects of rendering the section, including layout and emitting ANSI escape codes.
      * The {@link Help.TextTable} and {@link Help.Ansi.Text} classes, and the {@link CommandLine.Help.Ansi#string(String)} and {@link CommandLine.Help.Ansi#text(String)} methods may be useful.
      * </p>
-     * @see UsageMessageSpec
+     * @see Model.UsageMessageSpec
      * @since 3.9
      */
     public interface IHelpSectionRenderer {
@@ -15392,7 +15493,7 @@ public class CommandLine {
      * <img src="doc-files/class-diagram-help-api.png" alt="Class Diagram of the CommandLine.Help API">
      * </p>
      * <h2>Layered API</h2>
-     * <p>The {@link Command} annotation and the {@link UsageMessageSpec} programmatic API equivalent
+     * <p>The {@link Command} annotation and the {@link Model.UsageMessageSpec} programmatic API equivalent
      * provide the easiest way to configure the usage help message. See
      * the <a href="https://remkop.github.io/picocli/index.html#_usage_help">Manual</a> for details.</p>
      * <p>This Help class provides high-level functions to create sections of the usage help message and headings
@@ -15427,17 +15528,17 @@ public class CommandLine {
         /** Constant String holding the default program name, value defined in {@link CommandSpec#DEFAULT_COMMAND_NAME}. */
         protected static final String DEFAULT_COMMAND_NAME = CommandSpec.DEFAULT_COMMAND_NAME;
 
-        /** Constant String holding the default string that separates options from option parameters, value defined in {@link ParserSpec#DEFAULT_SEPARATOR}. */
-        protected static final String DEFAULT_SEPARATOR = ParserSpec.DEFAULT_SEPARATOR;
+        /** Constant String holding the default string that separates options from option parameters, value defined in {@link Model.ParserSpec#DEFAULT_SEPARATOR}. */
+        protected static final String DEFAULT_SEPARATOR = Model.ParserSpec.DEFAULT_SEPARATOR;
 
-        public final PositionalParamSpec AT_FILE_POSITIONAL_PARAM = PositionalParamSpec.builder()
+        public final Model.PositionalParamSpec AT_FILE_POSITIONAL_PARAM = Model.PositionalParamSpec.builder()
                 .paramLabel("${picocli.atfile.label:-@<filename>}").description("${picocli.atfile.description:-One or more argument files containing options.}").arity("0..*")
                 .descriptionKey("picocli.atfile").build();
 
-        public final OptionSpec END_OF_OPTIONS_OPTION = createEndOfOptionsOption(ParserSpec.DEFAULT_END_OF_OPTIONS_DELIMITER);
+        public final Model.OptionSpec END_OF_OPTIONS_OPTION = createEndOfOptionsOption(Model.ParserSpec.DEFAULT_END_OF_OPTIONS_DELIMITER);
 
-        private OptionSpec createEndOfOptionsOption(String name) {
-            return OptionSpec.builder(name)
+        private Model.OptionSpec createEndOfOptionsOption(String name) {
+            return Model.OptionSpec.builder(name)
                     .description("${picocli.endofoptions.description:-This option can be used to separate command-line options from the list of positional parameters.}").arity("0")
                     .descriptionKey("picocli.endofoptions")
                     .build();
@@ -15469,7 +15570,7 @@ public class CommandLine {
          * on the specified class and superclasses.
          * @param command the annotated object to create usage help for
          * @param colorScheme the color scheme to use
-         * @deprecated use {@link picocli.CommandLine.Help#Help(picocli.CommandLine.Model.CommandSpec, picocli.CommandLine.Help.ColorScheme)}  */
+         * @deprecated use {@link picocli.CommandLine.Help#Help(CommandSpec, picocli.CommandLine.Help.ColorScheme)}  */
         @Deprecated public Help(Object command, ColorScheme colorScheme) {
             this(CommandSpec.forAnnotatedObject(command, new DefaultFactory()), colorScheme);
         }
@@ -15518,7 +15619,7 @@ public class CommandLine {
 
         /** Option and positional parameter value label renderer used for the synopsis line(s) and the option list.
          * By default initialized to the result of {@link #createDefaultParamLabelRenderer()}, which takes a snapshot
-         * of the {@link ParserSpec#separator()} at construction time. If the separator is modified after Help construction, you
+         * of the {@link Model.ParserSpec#separator()} at construction time. If the separator is modified after Help construction, you
          * may need to re-initialize this field by calling {@link #createDefaultParamLabelRenderer()} again. */
         public IParamLabelRenderer parameterLabelRenderer() {return parameterLabelRenderer;}
 
@@ -15580,8 +15681,8 @@ public class CommandLine {
             return this;
         }
 
-        List<OptionSpec> options() { return commandSpec.options(); }
-        List<PositionalParamSpec> positionalParameters() { return commandSpec.positionalParameters(); }
+        List<Model.OptionSpec> options() { return commandSpec.options(); }
+        List<Model.PositionalParamSpec> positionalParameters() { return commandSpec.positionalParameters(); }
         String commandName() { return commandSpec.name(); }
 
         /**
@@ -15610,7 +15711,7 @@ public class CommandLine {
          */
         public String synopsis(int synopsisHeadingLength) {
             if (!empty(commandSpec.usageMessage().customSynopsis())) { return customSynopsis(); }
-            Comparator<OptionSpec> sortStrategy = commandSpec.usageMessage().sortSynopsis()
+            Comparator<Model.OptionSpec> sortStrategy = commandSpec.usageMessage().sortSynopsis()
                     ? createShortOptionArityAndNameComparator() // alphabetic sort
                     : createOrderComparatorIfNecessary(commandSpec.options()); // explicit sort
             boolean clusterBooleanOptions = commandSpec.parser().posixClusteredShortOptionsAllowed();
@@ -15627,7 +15728,7 @@ public class CommandLine {
                 sb.append(" [OPTIONS]");
             }
             // sb.append(" [--] "); // implied
-            for (PositionalParamSpec positionalParam : commandSpec.positionalParameters()) {
+            for (Model.PositionalParamSpec positionalParam : commandSpec.positionalParameters()) {
                 if (!positionalParam.hidden()) {
                     sb.append(' ').append(parameterLabelRenderer().renderParameterLabel(positionalParam, ansi(), colorScheme.parameterStyles));
                 }
@@ -15647,7 +15748,7 @@ public class CommandLine {
          * @param clusterBooleanOptions {@code true} if boolean short options should be clustered into a single string
          * @return a detailed synopsis
          * @deprecated use {@link #detailedSynopsis(int, Comparator, boolean)} instead. */
-        @Deprecated public String detailedSynopsis(Comparator<OptionSpec> optionSort, boolean clusterBooleanOptions) {
+        @Deprecated public String detailedSynopsis(Comparator<Model.OptionSpec> optionSort, boolean clusterBooleanOptions) {
             return detailedSynopsis(0, optionSort, clusterBooleanOptions);
         }
 
@@ -15658,8 +15759,8 @@ public class CommandLine {
          * @param clusterBooleanOptions {@code true} if boolean short options should be clustered into a single string
          * @return a detailed synopsis
          * @since 3.0 */
-        public String detailedSynopsis(int synopsisHeadingLength, Comparator<OptionSpec> optionSort, boolean clusterBooleanOptions) {
-            Set<ArgSpec> argsInGroups = new HashSet<ArgSpec>();
+        public String detailedSynopsis(int synopsisHeadingLength, Comparator<Model.OptionSpec> optionSort, boolean clusterBooleanOptions) {
+            Set<Model.ArgSpec> argsInGroups = new HashSet<Model.ArgSpec>();
             Text groupsText = createDetailedSynopsisGroupsText(argsInGroups);
             Text optionText = createDetailedSynopsisOptionsText(argsInGroups, optionSort, clusterBooleanOptions);
             Text endOfOptionsText = createDetailedSynopsisEndOfOptionsText();
@@ -15683,7 +15784,7 @@ public class CommandLine {
          */
         protected String makeSynopsisFromParts(int synopsisHeadingLength, Text optionText, Text groupsText, Text endOfOptionsText, Text positionalParamText, Text commandText) {
             boolean positionalsOnly = true;
-            for (ArgGroupSpec group : commandSpec().argGroups()) {
+            for (Model.ArgGroupSpec group : commandSpec().argGroups()) {
                 if (group.validate()) { // non-validating groups are not shown in the synopsis
                     positionalsOnly &= group.allOptionsNested().isEmpty();
                 }
@@ -15703,9 +15804,9 @@ public class CommandLine {
          *                           these options and positional parameters should be excluded from appearing elsewhere in the synopsis
          * @return the formatted groups synopsis elements, starting with a {@code " "} space, or an empty Text if this command has no validating groups
          * @since 4.0 */
-        protected Text createDetailedSynopsisGroupsText(Set<ArgSpec> outparam_groupArgs) {
+        protected Text createDetailedSynopsisGroupsText(Set<Model.ArgSpec> outparam_groupArgs) {
             Text groupText = ansi().new Text(0);
-            for (ArgGroupSpec group : commandSpec().argGroups()) {
+            for (Model.ArgGroupSpec group : commandSpec().argGroups()) {
                 if (group.validate()) { // non-validating groups are not shown in the synopsis
                     groupText = groupText.concat(" ").concat(group.synopsisText(colorScheme(), outparam_groupArgs));
                 }
@@ -15719,7 +15820,7 @@ public class CommandLine {
          * @param clusterBooleanOptions {@code true} if boolean short options should be clustered into a single string
          * @return the formatted options, starting with a {@code " "} space, or an empty Text if this command has no named options
          * @since 3.9 */
-        protected Text createDetailedSynopsisOptionsText(Collection<ArgSpec> done, Comparator<OptionSpec> optionSort, boolean clusterBooleanOptions) {
+        protected Text createDetailedSynopsisOptionsText(Collection<Model.ArgSpec> done, Comparator<Model.OptionSpec> optionSort, boolean clusterBooleanOptions) {
             return createDetailedSynopsisOptionsText(done, commandSpec.options(), optionSort, clusterBooleanOptions);
         }
         /** Returns a Text object containing a partial detailed synopsis showing only the specified options, starting with a {@code " "} space.
@@ -15730,18 +15831,18 @@ public class CommandLine {
          * @param clusterBooleanOptions {@code true} if boolean short options should be clustered into a single string
          * @return the formatted options, starting with a {@code " "} space, or an empty Text if this command has no named options
          * @since 4.4 */
-        protected Text createDetailedSynopsisOptionsText(Collection<ArgSpec> done, List<OptionSpec> optionList, Comparator<OptionSpec> optionSort, boolean clusterBooleanOptions) {
+        protected Text createDetailedSynopsisOptionsText(Collection<Model.ArgSpec> done, List<Model.OptionSpec> optionList, Comparator<Model.OptionSpec> optionSort, boolean clusterBooleanOptions) {
             Text optionText = ansi().new Text(0);
-            List<OptionSpec> options = new ArrayList<OptionSpec>(optionList); // iterate in declaration order
+            List<Model.OptionSpec> options = new ArrayList<Model.OptionSpec>(optionList); // iterate in declaration order
             if (optionSort != null) {
                 Collections.sort(options, optionSort);// iterate in specified sort order
             }
             options.removeAll(done);
             if (clusterBooleanOptions) { // cluster all short boolean options into a single string
-                List<OptionSpec> booleanOptions = new ArrayList<OptionSpec>();
+                List<Model.OptionSpec> booleanOptions = new ArrayList<Model.OptionSpec>();
                 StringBuilder clusteredRequired = new StringBuilder("-");
                 StringBuilder clusteredOptional = new StringBuilder("-");
-                for (OptionSpec option : options) {
+                for (Model.OptionSpec option : options) {
                     if (option.hidden()) { continue; }
                     boolean isFlagOption = option.typeInfo().isBoolean();
                     if (isFlagOption && option.arity().max <= 0) { // #612 consider arity: boolean options may require a parameter
@@ -15767,13 +15868,13 @@ public class CommandLine {
                     optionText = optionText.concat(" [").concat(colorScheme.optionText(clusteredOptional.toString())).concat("]");
                 }
             }
-            for (OptionSpec option : options) {
+            for (Model.OptionSpec option : options) {
                 optionText = concatOptionText(" ", optionText, colorScheme, option, parameterLabelRenderer());
             }
             return optionText;
         }
 
-        static Text concatOptionText(String prefix, Text text, Help.ColorScheme colorScheme, OptionSpec option, Help.IParamLabelRenderer parameterLabelRenderer) {
+        static Text concatOptionText(String prefix, Text text, Help.ColorScheme colorScheme, Model.OptionSpec option, Help.IParamLabelRenderer parameterLabelRenderer) {
             if (!option.hidden()) {
                 String nameString = option.shortestName();
                 if (option.negatable) {
@@ -15815,20 +15916,20 @@ public class CommandLine {
          * @param done the list of options and positional parameters for which a synopsis was already generated. Positional parameters in this set should be excluded.
          * @return the formatted positional parameters, starting with a {@code " "} space, or an empty Text if this command has no positional parameters
          * @since 3.9 */
-        protected Text createDetailedSynopsisPositionalsText(Collection<ArgSpec> done) {
+        protected Text createDetailedSynopsisPositionalsText(Collection<Model.ArgSpec> done) {
             Text positionalParamText = ansi().new Text(0);
-            List<PositionalParamSpec> positionals = new ArrayList<PositionalParamSpec>(commandSpec.positionalParameters()); // iterate in declaration order
+            List<Model.PositionalParamSpec> positionals = new ArrayList<Model.PositionalParamSpec>(commandSpec.positionalParameters()); // iterate in declaration order
             if (hasAtFileParameter()) {
                 positionals.add(0, AT_FILE_POSITIONAL_PARAM);
                 AT_FILE_POSITIONAL_PARAM.messages(commandSpec.usageMessage().messages());
             }
             positionals.removeAll(done);
-            for (PositionalParamSpec positionalParam : positionals) {
+            for (Model.PositionalParamSpec positionalParam : positionals) {
                 positionalParamText = concatPositionalText(" ", positionalParamText, colorScheme, positionalParam, parameterLabelRenderer());
             }
             return positionalParamText;
         }
-        static Text concatPositionalText(String prefix, Text text, Help.ColorScheme colorScheme, PositionalParamSpec positionalParam, IParamLabelRenderer parameterLabelRenderer) {
+        static Text concatPositionalText(String prefix, Text text, Help.ColorScheme colorScheme, Model.PositionalParamSpec positionalParam, IParamLabelRenderer parameterLabelRenderer) {
             if (!positionalParam.hidden()) {
                 Text label = parameterLabelRenderer.renderParameterLabel(positionalParam, colorScheme.ansi(), colorScheme.parameterStyles);
                 text = text.concat(prefix).concat(label);
@@ -15838,7 +15939,7 @@ public class CommandLine {
 
         /** Returns a Text object containing a partial detailed synopsis showing only the subcommands, starting with a {@code " "} space.
          * Follows the unix convention of showing optional elements in square brackets ({@code [ ]}).
-         * @return this implementation returns " " + {@link UsageMessageSpec#synopsisSubcommandLabel()} if this command has subcommands, an empty Text otherwise.
+         * @return this implementation returns " " + {@link Model.UsageMessageSpec#synopsisSubcommandLabel()} if this command has subcommands, an empty Text otherwise.
          * @since 3.9 */
         protected Text createDetailedSynopsisCommandText() {
             Text commandText = ansi().new Text(0);
@@ -15866,7 +15967,7 @@ public class CommandLine {
             int indent = synopsisHeadingLength + commandName.length() + 1; // +1 for space after command name
             if (indent > commandSpec.usageMessage().synopsisAutoIndentThreshold() * width()) {
                 indent = commandSpec.usageMessage().synopsisIndent() < 0 ? synopsisHeadingLength : commandSpec.usageMessage().synopsisIndent();
-                indent = Math.min(indent, (int) (UsageMessageSpec.MAX_SYNOPSIS_AUTO_INDENT_THRESHOLD * width()));
+                indent = Math.min(indent, (int) (Model.UsageMessageSpec.MAX_SYNOPSIS_AUTO_INDENT_THRESHOLD * width()));
             }
             TextTable textTable = TextTable.forColumnWidths(colorScheme, width());
             textTable.setAdjustLineBreaksForWideCJKCharacters(commandSpec.usageMessage().adjustLineBreaksForWideCJKCharacters());
@@ -15886,20 +15987,20 @@ public class CommandLine {
             String[] lines = Ansi.OFF.new Text(commandSpec.usageMessage().synopsisHeading()).toString().split("\\r?\\n|\\r|%n", -1);
             return lines[lines.length - 1].length();
         }
-        private List<OptionSpec> excludeHiddenAndGroupOptions(List<OptionSpec> all) {
-            List<OptionSpec> result = new ArrayList<OptionSpec>(all);
-            for (ArgGroupSpec group : optionSectionGroups()) { result.removeAll(group.allOptionsNested()); }
-            for (Iterator<OptionSpec> iter = result.iterator(); iter.hasNext(); ) {
+        private List<Model.OptionSpec> excludeHiddenAndGroupOptions(List<Model.OptionSpec> all) {
+            List<Model.OptionSpec> result = new ArrayList<Model.OptionSpec>(all);
+            for (Model.ArgGroupSpec group : optionSectionGroups()) { result.removeAll(group.allOptionsNested()); }
+            for (Iterator<Model.OptionSpec> iter = result.iterator(); iter.hasNext(); ) {
                 if (iter.next().hidden()) {
                     iter.remove();
                 }
             }
             return result;
         }
-        private List<PositionalParamSpec> excludeHiddenAndGroupParams(List<PositionalParamSpec> all) {
-            List<PositionalParamSpec> result = new ArrayList<PositionalParamSpec>(all);
-            for (ArgGroupSpec group : optionSectionGroups()) { result.removeAll(group.allPositionalParametersNested()); }
-            for (Iterator<PositionalParamSpec> iter = result.iterator(); iter.hasNext(); ) {
+        private List<Model.PositionalParamSpec> excludeHiddenAndGroupParams(List<Model.PositionalParamSpec> all) {
+            List<Model.PositionalParamSpec> result = new ArrayList<Model.PositionalParamSpec>(all);
+            for (Model.ArgGroupSpec group : optionSectionGroups()) { result.removeAll(group.allPositionalParametersNested()); }
+            for (Iterator<Model.PositionalParamSpec> iter = result.iterator(); iter.hasNext(); ) {
                 if (iter.next().hidden()) {
                     iter.remove();
                 }
@@ -15907,8 +16008,8 @@ public class CommandLine {
             return result;
         }
 
-        private static Comparator<OptionSpec> createOrderComparatorIfNecessary(List<OptionSpec> options) {
-            for (OptionSpec option : options) { if (option.order() != OptionSpec.DEFAULT_ORDER) { return createOrderComparator(); } }
+        private static Comparator<Model.OptionSpec> createOrderComparatorIfNecessary(List<Model.OptionSpec> options) {
+            for (Model.OptionSpec option : options) { if (option.order() != Model.OptionSpec.DEFAULT_ORDER) { return createOrderComparator(); } }
             return null;
         }
 
@@ -15921,7 +16022,7 @@ public class CommandLine {
          *      Otherwise, return {@code null} to indicate that options should not be sorted.
          * @since 4.4
          */
-        public Comparator<OptionSpec> createDefaultOptionSort() {
+        public Comparator<Model.OptionSpec> createDefaultOptionSort() {
             return commandSpec.usageMessage().sortOptions()
                     ? createShortOptionNameComparator()
                     : createOrderComparatorIfNecessary(commandSpec.options());
@@ -15953,7 +16054,7 @@ public class CommandLine {
          * @see #optionListExcludingGroups(List, Layout, Comparator, IParamLabelRenderer)
          * @since 4.4
          */
-        public String optionListExcludingGroups(List<OptionSpec> options) {
+        public String optionListExcludingGroups(List<Model.OptionSpec> options) {
             return optionListExcludingGroups(options, createDefaultLayout(), createDefaultOptionSort(), parameterLabelRenderer());
         }
         /** Sorts all {@code Options} with the specified {@code comparator} (if the comparator is non-{@code null}),
@@ -15965,8 +16066,8 @@ public class CommandLine {
          * @see #optionListExcludingGroups(List, Layout, Comparator, IParamLabelRenderer)
          * @see #optionListGroupSections()
          * @since 3.0 */
-        public String optionList(Layout layout, Comparator<OptionSpec> optionSort, IParamLabelRenderer valueLabelRenderer) {
-            List<OptionSpec> visibleOptionsNotInGroups = excludeHiddenAndGroupOptions(options());
+        public String optionList(Layout layout, Comparator<Model.OptionSpec> optionSort, IParamLabelRenderer valueLabelRenderer) {
+            List<Model.OptionSpec> visibleOptionsNotInGroups = excludeHiddenAndGroupOptions(options());
             return optionListExcludingGroups(visibleOptionsNotInGroups, layout, optionSort, valueLabelRenderer) + optionListGroupSections();
         }
         /** Sorts all {@code Options} with the specified {@code comparator} (if the comparator is non-{@code null}),
@@ -15979,8 +16080,8 @@ public class CommandLine {
          * @param valueLabelRenderer used for options with a parameter
          * @return the fully formatted portion of the option list for the specified options only (argument groups are not included)
          * @since 4.4 */
-        public String optionListExcludingGroups(List<OptionSpec> optionList, Layout layout, Comparator<OptionSpec> optionSort, IParamLabelRenderer valueLabelRenderer) {
-            List<OptionSpec> options = new ArrayList<OptionSpec>(optionList); // options are stored in order of declaration
+        public String optionListExcludingGroups(List<Model.OptionSpec> optionList, Layout layout, Comparator<Model.OptionSpec> optionSort, IParamLabelRenderer valueLabelRenderer) {
+            List<Model.OptionSpec> options = new ArrayList<Model.OptionSpec>(optionList); // options are stored in order of declaration
             if (optionSort != null) {
                 Collections.sort(options, optionSort); // default: sort options ABC
             }
@@ -16002,19 +16103,19 @@ public class CommandLine {
             return optionListGroupSections(optionSectionGroups(), createDefaultOptionSort(), parameterLabelRenderer());
         }
         // @since 4.4
-        private String optionListGroupSections(List<ArgGroupSpec> groupList, Comparator<OptionSpec> optionSort, IParamLabelRenderer paramLabelRenderer) {
-            Set<ArgSpec> done = new HashSet<ArgSpec>();
-            List<ArgGroupSpec> groups = new ArrayList<ArgGroupSpec>(groupList);
-            Collections.sort(groups, new SortByOrder<ArgGroupSpec>());
+        private String optionListGroupSections(List<Model.ArgGroupSpec> groupList, Comparator<Model.OptionSpec> optionSort, IParamLabelRenderer paramLabelRenderer) {
+            Set<Model.ArgSpec> done = new HashSet<Model.ArgSpec>();
+            List<Model.ArgGroupSpec> groups = new ArrayList<Model.ArgGroupSpec>(groupList);
+            Collections.sort(groups, new SortByOrder<Model.ArgGroupSpec>());
 
             StringBuilder sb = new StringBuilder();
-            for (ArgGroupSpec group : groups) {
-                List<OptionSpec> groupOptions = new ArrayList<OptionSpec>(group.allOptionsNested());
+            for (Model.ArgGroupSpec group : groups) {
+                List<Model.OptionSpec> groupOptions = new ArrayList<Model.OptionSpec>(group.allOptionsNested());
                 if (optionSort != null) { Collections.sort(groupOptions, optionSort); }
                 groupOptions.removeAll(done);
                 done.addAll(groupOptions);
 
-                List<PositionalParamSpec> groupPositionals = new ArrayList<PositionalParamSpec>(group.allPositionalParametersNested());
+                List<Model.PositionalParamSpec> groupPositionals = new ArrayList<Model.PositionalParamSpec>(group.allPositionalParametersNested());
                 groupPositionals.removeAll(done);
                 done.addAll(groupPositionals);
 
@@ -16031,13 +16132,13 @@ public class CommandLine {
         /** Returns the list of {@code ArgGroupSpec} instances in this command that have a non-{@code null} heading, most deeply nested argument groups first.
          * @see #optionListGroupSections()
          * @since 4.4 */
-        public List<ArgGroupSpec> optionSectionGroups() {
-            List<ArgGroupSpec> result = new ArrayList<ArgGroupSpec>();
+        public List<Model.ArgGroupSpec> optionSectionGroups() {
+            List<Model.ArgGroupSpec> result = new ArrayList<Model.ArgGroupSpec>();
             optionSectionGroups(commandSpec.argGroups(), result);
             return result;
         }
-        private static void optionSectionGroups(List<ArgGroupSpec> groups, List<ArgGroupSpec> result) {
-            for (ArgGroupSpec group : groups) {
+        private static void optionSectionGroups(List<Model.ArgGroupSpec> groups, List<Model.ArgGroupSpec> result) {
+            for (Model.ArgGroupSpec group : groups) {
                 optionSectionGroups(group.subgroups(), result);
                 if (group.heading() != null) { result.add(group); }
             }
@@ -16058,7 +16159,7 @@ public class CommandLine {
          * @return the section of the usage help message that lists the parameters
          * @see #parameterList(List, Layout, IParamLabelRenderer)
          * @since 4.4 */
-        public String parameterList(List<PositionalParamSpec> positionalParams) {
+        public String parameterList(List<Model.PositionalParamSpec> positionalParams) {
             return parameterList(positionalParams, createDefaultLayout(), parameterLabelRenderer());
         }
         /**
@@ -16078,7 +16179,7 @@ public class CommandLine {
          * @param paramLabelRenderer for rendering parameter names
          * @return the section of the usage help message that lists the parameters
          * @since 4.4 */
-        public String parameterList(List<PositionalParamSpec> positionalParams, Layout layout, IParamLabelRenderer paramLabelRenderer) {
+        public String parameterList(List<Model.PositionalParamSpec> positionalParams, Layout layout, IParamLabelRenderer paramLabelRenderer) {
             layout.addAllPositionalParameters(positionalParams, paramLabelRenderer);
             return layout.toString();
         }
@@ -16113,7 +16214,7 @@ public class CommandLine {
             if (!commandSpec.usageMessage.showEndOfOptionsDelimiterInUsageHelp()) {
                 return "";
             }
-            OptionSpec endOfOptionsOption = ParserSpec.DEFAULT_END_OF_OPTIONS_DELIMITER.equals(commandSpec.parser().endOfOptionsDelimiter())
+            Model.OptionSpec endOfOptionsOption = Model.ParserSpec.DEFAULT_END_OF_OPTIONS_DELIMITER.equals(commandSpec.parser().endOfOptionsDelimiter())
                     ? END_OF_OPTIONS_OPTION
                     : createEndOfOptionsOption(commandSpec.parser().endOfOptionsDelimiter());
             endOfOptionsOption.commandSpec = this.commandSpec; // needed for interpolation
@@ -16148,7 +16249,7 @@ public class CommandLine {
          * @deprecated Use {@link #join(Ansi, int, boolean, String[], StringBuilder, Object...)}  instead
          */
         @Deprecated public static StringBuilder join(Ansi ansi, int usageHelpWidth, String[] values, StringBuilder sb, Object... params) {
-            return join(ansi, usageHelpWidth, UsageMessageSpec.DEFAULT_ADJUST_CJK, values, sb, params);
+            return join(ansi, usageHelpWidth, Model.UsageMessageSpec.DEFAULT_ADJUST_CJK, values, sb, params);
         }
 
         /** Formats each of the specified values and appends it to the specified StringBuilder.
@@ -16250,7 +16351,7 @@ public class CommandLine {
          * @return the formatted option list heading */
         public String optionListHeading(Object... params) {
             boolean hasVisibleOption = false;
-            for (OptionSpec option : commandSpec.options()) { hasVisibleOption |= !option.hidden(); }
+            for (Model.OptionSpec option : commandSpec.options()) { hasVisibleOption |= !option.hidden(); }
             if (commandSpec.usageMessage().showEndOfOptionsDelimiterInUsageHelp() || hasVisibleOption) {
                 return createHeading(commandSpec.usageMessage().optionListHeading(), params);
             }
@@ -16289,7 +16390,7 @@ public class CommandLine {
         /**
          * Returns a String that can be used as a help section heading. Embedded {@code %n} format
          * specifiers will be converted to platform-specific line breaks. Long lines will be wrapped
-         * on word boundaries to ensure they do not exceed the {@linkplain UsageMessageSpec#width() usage message width}.
+         * on word boundaries to ensure they do not exceed the {@linkplain Model.UsageMessageSpec#width() usage message width}.
          * Embedded {@code @|style[,style] ...|@} markup will be converted to {@linkplain Ansi.Text Ansi} escape codes when
          * {@linkplain Ansi#enabled() Ansi is enabled}, and stripped out otherwise.
          * @param text a printf-style {@linkplain Formatter format string} that may one or more embedded format specifiers
@@ -16351,7 +16452,7 @@ public class CommandLine {
 
             for (Map.Entry<String, Help> entry : subcommands.entrySet()) {
                 Help help = entry.getValue();
-                UsageMessageSpec usage = help.commandSpec().usageMessage();
+                Model.UsageMessageSpec usage = help.commandSpec().usageMessage();
                 String header = !empty(usage.header())
                         ? usage.header()[0]
                         : (!empty(usage.description()) ? usage.description()[0] : "");
@@ -16403,7 +16504,7 @@ public class CommandLine {
          * @param aColorScheme used in the layout to create {@linkplain Text} values
          * @return a Layout with the default columns
          * @since 4.4 */
-        public Layout createDefaultLayout(List<OptionSpec> options, List<PositionalParamSpec> positionals, ColorScheme aColorScheme) {
+        public Layout createDefaultLayout(List<Model.OptionSpec> options, List<Model.PositionalParamSpec> positionals, ColorScheme aColorScheme) {
             return createLayout(calcLongOptionColumnWidth(options, positionals, aColorScheme), aColorScheme);
         }
 
@@ -16419,24 +16520,24 @@ public class CommandLine {
          * @param aColorScheme the colorscheme used in the layout to create {@linkplain Text} values
          * @return the width of the long options column in the layout
          * @since 4.6 */
-        public int calcLongOptionColumnWidth(List<OptionSpec> options, List<PositionalParamSpec> positionals, ColorScheme aColorScheme) {
+        public int calcLongOptionColumnWidth(List<Model.OptionSpec> options, List<Model.PositionalParamSpec> positionals, ColorScheme aColorScheme) {
             int max = 0;
             IOptionRenderer optionRenderer = createDefaultOptionRenderer();
             boolean cjk = commandSpec.usageMessage().adjustLineBreaksForWideCJKCharacters();
             int longOptionsColWidth = commandSpec.usageMessage().longOptionsMaxWidth() + 1; // add 1 space for indentation
-            for (OptionSpec option : options) {
+            for (Model.OptionSpec option : options) {
                 if (option.hidden()) { continue; }
                 Text[][] values = optionRenderer.render(option, parameterLabelRenderer(), aColorScheme);
                 int len = cjk ? values[0][3].getCJKAdjustedLength() : values[0][3].length;
                 if (len < longOptionsColWidth) { max = Math.max(max, len); }
             }
-            List<PositionalParamSpec> positionalsWithAtFile = new ArrayList<PositionalParamSpec>(positionals); // iterate in declaration order
+            List<Model.PositionalParamSpec> positionalsWithAtFile = new ArrayList<Model.PositionalParamSpec>(positionals); // iterate in declaration order
             if (hasAtFileParameter()) {
                 positionalsWithAtFile.add(0, AT_FILE_POSITIONAL_PARAM);
                 AT_FILE_POSITIONAL_PARAM.messages(commandSpec.usageMessage().messages());
             }
             //IParameterRenderer paramRenderer = new DefaultParameterRenderer(false, " ");
-            for (PositionalParamSpec positional : positionalsWithAtFile) {
+            for (Model.PositionalParamSpec positional : positionalsWithAtFile) {
                 if (positional.hidden()) { continue; }
                 //Text[][] values = paramRenderer.render(positional, parameterLabelRenderer(), colorScheme); // values[0][3]; //
                 Text label = parameterLabelRenderer().renderParameterLabel(positional, aColorScheme.ansi(), aColorScheme.parameterStyles);
@@ -16447,47 +16548,47 @@ public class CommandLine {
             return max + 3;
         }
 
-        /** Returns a new default OptionRenderer which converts {@link OptionSpec Options} to five columns of text to match
+        /** Returns a new default OptionRenderer which converts {@link Model.OptionSpec Options} to five columns of text to match
          *  the default {@linkplain TextTable TextTable} column layout. The first row of values looks like this:
          * <ol>
          * <li>the required option marker</li>
          * <li>2-character short option name (or empty string if no short option exists)</li>
          * <li>comma separator (only if both short option and long option exist, empty string otherwise)</li>
          * <li>comma-separated string with long option name(s)</li>
-         * <li>first element of the {@link OptionSpec#description()} array</li>
+         * <li>first element of the {@link Model.OptionSpec#description()} array</li>
          * </ol>
          * <p>Following this, there will be one row for each of the remaining elements of the {@link
-         *   OptionSpec#description()} array, and these rows look like {@code {"", "", "", "", option.description()[i]}}.</p>
+         *   Model.OptionSpec#description()} array, and these rows look like {@code {"", "", "", "", option.description()[i]}}.</p>
          * <p>If configured, this option renderer adds an additional row to display the default field value.</p>
          * @return a new default OptionRenderer
          */
         public IOptionRenderer createDefaultOptionRenderer() {
             return new DefaultOptionRenderer(commandSpec.usageMessage.showDefaultValues(), "" +commandSpec.usageMessage().requiredOptionMarker());
         }
-        /** Returns a new minimal OptionRenderer which converts {@link OptionSpec Options} to a single row with two columns
+        /** Returns a new minimal OptionRenderer which converts {@link Model.OptionSpec Options} to a single row with two columns
          * of text: an option name and a description. If multiple names or descriptions exist, the first value is used.
          * @return a new minimal OptionRenderer */
         public static IOptionRenderer createMinimalOptionRenderer() {
             return new MinimalOptionRenderer();
         }
 
-        /** Returns a new default ParameterRenderer which converts {@linkplain PositionalParamSpec positional parameters} to four columns of
+        /** Returns a new default ParameterRenderer which converts {@linkplain Model.PositionalParamSpec positional parameters} to four columns of
          * text to match the default {@linkplain TextTable TextTable} column layout. The first row of values looks like this:
          * <ol>
          * <li>empty string </li>
          * <li>empty string </li>
          * <li>parameter(s) label as rendered by the {@link IParamLabelRenderer}</li>
-         * <li>first element of the {@link PositionalParamSpec#description()} array</li>
+         * <li>first element of the {@link Model.PositionalParamSpec#description()} array</li>
          * </ol>
          * <p>Following this, there will be one row for each of the remaining elements of the {@link
-         *   PositionalParamSpec#description()} array, and these rows look like {@code {"", "", "", param.description()[i]}}.</p>
+         *   Model.PositionalParamSpec#description()} array, and these rows look like {@code {"", "", "", param.description()[i]}}.</p>
          * <p>If configured, this parameter renderer adds an additional row to display the default field value.</p>
          * @return a new default ParameterRenderer
          */
         public IParameterRenderer createDefaultParameterRenderer() {
             return new DefaultParameterRenderer(commandSpec.usageMessage.showDefaultValues(), "" + commandSpec.usageMessage().requiredOptionMarker());
         }
-        /** Returns a new minimal ParameterRenderer which converts {@linkplain PositionalParamSpec positional parameters}
+        /** Returns a new minimal ParameterRenderer which converts {@linkplain Model.PositionalParamSpec positional parameters}
          * to a single row with two columns of text: an option name and a description. If multiple descriptions exist, the first value is used.
          * @return a new minimal ParameterRenderer */
         public static IParameterRenderer createMinimalParameterRenderer() {
@@ -16498,7 +16599,7 @@ public class CommandLine {
          * @return a new minimal ParamLabelRenderer */
         public static IParamLabelRenderer createMinimalParamLabelRenderer() {
             return new IParamLabelRenderer() {
-                public Text renderParameterLabel(ArgSpec argSpec, Ansi ansi, List<IStyle> styles) {
+                public Text renderParameterLabel(Model.ArgSpec argSpec, Ansi ansi, List<IStyle> styles) {
                     return argSpec.command() != null && argSpec.command().commandLine() != null
                             ? argSpec.command().commandLine().getColorScheme().apply(argSpec.paramLabel(), styles)
                             : ansi.apply(argSpec.paramLabel(), styles);
@@ -16507,7 +16608,7 @@ public class CommandLine {
             };
         }
         /** Returns a new default param label renderer that separates option parameters from their option name
-         * with the specified separator string, and, unless {@link ArgSpec#hideParamSyntax()} is true,
+         * with the specified separator string, and, unless {@link Model.ArgSpec#hideParamSyntax()} is true,
          * surrounds optional parameters with {@code '['} and {@code ']'}
          * characters and uses ellipses ("...") to indicate that any number of a parameter are allowed.
          * @return a new default ParamLabelRenderer
@@ -16515,26 +16616,26 @@ public class CommandLine {
         public IParamLabelRenderer createDefaultParamLabelRenderer() {
             return new DefaultParamLabelRenderer(commandSpec);
         }
-        /** Sorts {@link OptionSpec OptionSpecs} by their option name in case-insensitive alphabetic order. If an
+        /** Sorts {@link Model.OptionSpec OptionSpecs} by their option name in case-insensitive alphabetic order. If an
          * option has multiple names, the shortest name is used for the sorting. Help options follow non-help options.
          * @return a comparator that sorts OptionSpecs by their option name in case-insensitive alphabetic order */
-        public static Comparator<OptionSpec> createShortOptionNameComparator() {
+        public static Comparator<Model.OptionSpec> createShortOptionNameComparator() {
             return new SortByShortestOptionNameAlphabetically();
         }
-        /** Sorts {@link OptionSpec OptionSpecs} by their option {@linkplain Range#max max arity} first, by
+        /** Sorts {@link Model.OptionSpec OptionSpecs} by their option {@linkplain Range#max max arity} first, by
          * {@linkplain Range#min min arity} next, and by {@linkplain #createShortOptionNameComparator() option name} last.
          * @return a comparator that sorts OptionSpecs by arity first, then their option name */
-        public static Comparator<OptionSpec> createShortOptionArityAndNameComparator() {
+        public static Comparator<Model.OptionSpec> createShortOptionArityAndNameComparator() {
             return new SortByOptionArityAndNameAlphabetically();
         }
         /** Sorts short strings before longer strings.
          * @return a comparators that sorts short strings before longer strings */
         public static Comparator<String> shortestFirst() { return new ShortestFirst(); }
-        /** Sorts {@link OptionSpec options} by their option {@linkplain IOrdered#order() order}, lowest first, highest last.
+        /** Sorts {@link Model.OptionSpec options} by their option {@linkplain Model.IOrdered#order() order}, lowest first, highest last.
          * @return a comparator that sorts OptionSpecs by their order
          * @since 3.9*/
-        static Comparator<OptionSpec> createOrderComparator() {
-            return new SortByOrder<OptionSpec>();
+        static Comparator<Model.OptionSpec> createOrderComparator() {
+            return new SortByOrder<Model.OptionSpec>();
         }
 
         /** Returns whether ANSI escape codes are enabled or not.
@@ -16545,7 +16646,7 @@ public class CommandLine {
         /** Controls the visibility of certain aspects of the usage help message. */
         public enum Visibility { ALWAYS, NEVER, ON_DEMAND }
 
-        /** When customizing online help for {@link OptionSpec Option} details, a custom {@code IOptionRenderer} can be
+        /** When customizing online help for {@link Model.OptionSpec Option} details, a custom {@code IOptionRenderer} can be
          * used to create textual representation of an Option in a tabular format: one or more rows, each containing
          * one or more columns. The {@link Layout Layout} is responsible for placing these text values in the
          * {@link TextTable TextTable}. */
@@ -16558,19 +16659,19 @@ public class CommandLine {
              * @return a 2-dimensional array of text values: one or more rows, each containing one or more columns
              * @since 3.0
              */
-            Text[][] render(OptionSpec option, IParamLabelRenderer parameterLabelRenderer, ColorScheme scheme);
+            Text[][] render(Model.OptionSpec option, IParamLabelRenderer parameterLabelRenderer, ColorScheme scheme);
         }
-        /** The DefaultOptionRenderer converts {@link OptionSpec Options} to five columns of text to match the default
+        /** The DefaultOptionRenderer converts {@link Model.OptionSpec Options} to five columns of text to match the default
          * {@linkplain TextTable TextTable} column layout. The first row of values looks like this:
          * <ol>
          * <li>the required option marker (if the option is required)</li>
          * <li>2-character short option name (or empty string if no short option exists)</li>
          * <li>comma separator (only if both short option and long option exist, empty string otherwise)</li>
          * <li>comma-separated string with long option name(s)</li>
-         * <li>first element of the {@link OptionSpec#description()} array</li>
+         * <li>first element of the {@link Model.OptionSpec#description()} array</li>
          * </ol>
          * <p>Following this, there will be one row for each of the remaining elements of the {@link
-         *   OptionSpec#description()} array, and these rows look like {@code {"", "", "", option.description()[i]}}.</p>
+         *   Model.OptionSpec#description()} array, and these rows look like {@code {"", "", "", option.description()[i]}}.</p>
          */
         static class DefaultOptionRenderer implements IOptionRenderer {
             private final String requiredMarker;
@@ -16580,7 +16681,7 @@ public class CommandLine {
                 this.showDefaultValues = showDefaultValues;
                 this.requiredMarker = Assert.notNull(requiredMarker, "requiredMarker");
             }
-            public Text[][] render(OptionSpec option, IParamLabelRenderer paramLabelRenderer, ColorScheme scheme) {
+            public Text[][] render(Model.OptionSpec option, IParamLabelRenderer paramLabelRenderer, ColorScheme scheme) {
                 String[] names = ShortestFirst.sort(option.names());
                 int shortOptionCount = names[0].length() == 2 ? 1 : 0;
                 String shortOption = shortOptionCount > 0 ? names[0] : "";
@@ -16603,7 +16704,7 @@ public class CommandLine {
                 return renderDescriptionLines(option, scheme, requiredOption, shortOption, longOptionText);
             }
 
-            private Text createLongOptionText(OptionSpec option, IParamLabelRenderer renderer, ColorScheme scheme, String longOption) {
+            private Text createLongOptionText(Model.OptionSpec option, IParamLabelRenderer renderer, ColorScheme scheme, String longOption) {
                 Text paramLabelText = renderer.renderParameterLabel(option, scheme.ansi(), scheme.optionParamStyles);
 
                 // if no long option, fill in the space between the short option name and the param label value
@@ -16619,7 +16720,7 @@ public class CommandLine {
                 return longOptionText;
             }
 
-            private Text[][] renderDescriptionLines(OptionSpec option,
+            private Text[][] renderDescriptionLines(Model.OptionSpec option,
                                                     ColorScheme scheme,
                                                     String requiredOption,
                                                     String shortOption,
@@ -16644,10 +16745,10 @@ public class CommandLine {
                 return result.toArray(new Text[result.size()][]);
             }
         }
-        /** The MinimalOptionRenderer converts {@link OptionSpec Options} to a single row with two columns of text: an
+        /** The MinimalOptionRenderer converts {@link Model.OptionSpec Options} to a single row with two columns of text: an
          * option name and a description. If multiple names or description lines exist, the first value is used. */
         static class MinimalOptionRenderer implements IOptionRenderer {
-            public Text[][] render(OptionSpec option, IParamLabelRenderer parameterLabelRenderer, ColorScheme scheme) {
+            public Text[][] render(Model.OptionSpec option, IParamLabelRenderer parameterLabelRenderer, ColorScheme scheme) {
                 Text optionText = option.negatable()
                         ? scheme.optionText(option.commandSpec.negatableOptionTransformer().makeSynopsis(option.names()[0], option.commandSpec))
                         : scheme.optionText(option.names()[0]);
@@ -16657,15 +16758,15 @@ public class CommandLine {
                         scheme.ansi().new Text(option.description().length == 0 ? "" : option.description()[0], scheme) }};
             }
         }
-        /** The MinimalParameterRenderer converts {@linkplain PositionalParamSpec positional parameters} to a single row with two columns of
+        /** The MinimalParameterRenderer converts {@linkplain Model.PositionalParamSpec positional parameters} to a single row with two columns of
          * text: the parameters label and a description. If multiple description lines exist, the first value is used. */
         static class MinimalParameterRenderer implements IParameterRenderer {
-            public Text[][] render(PositionalParamSpec param, IParamLabelRenderer parameterLabelRenderer, ColorScheme scheme) {
+            public Text[][] render(Model.PositionalParamSpec param, IParamLabelRenderer parameterLabelRenderer, ColorScheme scheme) {
                 return new Text[][] {{ parameterLabelRenderer.renderParameterLabel(param, scheme.ansi(), scheme.parameterStyles),
                         scheme.ansi().new Text(param.description().length == 0 ? "" : param.description()[0], scheme) }};
             }
         }
-        /** When customizing online help for {@linkplain PositionalParamSpec positional parameters} details, a custom {@code IParameterRenderer}
+        /** When customizing online help for {@linkplain Model.PositionalParamSpec positional parameters} details, a custom {@code IParameterRenderer}
          * can be used to create textual representation of a Parameters field in a tabular format: one or more rows,
          * each containing one or more columns. The {@link Layout Layout} is responsible for placing these text
          * values in the {@link TextTable TextTable}. */
@@ -16678,19 +16779,19 @@ public class CommandLine {
              * @return a 2-dimensional array of text values: one or more rows, each containing one or more columns
              * @since 3.0
              */
-            Text[][] render(PositionalParamSpec param, IParamLabelRenderer parameterLabelRenderer, ColorScheme scheme);
+            Text[][] render(Model.PositionalParamSpec param, IParamLabelRenderer parameterLabelRenderer, ColorScheme scheme);
         }
-        /** The DefaultParameterRenderer converts {@linkplain PositionalParamSpec positional parameters} to five columns of text to match the
+        /** The DefaultParameterRenderer converts {@linkplain Model.PositionalParamSpec positional parameters} to five columns of text to match the
          * default {@linkplain TextTable TextTable} column layout. The first row of values looks like this:
          * <ol>
          * <li>the required option marker (if the parameter's arity is to have at least one value)</li>
          * <li>empty string </li>
          * <li>empty string </li>
          * <li>parameter(s) label as rendered by the {@link IParamLabelRenderer}</li>
-         * <li>first element of the {@link PositionalParamSpec#description()} array</li>
+         * <li>first element of the {@link Model.PositionalParamSpec#description()} array</li>
          * </ol>
          * <p>Following this, there will be one row for each of the remaining elements of the {@link
-         *   PositionalParamSpec#description()} array, and these rows look like {@code {"", "", "", param.description()[i]}}.</p>
+         *   Model.PositionalParamSpec#description()} array, and these rows look like {@code {"", "", "", param.description()[i]}}.</p>
          */
         static class DefaultParameterRenderer implements IParameterRenderer {
             private final String requiredMarker;
@@ -16699,7 +16800,7 @@ public class CommandLine {
                 this.showDefaultValues = showDefaultValues;
                 this.requiredMarker = Assert.notNull(requiredMarker, "requiredMarker");
             }
-            public Text[][] render(PositionalParamSpec param, IParamLabelRenderer paramLabelRenderer, ColorScheme scheme) {
+            public Text[][] render(Model.PositionalParamSpec param, IParamLabelRenderer paramLabelRenderer, ColorScheme scheme) {
                 Text label = paramLabelRenderer.renderParameterLabel(param, scheme.ansi(), scheme.parameterStyles);
                 Text requiredParameter = scheme.parameterText(param.arity().min > 0 ? requiredMarker : "");
 
@@ -16723,12 +16824,12 @@ public class CommandLine {
             }
         }
 
-        private static void addTrailingDefaultLine(List<Text[]> result, ArgSpec arg, ColorScheme scheme) {
+        private static void addTrailingDefaultLine(List<Text[]> result, Model.ArgSpec arg, ColorScheme scheme) {
             Text EMPTY = Ansi.EMPTY_TEXT;
             result.add(new Text[]{EMPTY, EMPTY, EMPTY, EMPTY, scheme.ansi().new Text("  Default: " + arg.defaultValueString(true), scheme)});
         }
 
-        private static Text[] createDescriptionFirstLines(ColorScheme scheme, ArgSpec arg, String[] description, boolean[] showDefault) {
+        private static Text[] createDescriptionFirstLines(ColorScheme scheme, Model.ArgSpec arg, String[] description, boolean[] showDefault) {
             Text[] result = scheme.ansi().new Text(str(description, 0), scheme).splitLines();
             if (result.length == 0 || (result.length == 1 && result[0].plain.length() == 0)) {
                 if (showDefault[0]) {
@@ -16752,16 +16853,16 @@ public class CommandLine {
              * @param styles the styles to apply to the parameter label
              * @return a text rendering of the Option parameter or positional parameter
              * @since 3.0 */
-            Text renderParameterLabel(ArgSpec argSpec, Ansi ansi, List<IStyle> styles);
+            Text renderParameterLabel(Model.ArgSpec argSpec, Ansi ansi, List<IStyle> styles);
 
             /** Returns the separator between option name and param label.
              * @return the separator between option name and param label */
             String separator();
         }
         /**
-         * DefaultParamLabelRenderer separates option parameters from their {@linkplain OptionSpec option names} with a
+         * DefaultParamLabelRenderer separates option parameters from their {@linkplain Model.OptionSpec option names} with a
          * {@linkplain CommandLine.Model.ParserSpec#separator() separator} string, and, unless
-         * {@link ArgSpec#hideParamSyntax()} is true, surrounds optional values with {@code '['} and {@code ']'} characters
+         * {@link Model.ArgSpec#hideParamSyntax()} is true, surrounds optional values with {@code '['} and {@code ']'} characters
          * and uses ellipses ("...") to indicate that any number of values is allowed for options or parameters with variable arity.
          */
         static class DefaultParamLabelRenderer implements IParamLabelRenderer {
@@ -16771,8 +16872,8 @@ public class CommandLine {
                 this.commandSpec = Assert.notNull(commandSpec, "commandSpec");
             }
             public String separator() { return commandSpec.parser().separator(); }
-            public Text renderParameterLabel(ArgSpec argSpec, Ansi ansi, List<IStyle> styles) {
-                Range capacity = argSpec.isOption() ? argSpec.arity() : ((PositionalParamSpec)argSpec).capacity();
+            public Text renderParameterLabel(Model.ArgSpec argSpec, Ansi ansi, List<IStyle> styles) {
+                Range capacity = argSpec.isOption() ? argSpec.arity() : ((Model.PositionalParamSpec)argSpec).capacity();
                 ColorScheme colorScheme = commandSpec.commandLine() == null ? Help.defaultColorScheme(ansi) : commandSpec.commandLine().getColorScheme();
                 if (capacity.max == 0) { return ansi.new Text("", colorScheme); }
                 if (argSpec.hideParamSyntax()) { return colorScheme.apply((argSpec.isOption() ? separator() : "") + argSpec.paramLabel(), styles); }
@@ -16852,7 +16953,7 @@ public class CommandLine {
              * {@linkplain Help#createDefaultParameterRenderer() default parameter renderer}.
              * @param colorScheme the color scheme to use for common, auto-generated parts of the usage help message */
             public Layout(ColorScheme colorScheme, int tableWidth) { this(colorScheme,
-                    TextTable.forDefaultColumns(colorScheme, UsageMessageSpec.DEFAULT_USAGE_LONG_OPTIONS_WIDTH + 4, tableWidth)); }
+                    TextTable.forDefaultColumns(colorScheme, Model.UsageMessageSpec.DEFAULT_USAGE_LONG_OPTIONS_WIDTH + 4, tableWidth)); }
 
             /** Constructs a Layout with the specified color scheme, the specified TextTable, the
              * {@linkplain Help#createDefaultOptionRenderer() default option renderer}, and the
@@ -16881,7 +16982,7 @@ public class CommandLine {
              * @param argSpec the Option or Parameters
              * @param cellValues the text values representing the Option/Parameters, to be displayed in tabular form
              * @since 3.0 */
-            public void layout(ArgSpec argSpec, Text[][] cellValues) {
+            public void layout(Model.ArgSpec argSpec, Text[][] cellValues) {
                 for (Text[] oneRow : cellValues) {
                     table.addRowValues(oneRow);
                 }
@@ -16890,8 +16991,8 @@ public class CommandLine {
              * @param options options to add usage descriptions for
              * @param paramLabelRenderer object that knows how to render option parameters
              * @since 3.0 */
-            public void addOptions(List<OptionSpec> options, IParamLabelRenderer paramLabelRenderer) {
-                for (OptionSpec option : options) {
+            public void addOptions(List<Model.OptionSpec> options, IParamLabelRenderer paramLabelRenderer) {
+                for (Model.OptionSpec option : options) {
                     if (!option.hidden()) {
                         addOption(option, paramLabelRenderer);
                     }
@@ -16902,17 +17003,17 @@ public class CommandLine {
              *                it is the responsibility of the caller to exclude options that should not be shown
              * @param paramLabelRenderer object that knows how to render option parameters
              * @since 4.4 */
-            public void addAllOptions(List<OptionSpec> options, IParamLabelRenderer paramLabelRenderer) {
-                for (OptionSpec option : options) { addOption(option, paramLabelRenderer); }
+            public void addAllOptions(List<Model.OptionSpec> options, IParamLabelRenderer paramLabelRenderer) {
+                for (Model.OptionSpec option : options) { addOption(option, paramLabelRenderer); }
             }
             /**
              * Delegates to the {@link #optionRenderer option renderer} of this layout to obtain
-             * text values for the specified {@link OptionSpec}, and then calls the {@link #layout(CommandLine.Model.ArgSpec, CommandLine.Help.Ansi.Text[][])}
+             * text values for the specified {@link Model.OptionSpec}, and then calls the {@link #layout(CommandLine.Model.ArgSpec, CommandLine.Help.Ansi.Text[][])}
              * method to write these text values into the correct cells in the TextTable.
              * @param option the option argument
              * @param paramLabelRenderer knows how to render option parameters
              * @since 3.0 */
-            public void addOption(OptionSpec option, IParamLabelRenderer paramLabelRenderer) {
+            public void addOption(Model.OptionSpec option, IParamLabelRenderer paramLabelRenderer) {
                 Text[][] values = optionRenderer.render(option, paramLabelRenderer, colorScheme);
                 layout(option, values);
             }
@@ -16920,8 +17021,8 @@ public class CommandLine {
              * @param params positional parameters to add usage descriptions for
              * @param paramLabelRenderer knows how to render option parameters
              * @since 3.0 */
-            public void addPositionalParameters(List<PositionalParamSpec> params, IParamLabelRenderer paramLabelRenderer) {
-                for (PositionalParamSpec param : params) {
+            public void addPositionalParameters(List<Model.PositionalParamSpec> params, IParamLabelRenderer paramLabelRenderer) {
+                for (Model.PositionalParamSpec param : params) {
                     if (!param.hidden()) {
                         addPositionalParameter(param, paramLabelRenderer);
                     }
@@ -16932,17 +17033,17 @@ public class CommandLine {
              *               it is the responsibility of the caller to exclude positional parameters that should not be shown
              * @param paramLabelRenderer knows how to render option parameters
              * @since 4.4 */
-            public void addAllPositionalParameters(List<PositionalParamSpec> params, IParamLabelRenderer paramLabelRenderer) {
-                for (PositionalParamSpec param : params) { addPositionalParameter(param, paramLabelRenderer); }
+            public void addAllPositionalParameters(List<Model.PositionalParamSpec> params, IParamLabelRenderer paramLabelRenderer) {
+                for (Model.PositionalParamSpec param : params) { addPositionalParameter(param, paramLabelRenderer); }
             }
             /**
              * Delegates to the {@link #parameterRenderer parameter renderer} of this layout
-             * to obtain text values for the specified {@linkplain PositionalParamSpec positional parameter}, and then calls
+             * to obtain text values for the specified {@linkplain Model.PositionalParamSpec positional parameter}, and then calls
              * {@link #layout(CommandLine.Model.ArgSpec, CommandLine.Help.Ansi.Text[][])} to write these text values into the correct cells in the TextTable.
              * @param param the positional parameter
              * @param paramLabelRenderer knows how to render option parameters
              * @since 3.0 */
-            public void addPositionalParameter(PositionalParamSpec param, IParamLabelRenderer paramLabelRenderer) {
+            public void addPositionalParameter(Model.PositionalParamSpec param, IParamLabelRenderer paramLabelRenderer) {
                 Text[][] values = parameterRenderer.render(param, paramLabelRenderer, colorScheme);
                 layout(param, values);
             }
@@ -16979,8 +17080,8 @@ public class CommandLine {
         }
         /** Sorts {@code OptionSpec} instances by their name in case-insensitive alphabetic order. If an option has
          * multiple names, the shortest name is used for the sorting. Help options follow non-help options. */
-        static class SortByShortestOptionNameAlphabetically implements Comparator<OptionSpec> {
-            public int compare(OptionSpec o1, OptionSpec o2) {
+        static class SortByShortestOptionNameAlphabetically implements Comparator<Model.OptionSpec> {
+            public int compare(Model.OptionSpec o1, Model.OptionSpec o2) {
                 if (o1 == null) { return 1; } else if (o2 == null) { return -1; } // options before params
                 String[] names1 = ShortestFirst.sort(o1.names());
                 String[] names2 = ShortestFirst.sort(o2.names());
@@ -16993,7 +17094,7 @@ public class CommandLine {
         }
         /** Sorts {@code OptionSpec} instances by their max arity first, then their min arity, then delegates to super class. */
         static class SortByOptionArityAndNameAlphabetically extends SortByShortestOptionNameAlphabetically {
-            public int compare(OptionSpec o1, OptionSpec o2) {
+            public int compare(Model.OptionSpec o1, Model.OptionSpec o2) {
                 Range arity1 = o1.arity();
                 Range arity2 = o2.arity();
                 int result = arity1.max - arity2.max;
@@ -17007,7 +17108,7 @@ public class CommandLine {
                 return result == 0 ? super.compare(o1, o2) : result;
             }
         }
-        static class SortByOrder<T extends IOrdered> implements Comparator<T> {
+        static class SortByOrder<T extends Model.IOrdered> implements Comparator<T> {
             public int compare(T o1, T o2) {
                 return Integer.signum(o1.order() - o2.order());
             }
@@ -17063,7 +17164,7 @@ public class CommandLine {
              */
             @Deprecated public static TextTable forDefaultColumns(Ansi ansi, int usageHelpWidth) {
                 // TODO split out the 1 (for long column indent) and 3 (should be description indent)
-                return forDefaultColumns(Help.defaultColorScheme(ansi), UsageMessageSpec.DEFAULT_USAGE_LONG_OPTIONS_WIDTH + 4, usageHelpWidth);
+                return forDefaultColumns(Help.defaultColorScheme(ansi), Model.UsageMessageSpec.DEFAULT_USAGE_LONG_OPTIONS_WIDTH + 4, usageHelpWidth);
             }
 
             /** Constructs a TextTable with five columns as follows:
@@ -17144,10 +17245,10 @@ public class CommandLine {
                 for (Column col : columns) { totalWidth += col.width; }
                 tableWidth = totalWidth;
             }
-            /** @see UsageMessageSpec#adjustLineBreaksForWideCJKCharacters()
+            /** @see Model.UsageMessageSpec#adjustLineBreaksForWideCJKCharacters()
              * @since 4.0 */
             public boolean isAdjustLineBreaksForWideCJKCharacters() { return adjustLineBreaksForWideCJKCharacters; }
-            /** @see UsageMessageSpec#adjustLineBreaksForWideCJKCharacters(boolean)
+            /** @see Model.UsageMessageSpec#adjustLineBreaksForWideCJKCharacters(boolean)
              * @since 4.0 */
             public TextTable setAdjustLineBreaksForWideCJKCharacters(boolean adjustLineBreaksForWideCJKCharacters) {
                 this.adjustLineBreaksForWideCJKCharacters = adjustLineBreaksForWideCJKCharacters;
@@ -18266,7 +18367,7 @@ public class CommandLine {
                                 codePoint = c1;
                             }
                         }
-                        result += UsageMessageSpec.isCodePointCJK(codePoint) ? 2 : 1;
+                        result += Model.UsageMessageSpec.isCodePointCJK(codePoint) ? 2 : 1;
                     }
 
                     return result;
@@ -18461,7 +18562,7 @@ public class CommandLine {
     public static class ParameterException extends PicocliException {
         private static final long serialVersionUID = 1477112829129763139L;
         private final CommandLine commandLine;
-        private ArgSpec argSpec = null;
+        private Model.ArgSpec argSpec = null;
         private String value = null;
 
         /** Constructs a new ParameterException with the specified CommandLine and error message.
@@ -18490,7 +18591,7 @@ public class CommandLine {
          * @param argSpec the argSpec that caused this ParameterException
          * @param value the value that caused this ParameterException
          * @since 3.2 */
-        public ParameterException(CommandLine commandLine, String msg, Throwable t, ArgSpec argSpec, String value) {
+        public ParameterException(CommandLine commandLine, String msg, Throwable t, Model.ArgSpec argSpec, String value) {
             super(msg, t);
             this.commandLine = Assert.notNull(commandLine, "commandLine");
             if (argSpec == null && value == null) { throw new IllegalArgumentException("ArgSpec and value cannot both be null"); }
@@ -18504,7 +18605,7 @@ public class CommandLine {
          * @param argSpec the argSpec that caused this ParameterException
          * @param value the value that caused this ParameterException
          * @since 3.2 */
-        public ParameterException(CommandLine commandLine, String msg, ArgSpec argSpec, String value) {
+        public ParameterException(CommandLine commandLine, String msg, Model.ArgSpec argSpec, String value) {
             super(msg);
             this.commandLine = Assert.notNull(commandLine, "commandLine");
             if (argSpec == null && value == null) { throw new IllegalArgumentException("ArgSpec and value cannot both be null"); }
@@ -18523,7 +18624,7 @@ public class CommandLine {
          * @return the {@code ArgSpec} object for the (sub)command where parsing failed.
          * @since 3.2
          */
-        public ArgSpec getArgSpec() { return argSpec; }
+        public Model.ArgSpec getArgSpec() { return argSpec; }
 
         /** Returns the {@code String} value for the (sub)command whose input could not be parsed.
          * @return the {@code String} value for the (sub)command where parsing failed.
@@ -18542,16 +18643,16 @@ public class CommandLine {
      */
     public static class MissingParameterException extends ParameterException {
         private static final long serialVersionUID = 5075678535706338753L;
-        private final List<ArgSpec> missing;
-        public MissingParameterException(CommandLine commandLine, ArgSpec missing, String msg) { this(commandLine, Collections.singletonList(missing), msg); }
-        public MissingParameterException(CommandLine commandLine, Collection<ArgSpec> missing, String msg) {
+        private final List<Model.ArgSpec> missing;
+        public MissingParameterException(CommandLine commandLine, Model.ArgSpec missing, String msg) { this(commandLine, Collections.singletonList(missing), msg); }
+        public MissingParameterException(CommandLine commandLine, Collection<Model.ArgSpec> missing, String msg) {
             super(commandLine, msg);
-            this.missing = Collections.unmodifiableList(new ArrayList<ArgSpec>(missing));
+            this.missing = Collections.unmodifiableList(new ArrayList<Model.ArgSpec>(missing));
         }
-        public List<ArgSpec> getMissing() { return missing; }
-        private static MissingParameterException create(CommandLine cmd, Collection<ArgSpec> missing, String separator) {
-            String missingArgs = ArgSpec.describe(missing, ", ", separator, "'", "'");
-            String types = ArgSpec.describeTypes(missing);
+        public List<Model.ArgSpec> getMissing() { return missing; }
+        private static MissingParameterException create(CommandLine cmd, Collection<Model.ArgSpec> missing, String separator) {
+            String missingArgs = Model.ArgSpec.describe(missing, ", ", separator, "'", "'");
+            String types = Model.ArgSpec.describeTypes(missing);
             return new MissingParameterException(cmd, missing, "Missing required " + types + ": " + missingArgs);
         }
     }
@@ -18575,7 +18676,7 @@ public class CommandLine {
         private static final long serialVersionUID = -3355128012575075641L;
         public DuplicateOptionAnnotationsException(String msg) { super(msg); }
 
-        private static DuplicateOptionAnnotationsException create(String name, ArgSpec argSpec1, ArgSpec argSpec2) {
+        private static DuplicateOptionAnnotationsException create(String name, Model.ArgSpec argSpec1, Model.ArgSpec argSpec2) {
             return new DuplicateOptionAnnotationsException("Option name '" + name + "' is used by both " +
                     argSpec1.toString() + " and " + argSpec2.toString());
         }
@@ -18695,14 +18796,14 @@ public class CommandLine {
     /** Exception indicating that an option for a single-value option field has been specified multiple times on the command line. */
     public static class OverwrittenOptionException extends ParameterException {
         private static final long serialVersionUID = 1338029208271055776L;
-        private final ArgSpec overwrittenArg;
-        public OverwrittenOptionException(CommandLine commandLine, ArgSpec overwritten, String msg) {
+        private final Model.ArgSpec overwrittenArg;
+        public OverwrittenOptionException(CommandLine commandLine, Model.ArgSpec overwritten, String msg) {
             super(commandLine, msg);
             overwrittenArg = overwritten;
         }
-        /** Returns the {@link ArgSpec} for the option which was being overwritten.
+        /** Returns the {@link Model.ArgSpec} for the option which was being overwritten.
          * @since 3.8 */
-        public ArgSpec getOverwritten() { return overwrittenArg; }
+        public Model.ArgSpec getOverwritten() { return overwrittenArg; }
     }
     /**
      * Exception indicating that an annotated field had a type for which no {@link ITypeConverter} was
@@ -18742,11 +18843,11 @@ public class CommandLine {
      * <h2>Format</h2>
      * <p>
      * For options, the key is either the {@linkplain CommandLine.Option#descriptionKey() descriptionKey},
-     * or the option's {@linkplain OptionSpec#longestName() longest name}.
+     * or the option's {@linkplain Model.OptionSpec#longestName() longest name}.
      * </p><p>
      * For positional parameters, the key is either the
      * {@linkplain CommandLine.Parameters#descriptionKey() descriptionKey},
-     * or the positional parameter's {@linkplain PositionalParamSpec#paramLabel() param label}.
+     * or the positional parameter's {@linkplain Model.PositionalParamSpec#paramLabel() param label}.
      * </p><p>
      * End users may not know what the {@code descriptionKey} of your options and positional parameters are, so be sure
      * to document that with your application.
@@ -18863,7 +18964,7 @@ public class CommandLine {
             return loadProperties(commandSpec.parent());
         }
 
-        public String defaultValue(ArgSpec argSpec) throws Exception {
+        public String defaultValue(Model.ArgSpec argSpec) throws Exception {
             if (properties == null) {
                 properties = loadProperties(argSpec.command());
                 location = properties == null ? null : (File) properties.remove("__picocli_internal_location");
@@ -18872,11 +18973,11 @@ public class CommandLine {
                 return null;
             }
             return argSpec.isOption()
-                    ? optionDefaultValue((OptionSpec) argSpec)
-                    : positionalDefaultValue((PositionalParamSpec) argSpec);
+                    ? optionDefaultValue((Model.OptionSpec) argSpec)
+                    : positionalDefaultValue((Model.PositionalParamSpec) argSpec);
         }
 
-        private String optionDefaultValue(OptionSpec option) {
+        private String optionDefaultValue(Model.OptionSpec option) {
             String result = getValue(option.descriptionKey(), option.command());
             result = result != null ? result : getValue(stripPrefix(option.longestName()), option.command());
             return result;
@@ -18890,7 +18991,7 @@ public class CommandLine {
             return prefixed;
         }
 
-        private String positionalDefaultValue(PositionalParamSpec positional) {
+        private String positionalDefaultValue(Model.PositionalParamSpec positional) {
             String result = getValue(positional.descriptionKey(), positional.command());
             result = result != null ? result : getValue(positional.paramLabel(), positional.command());
             return result;
