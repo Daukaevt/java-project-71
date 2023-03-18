@@ -19,6 +19,6 @@ public class Differ {
         Map<String, String> parseJson2 =
                 Parser.parse(Reader.readFile(filePath2));
         String content = Parser.agregate(parseJson1, parseJson2);
-     return ContentFormatter.makeStyle(content, format);
+        return ContentFormatter.makeStyle(content, format);
     }
 }
