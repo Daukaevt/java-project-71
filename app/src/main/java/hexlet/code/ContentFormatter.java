@@ -9,7 +9,9 @@ import java.util.Map;
 
 import static java.lang.Integer.parseInt;
 
+
 public class ContentFormatter {
+    public static final int NO_TRAILING_SPACES_INDEX = 4;
     public static String makeStyle(final String content, final String format) {
         String contentStyled;
         if (format.equals("plain")) {
@@ -46,7 +48,7 @@ public class ContentFormatter {
                 .replaceAll(".\",", "\",\n  ")
                 .replaceAll("\":\"[\\[|\\{]", "\":\"");
     }
-    private static int noTrailingSpacesIndex = 4;
+
     public static String plainFormat(final String result) {
         var tmpText = result.replaceAll("^.|.$", "");
         var tmpLines = tmpText.lines();
@@ -58,7 +60,7 @@ public class ContentFormatter {
         for (int i = 0; i < arrayList.size(); i++) {
             String tmpSubstringPlus;
             String line = arrayList.get(i);
-            var key = line.substring(noTrailingSpacesIndex)
+            var key = line.substring(NO_TRAILING_SPACES_INDEX)
                     .replaceAll(":\s.*", "");
             String firstValue = makeStyle(line.replaceAll(".*:\s", ""));
             if (i + 1 < arrayList.size()) {
@@ -90,6 +92,7 @@ public class ContentFormatter {
                             + key + "' was added with value: " + firstValue;
                     tmpArrayList.add(tmpSubstringPlus);
                 }
+                default -> { }
             }
         }
         return createResult(tmpArrayList);
