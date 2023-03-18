@@ -15,7 +15,7 @@ public class ContentFormatter {
     public static String makeStyle(final String content, final String format) {
         String contentStyled;
         if (format.equals("plain")) {
-             contentStyled = plainFormat(content);
+            contentStyled = plainFormat(content);
         } else if (format.equals("json")) {
             contentStyled = jsonFormat(content);
         } else {
