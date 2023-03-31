@@ -1,6 +1,9 @@
 package hexlet.code;
 
 
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 
 public class Differ {
@@ -14,10 +17,12 @@ public class Differ {
     public static String generate(
             final String filePath1, final String filePath2, final String format
     ) throws Exception {
+        Path path1 = Paths.get(filePath1).normalize();
         Map<String, String> parseJson1 =
-                Parser.parse(Reader.readFile(filePath1));
+                Parser.parse(Reader.readFile(path1.toAbsolutePath().toString()));
+        Path path2 = Paths.get(filePath2).normalize();
         Map<String, String> parseJson2 =
-                Parser.parse(Reader.readFile(filePath2));
+                Parser.parse(Reader.readFile(path2.toAbsolutePath().toString()));
         String content = Parser.agregate(parseJson1, parseJson2);
         return ContentFormatter.makeStyle(content, format);
     }
