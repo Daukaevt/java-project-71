@@ -8,18 +8,18 @@ import java.util.TreeMap;
 
 public class ContentFormatter {
     public static String makeStyle1(
-            TreeMap<String, Wrapper> unitMap,
+            final TreeMap<String, Wrapper> unitMap,
             final String format
     ) {
         switch (format) {
             case ("plain") -> {
-                return PlainFormatter.plainFormate3(unitMap);
+                return PlainFormatter.plainFormate(unitMap);
             }
             case ("json") -> {
-                return JsonFormatter.jsonFormat2(unitMap);
+                return JsonFormatter.jsonFormat(unitMap);
             }
             default -> {
-                return StylishFormatter.stylishFormat1(unitMap);
+                return StylishFormatter.stylishFormat(unitMap);
             }
         }
     }
