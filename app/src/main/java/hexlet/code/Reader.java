@@ -27,7 +27,7 @@ public class Reader {
                 throw new RuntimeException(e);
             }
         }
-        String content1 = null;
+        String content = null;
         try (BufferedReader br =
                      new BufferedReader(new FileReader(filePath1))) {
             StringBuilder sb = new StringBuilder();
@@ -36,13 +36,9 @@ public class Reader {
                 sb.append(line);
                 sb.append(System.lineSeparator());
                 line = br.readLine();
-            }
-            if (sb != null) {
-                content1 = sb.toString();
-            } else {
-                System.out.println("null");
+                content = sb.toString();
             }
         }
-        return content1;
+        return content;
     }
 }
