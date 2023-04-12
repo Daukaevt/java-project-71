@@ -1,69 +1,42 @@
 package hexlet.code.formatter;
 
 
-import java.util.Map;
+import hexlet.code.utils.Wrapper;
+
 import java.util.TreeMap;
 
 import static java.lang.Integer.parseInt;
 
 public class PlainFormatter {
-    public static String plainFormate2(
-            Map<String, Object> parseJson1, Map<String, Object> parseJson2) {
-        TreeMap treeMap = new TreeMap();
+    public static String plainFormate(TreeMap<String, Wrapper> unitMap) {
         StringBuilder stringBuilder = new StringBuilder();
-        for (Object key : parseJson1.keySet()) {
-            if (parseJson2.containsKey(key)) {
-                if (!parseJson1.get(key).equals(parseJson2.get(key))) {
-                    treeMap.put(key, "  Property '" + key + "' was updated. From "
-                            + getSingleQuotes(parseJson1.get(key).toString()) + " to "
-                            + getSingleQuotes(parseJson2.get(key).toString()));
-                } else {
-                    if (parseJson1.get(key).toString().contains("\\[.*]|\\{.*}")) {
-                        treeMap.put(key, "  Property '" + key + "' was updated. From "
-                                + parseJson1.get(key) + " to "
-                                + getSingleQuotes(parseJson2.get(key).toString()));
-                    }
-                }
-            } else {
-                treeMap.put(key, "  Property '" + key + "' was removed");
+        for (Object key: unitMap.keySet()) {
+            Wrapper values = unitMap.get(key);
+            String value1 = values.getValue1();
+            String value2 = values.getValue2();
+            if (value1.equals("-absent-")) {
+                stringBuilder.append("Property '" + key + "' was added with value: " + getSingleQuotes3(value2) + "\n");
+                continue;
+            }
+            if (value2.equals("-absent-")) {
+                stringBuilder.append("Property '" + key + "' was removed" + "\n");
+                continue;
+            }
+            if (!value1.equals(value2)) {
+                stringBuilder.append("Property '" + key + "' was updated. From " + getSingleQuotes3(value1)
+                        + " to " + getSingleQuotes3(value2) + "\n");
             }
         }
-        for (Object key : parseJson2.keySet()) {
-            if (!parseJson1.containsKey(key)) {
-                treeMap.put(key, "  Property '" + key + "' was added with value: "
-                        + getSingleQuotes(parseJson2.get(key).toString()));
-            }
-        }
-        Map getComplexValuesMap = getComplexValues(treeMap);
-        for (Object key: getComplexValuesMap.keySet()) {
-            stringBuilder.append(getComplexValuesMap.get(key) + "\n");
-        }
-
         return stringBuilder.toString();
     }
-
-    private static TreeMap getComplexValues(Map<String, Object> parseJson) {
-        TreeMap map1 = new TreeMap();
-        for (String key : parseJson.keySet()) {
-            String value = String.valueOf(parseJson.get(key));
-            var complexValue = value.replaceAll("'\\[.*?]'|\\{.*?}'", "[complex value]");
-            if (!value.equals(complexValue)) {
-                value = complexValue;
-            }
-            map1.put(key, value);
-        }
-        return map1;
-    }
-    public static String getSingleQuotes(String value) {
-        if (!value.contains("\\[.*]|\\{.*}")
-                && !isBoolean(value)
+    public static String getSingleQuotes3(String value) {
+        if (!isBoolean(value)
                 && !isNumeric(value)
                 && !value.equals("null")) {
             value = "'" + value + "'";
         }
-        return value;
+        return value.replaceAll("'\\[.*]'|'\\{.*}'", "[complex value]");
     }
-
     public static boolean isNumeric(final String str) {
         try {
             parseInt(str);
@@ -72,7 +45,6 @@ public class PlainFormatter {
             return false;
         }
     }
-
     public static boolean isBoolean(final String str) {
         return str.equals("true") || str.equals("false");
     }
