@@ -1,33 +1,32 @@
 package hexlet.code.formatter;
 
-import java.util.Map;
+import hexlet.code.utils.Wrapper;
+
+import java.util.TreeMap;
 
 public class StylishFormatter {
-    public static String stylishFormat(final Map stylishMap) {
+    public static String stylishFormat(TreeMap<String, Wrapper> unitMap) {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("{");
-        for (Object key: stylishMap.keySet()) {
-            String keyPostfix = null;
-            String tempKey = key.toString();
-            keyPostfix = tempKey.substring(tempKey.length() - 5);
-            String keyContent = tempKey.substring(0, tempKey.length() - 5);
-            switch (keyPostfix) {
-                case ("minus"): {
-                    stringBuilder.append("\n" + "  - " + keyContent + ": " + stylishMap.get(key));
-                    break;
-                }
-                case ("plus "): {
-                    stringBuilder.append("\n" + "  + " + keyContent + ": " + stylishMap.get(key));
-                    break;
-                }
-                case ("space"): {
-                    stringBuilder.append("\n" + "    " + keyContent + ": " + stylishMap.get(key));
-                }
-                    break;
-                default:
-                    throw new IllegalStateException("Unexpected value: " + keyPostfix);
+        stringBuilder.append("{\n");
+        for (Object key: unitMap.keySet()) {
+            Wrapper values = unitMap.get(key);
+            String value1 = values.getValue1();
+            String value2 = values.getValue2();
+            if (value1.equals("-absent-")) {
+                stringBuilder.append("  + " + key + ": " + value2 + "\n");
+                continue;
+            }
+            if (value2.equals("-absent-")) {
+                stringBuilder.append("  - " + key + ": " + value1 + "\n");
+                continue;
+            }
+            if (!value1.equals(value2)) {
+                stringBuilder.append("  - " + key + ": " + value1 + "\n");
+                stringBuilder.append("  + " + key + ": " + value2 + "\n");
+            } else {
+                stringBuilder.append("    " + key + ": " + value1 + "\n");
             }
         }
-        return stringBuilder + "\n}";
+        return stringBuilder.toString() ;
     }
 }
