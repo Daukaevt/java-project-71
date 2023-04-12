@@ -1,10 +1,13 @@
 package hexlet.code;
 
 
-import java.io.File;
+import hexlet.code.formatter.ContentFormatter;
+import hexlet.code.utils.Wrapper;
+
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
+import java.util.TreeMap;
 
 public class Differ {
     public static String generate(
@@ -18,12 +21,12 @@ public class Differ {
             final String filePath1, final String filePath2, final String format
     ) throws Exception {
         Path path1 = Paths.get(filePath1).normalize();
-        Map<String, String> parseJson1 =
+        Map<String, Object> parseJson1 =
                 Parser.parse(Reader.readFile(path1.toAbsolutePath().toString()));
         Path path2 = Paths.get(filePath2).normalize();
-        Map<String, String> parseJson2 =
+        Map<String, Object> parseJson2 =
                 Parser.parse(Reader.readFile(path2.toAbsolutePath().toString()));
-        String content = Parser.agregate(parseJson1, parseJson2);
-        return ContentFormatter.makeStyle(content, format);
+        TreeMap<String, Wrapper> unitMap = Uniter.unite(parseJson1, parseJson2);
+        return ContentFormatter.makeStyle1(unitMap, format);
     }
 }
