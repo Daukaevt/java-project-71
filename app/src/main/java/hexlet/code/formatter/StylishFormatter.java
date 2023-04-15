@@ -27,6 +27,6 @@ public class StylishFormatter {
                 stringBuilder.append("    " + key + ": " + value1 + "\n");
             }
         }
-        return stringBuilder.toString() ;
+        return stringBuilder + "}" ;
     }
 }
