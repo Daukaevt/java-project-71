@@ -19,7 +19,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Parser {
-    public static Map parse(final String content) {
+    public static Map parse(String content) {
+        if (content == null) {
+            content = "";
+        }
         boolean validJSON = isJSONValid(content);
         Map parseJsonToMap = null;
         if (validJSON) {
