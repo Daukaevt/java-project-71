@@ -15,6 +15,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -104,10 +106,13 @@ public class Parser {
     public static Map<String, String> replace(
             final Map parseFileContent) {
         HashMap hashMap = new HashMap();
+        Pattern pattern = Pattern.compile("\\[.*]|\\{.*}");
         for (Object key: parseFileContent.keySet()) {
             String value;
             parseFileContent.putIfAbsent(key, "null");
             value = parseFileContent.get(key).toString();
+
+            Matcher matcher = pattern.matcher(value);
             if (value == null) {
                 hashMap.put(key, "null");
             } else if (value.startsWith("[")) {
@@ -115,11 +120,11 @@ public class Parser {
                         .replaceAll("\\]$", "");
                 Stream<String> stream = Arrays.stream(value.split(","));
                 List<String> list = stream.collect(Collectors.toList());
-                list.replaceAll(s -> s.replaceAll("^\"", "")
-                        .replaceAll("\"$", ""));
+                list.replaceAll(s -> s.replaceAll("\"", "")
+                        .replaceAll("\"", ""));
                 hashMap.put(key, list);
-            } else if (value.startsWith("{")) {
-                hashMap.put(key, value);
+            } else if (matcher.find()) {
+                hashMap.put(key, value.replaceAll("\"", ""));
             } else {
                 hashMap.put(key, parseFileContent.get(key));
             }
