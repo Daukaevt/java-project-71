@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.google.common.base.Splitter;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -106,16 +107,17 @@ public class Parser {
     public static Map<String, String> replace(
             final Map parseFileContent) {
         HashMap hashMap = new HashMap();
-        Pattern pattern = Pattern.compile("\\[.*]|\\{.*}");
+        Pattern braces = Pattern.compile("\\{.*}");
+        Pattern squareBrackets = Pattern.compile("\\[.*]");
         for (Object key: parseFileContent.keySet()) {
             String value;
             parseFileContent.putIfAbsent(key, "null");
             value = parseFileContent.get(key).toString();
-
-            Matcher matcher = pattern.matcher(value);
+            Matcher hasBraces = braces.matcher(value);
+            Matcher hasSquareBrackets = squareBrackets.matcher(value);
             if (value == null) {
                 hashMap.put(key, "null");
-            } else if (value.startsWith("[")) {
+            } else if (hasSquareBrackets.find()) {
                 value = value.replaceAll("^\\[", "")
                         .replaceAll("\\]$", "");
                 Stream<String> stream = Arrays.stream(value.split(","));
@@ -123,8 +125,14 @@ public class Parser {
                 list.replaceAll(s -> s.replaceAll("\"", "")
                         .replaceAll("\"", ""));
                 hashMap.put(key, list);
-            } else if (matcher.find()) {
-                hashMap.put(key, value.replaceAll("\"", ""));
+            } else if (hasBraces.find()) {
+                ObjectMapper mapper = new ObjectMapper();
+                try {
+                    Map<String, String> map = mapper.readValue(value, Map.class);
+                    hashMap.put(key,map);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             } else {
                 hashMap.put(key, parseFileContent.get(key));
             }
