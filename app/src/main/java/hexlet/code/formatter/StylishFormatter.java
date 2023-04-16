@@ -5,7 +5,7 @@ import hexlet.code.utils.Wrapper;
 import java.util.TreeMap;
 
 public class StylishFormatter {
-    public static String stylishFormat(TreeMap<String, Wrapper> unitMap) {
+    public static String stylishFormat(final TreeMap<String, Wrapper> unitMap) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("{\n");
         for (Object key: unitMap.keySet()) {
@@ -27,6 +27,6 @@ public class StylishFormatter {
                 stringBuilder.append("    " + key + ": " + value1 + "\n");
             }
         }
-        return stringBuilder + "}" ;
+        return stringBuilder + "}";
     }
 }
