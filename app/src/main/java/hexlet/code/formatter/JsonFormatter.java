@@ -1,12 +1,12 @@
 package hexlet.code.formatter;
 
-import hexlet.code.Parser;
+
 import hexlet.code.utils.Wrapper;
 
 import java.util.TreeMap;
 
 public class JsonFormatter {
-    public static String jsonFormat(TreeMap<String, Wrapper> unitMap) {
+    public static String jsonFormat(final TreeMap<String, Wrapper> unitMap) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("{\n");
         for (Object key : unitMap.keySet()) {
@@ -28,7 +28,8 @@ public class JsonFormatter {
                 continue;
             }
             if (value1.equals(value2)) {
-                stringBuilder.append(tempMinus.replaceAll("\s{2}\"- ", "  \"  "));
+                stringBuilder.append(tempMinus
+                        .replaceAll("\s{2}\"- ", "  \"  "));
             } else {
                 stringBuilder.append(tempMinus);
                 stringBuilder.append(tempPlus);
