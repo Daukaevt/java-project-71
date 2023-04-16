@@ -1,6 +1,6 @@
 package hexlet.code.utils;
 
-public class Wrapper {
+public final class Wrapper {
     public Wrapper(final String value1, final String value2) {
         this.value1 = value1;
         this.value2 = value2;
