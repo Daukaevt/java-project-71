@@ -2,10 +2,8 @@ package hexlet.code;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.google.common.base.Splitter;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -22,19 +20,20 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Parser {
-    public static Map parse(String content) {
-        if (content == null) {
-            content = "";
+    public static Map parse(final String content) {
+        String notNullContent = content;
+        if (notNullContent == null) {
+            notNullContent = "";
         }
-        boolean validJSON = isJSONValid(content);
+        boolean validJSON = isJSONValid(notNullContent);
         Map parseJsonToMap = null;
         if (validJSON) {
-            parseJsonToMap = getJsonData(content);
+            parseJsonToMap = getJsonData(notNullContent);
         } else {
-            String jsonContent = convertYamlToJsonData(content);
+            String jsonContent = convertYamlToJsonData(notNullContent);
             try {
                 parseJsonToMap = getJsonData(jsonContent);
-            }  catch (Exception e) {
+            } catch (Exception e) {
                 System.out.println("Wrong file format");
                 System.exit(0);
             }
@@ -128,8 +127,9 @@ public class Parser {
             } else if (hasBraces.find()) {
                 ObjectMapper mapper = new ObjectMapper();
                 try {
-                    Map<String, String> map = mapper.readValue(value, Map.class);
-                    hashMap.put(key,map);
+                    Map<String, String> map = mapper
+                            .readValue(value, Map.class);
+                    hashMap.put(key, map);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
