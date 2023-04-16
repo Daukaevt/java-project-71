@@ -34,7 +34,7 @@ public class PlainFormatter {
         return stringBuilder.toString().replaceAll("\n$", "");
     }
     public static String getSingleQuotes3(final String value) {
-        String singleQuotesEnclosedValue = null;
+        String singleQuotesEnclosedValue = value;
         if (!isBoolean(value)
                 && !isNumeric(value)
                 && !value.equals("null")) {
