@@ -1,5 +1,6 @@
 package hexlet.code.formatter;
 
+import hexlet.code.Parser;
 import hexlet.code.utils.Wrapper;
 
 import java.util.TreeMap;
@@ -13,11 +14,11 @@ public class JsonFormatter {
             String value1 = values.getValue1();
             String tempPlus = "  \"+ " + key + "\": \""
                     + value1.replaceAll("\"", "")
-                    .replaceAll(",\\S", ",\s") + "\"\n";
+                    .replaceAll(",\\S", ",\s") + "\",\n";
             String value2 = values.getValue2();
             String tempMinus = "  \"- " + key + "\": \""
                     + value2.replaceAll("\"", "")
-                    .replaceAll(",\\S", ",\s") + "\"\n";
+                    .replaceAll(",\\S", ",\s") + "\",\n";
             if (value1.equals("-absent-")) {
                 stringBuilder.append(tempMinus);
                 continue;
@@ -33,6 +34,6 @@ public class JsonFormatter {
                 stringBuilder.append(tempPlus);
             }
         }
-        return stringBuilder + "}";
+        return stringBuilder.toString().replaceAll(",$", "\n}");
     }
 }
