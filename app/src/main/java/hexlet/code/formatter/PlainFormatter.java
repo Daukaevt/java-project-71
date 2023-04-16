@@ -27,7 +27,7 @@ public class PlainFormatter {
                         + " to " + getSingleQuotes3(value2) + "\n");
             }
         }
-        return stringBuilder.toString();
+        return stringBuilder.toString().replaceAll("\n$","");
     }
     public static String getSingleQuotes3(String value) {
         if (!isBoolean(value)
