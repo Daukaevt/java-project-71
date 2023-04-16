@@ -6,7 +6,10 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class Uniter {
-    public static TreeMap unite (Map<String, Object> parseJson1, Map<String, Object> parseJson2){
+    public static TreeMap unite(
+            final Map<String, Object> parseJson1,
+            final Map<String, Object> parseJson2
+    ) {
         TreeMap<String, Wrapper> unitMap = new TreeMap<>();
         for (Object key: parseJson1.keySet()) {
             if (parseJson2.containsKey(key)) {
