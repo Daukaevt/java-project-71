@@ -34072,14 +34072,10 @@ InitialValueState.CACHED;*/
         }
 
         private int applyValueToSingleValuedField(
-                Model.ArgSpec argSpec,
-                boolean negated,
-                LookBehind lookBehind,
-                boolean alreadyUnquoted,
-                Range derivedArity,
-                Stack<String> args,
-                Set<Model.ArgSpec> initialized,
-                String argDescription
+                Model.ArgSpec argSpec, boolean negated,
+                LookBehind lookBehind, boolean alreadyUnquoted,
+                Range derivedArity, Stack<String> args,
+                Set<Model.ArgSpec> initialized, String argDescription
         ) throws Exception {
             Tracer tracer = CommandLine.tracer();
             boolean noMoreValues = args.isEmpty();
@@ -34090,126 +34086,70 @@ InitialValueState.CACHED;*/
             }
             Range arity = argSpec.arity().isUnspecified
                     ? derivedArity : argSpec.arity(); // #509
-            if (
-                    arity.max == 0
-                            && !arity.isUnspecified
+            if (arity.max == 0 && !arity.isUnspecified
                             && lookBehind == LookBehind.ATTACHED_WITH_SEPARATOR
-            ) { // #509
-                throw new MaxValuesExceededException(
+            ) { throw new MaxValuesExceededException(
                         CommandLine.this, optionDescription("", argSpec, 0)
-                        + " should be specified without '"
-                        + value + "' parameter");
+                        + " should be specified without '" + value + "' parameter");
             }
-            if (arity.min > 0) {
-                args.push(quotedValue);
+            if (arity.min > 0) { args.push(quotedValue);
                 boolean discontinue = assertNoMissingMandatoryParameter(
                         argSpec, args, 0, arity) // #1055
                         || isArgResemblesOptionThereforeDiscontinue(
-                        argSpec, args, 0, arity); // #1015 #639
-                args.pop();
+                        argSpec, args, 0, arity); args.pop();
                 if (discontinue) {
                     return 0;
                 }
             }
             int consumed = arity.min; // the number or args we need to consume
-
             String actualValue = value;
             char[] interactiveValue = null;
-            Class<?> cls = argSpec.auxiliaryTypes()[0]; // field may be
-            // interface/abstract type, use annotation to get concrete type
-            if (arity.min <= 0) { // value may be optional
-                boolean optionalValueExists = true; // assume we will use
-                // the command line value
-                consumed = 1;
-
-                // special logic for booleans:
-                // BooleanConverter accepts only "true" or "false".
+            Class<?> cls = argSpec.auxiliaryTypes()[0];
+            if (arity.min <= 0) { boolean optionalValueExists = true; consumed = 1;
                 if (cls == Boolean.class || cls == Boolean.TYPE) {
-
-                    // boolean option with arity =
-                    // 0..1 or 0..*: value MAY be a param
                     boolean optionalWithBooleanValue = arity.max > 0
                             && ("true".equalsIgnoreCase(value)
                             || "false".equalsIgnoreCase(value));
                     if (!optionalWithBooleanValue
                             && lookBehind != LookBehind
                             .ATTACHED_WITH_SEPARATOR) {
-                        // if attached, try converting the value
-                        // to boolean (and fail if invalid value)
-                        Boolean defaultValue = booleanValue(
-                                argSpec,
+                        Boolean defaultValue = booleanValue(argSpec,
                                 argSpec.calcDefaultValue(true));
-                        // #712 flip the default value
-                        if (
-                                argSpec.isOption()
-                                        && !empty(((Model.OptionSpec) argSpec)
-                                        .fallbackValue())
-                        ) {
+                        if (argSpec.isOption() && !empty(((Model.OptionSpec) argSpec)
+                                        .fallbackValue())) {
                             defaultValue = !booleanValue(argSpec,
-                                    ((Model.OptionSpec) argSpec)
-                                            .fallbackValue());
-                            // #754 Allow boolean options to get value
-                            // from fallback instead
-                            // of defaultProvider
+                                    ((Model.OptionSpec) argSpec).fallbackValue());
                         }
-                        // don't process cmdline arg: it's okay
-                        // to ignore value if not attached to option
-                        Boolean oppositeValue = commandSpec.parser()
-                                .toggleBooleanFlags()
-                                ? (Boolean) argSpec
-                                .getValue() // #147 toggle
-                                // existing boolean value
-                                : defaultValue; // #712 flip the default value
+                        Boolean oppositeValue = commandSpec.parser().toggleBooleanFlags()
+                                ? (Boolean) argSpec.getValue() : defaultValue;
                         if (oppositeValue == null) {
                             oppositeValue = false;
                         }
                         actualValue = String.valueOf(!oppositeValue);
-                        if (
-                                argSpec.isOption()
-                                        && ((Model.OptionSpec) argSpec)
-                                        .negatable()
-                                        && negated
-                        ) {
+                        if (argSpec.isOption() && ((Model.OptionSpec) argSpec)
+                                .negatable() && negated) {
                             actualValue = String.valueOf(oppositeValue);
                         }
                         optionalValueExists = false;
                         consumed = 0;
                     }
-                } else { // non-boolean option with optional value #325, #279
-                    String fallbackValue = argSpec.isOption()
+                } else { String fallbackValue = argSpec.isOption()
                             ? ((Model.OptionSpec) argSpec).fallbackValue() : "";
-                    // #828 #1125 use varargCanConsumeNextValue(argSpec, value)
-                    // to detect if value can be a parameter
                     if (!varargCanConsumeNextValue(argSpec, value)
-                            // not a parameter
-                            || value == null) { // stack is empty,
-                        // option with arity=0..1 was the last arg
-                        actualValue = fallbackValue;
-                        optionalValueExists = false;
-                        consumed = 0;
+                            || value == null) {actualValue = fallbackValue;
+                        optionalValueExists = false; consumed = 0;
                     }
                 }
-                // if argSpec is interactive, we may need to read
-                // the password from the console:
-                // - if arity = 0   : ALWAYS read from console
-                // - if arity = 0..1: ONLY read from console
-                // if user specified a non-option value
-                if (argSpec.interactive()
-                        && (arity.max == 0
-                        || !optionalValueExists)
-                ) {
+                if (argSpec.interactive() && (arity.max == 0 || !optionalValueExists)) {
                     interactiveValue = readUserInput(argSpec);
                     consumed = 0;
                 }
             }
-            if (consumed == 0) { // optional value was not specified
-                // on command line, we made something up
+            if (consumed == 0) {
                 if (value != null) {
                     args.push(value); // we don't consume the command line value
                 }
-            } else { // value was non-optional
-                // or optional value was actually specified
-                // process the command line value
+            } else {
                 if (!lookBehind.isAttached()) {
                     parseResultBuilder.nowProcessing(argSpec, value);
                 } // update position for Completers
@@ -34218,47 +34158,31 @@ InitialValueState.CACHED;*/
                     "Setting %s to '%3$s' (was '%2$s') for %4$s on %5$s";
             String overwriteValueMessage =
                     "Overwriting %s value '%s' with '%s' for %s on %s";
-            Object newValue = interactiveValue != null
-                    ? interactiveValue
-                    : actualValue;
-            if (noMoreValues && actualValue == null
-                    && interactiveValue == null) {
+            Object newValue = interactiveValue != null ? interactiveValue : actualValue;
+            if (noMoreValues && actualValue == null && interactiveValue == null) {
                 consumed = 0;
-            } else {
-                consumed = 1;
+            } else {consumed = 1;
                 if (interactiveValue != null) {
-                    if (argSpec.echo()) {
-                        initValueMessage = "Setting %s to %3$s "
+                    if (argSpec.echo()) {initValueMessage = "Setting %s to %3$s "
                                 + "(interactive value) for %4$s on %5$s";
                         overwriteValueMessage = "Overwriting %s value "
-                                + "with %3$s (interactive value) "
-                                + "for %s on %5$s";
+                                + "with %3$s (interactive value) for %s on %5$s";
                     } else {
                         initValueMessage = "Setting %s to *** "
                                 + "(masked interactive value) for %4$s on %5$s";
-                        overwriteValueMessage = "Overwriting %s "
-                                + "value with *** (masked interactive value) "
-                                + "for %s on %5$s";
+                        overwriteValueMessage = "Overwriting %s value with *** "
+                                + "(masked interactive value) for %s on %5$s";
                     }
                 }
-                // #1642 Negatable options should negate explicit values
-                if ((cls == Boolean.class
-                        || cls == Boolean.TYPE) && arity.min >= 1) {
+                if ((cls == Boolean.class || cls == Boolean.TYPE) && arity.min >= 1) {
                     Boolean boolValue = booleanValue(argSpec, value);
-                    // note: we ignore commandSpec.parser().toggleBooleanFlags()
-                    // for explicit non-optional params
-                    if (
-                            argSpec.isOption()
-                                    && ((Model.OptionSpec) argSpec).negatable()
-                                    && negated
-                    ) {
-                        actualValue = String.valueOf(!boolValue);
+                    if (argSpec.isOption() && ((Model.OptionSpec) argSpec).negatable()
+                            && negated) {actualValue = String.valueOf(!boolValue);
                     } else {
                         actualValue = String.valueOf(boolValue);
                     }
                 }
-                if (!char[].class.equals(cls)
-                        && !char[].class.equals(argSpec.type())) {
+                if (!char[].class.equals(cls) && !char[].class.equals(argSpec.type())) {
                     if (interactiveValue != null) {
                         actualValue = new String(interactiveValue);
                     }
@@ -34269,12 +34193,9 @@ InitialValueState.CACHED;*/
                             argSpec, -1, converter, actualValue, 0);
                 } else { // type is char[], no type conversion needed
                     if (interactiveValue == null) {
-                        // setting command line arg to char[] field
                         newValue = actualValue.toCharArray();
-                    } else {
-                        actualValue = getMaskedValue(
+                    } else { actualValue = getMaskedValue(
                                 argSpec, new String(interactiveValue));
-                        // mask interactive value if echo is false
                         newValue = interactiveValue;
                     }
                 }
@@ -34283,33 +34204,23 @@ InitialValueState.CACHED;*/
             String traceMessage = initValueMessage;
             if (argSpec.group() == null && initialized.contains(argSpec)) {
                 if (!isOverwrittenOptionsAllowed()) {
-                    throw new OverwrittenOptionException(
-                            CommandLine.this, argSpec,
+                    throw new OverwrittenOptionException(CommandLine.this, argSpec,
                             optionDescription("", argSpec, 0)
                                     + " should be specified only once");
                 }
                 traceMessage = overwriteValueMessage;
             }
             addToInitialized(argSpec, initialized);
-
             if (argSpec.typeInfo().isOptional()) {
                 newValue = getOptionalOfNullable(newValue);
             }
-            if (tracer.isInfo()) {
-                tracer.info(
-                        traceMessage,
-                        argSpec.toString(),
-                        String.valueOf(oldValue),
-                        String.valueOf(newValue),
-                        argDescription,
-                        argSpec.scopeString()
-                );
+            if (tracer.isInfo()) {tracer.info(
+                    traceMessage, argSpec.toString(), String.valueOf(oldValue),
+                    String.valueOf(newValue), argDescription, argSpec.scopeString());
             }
             int pos = getPosition(argSpec);
             argSpec.setValue(newValue);
             parseResultBuilder.addOriginalStringValue(argSpec, actualValue);
-            // #279 track empty string value if
-            // no command line argument was consumed
             parseResultBuilder.addStringValue(argSpec, actualValue);
             parseResultBuilder.addTypedValues(argSpec, pos, newValue);
             parseResultBuilder.add(argSpec, pos);
@@ -34427,10 +34338,9 @@ InitialValueState.CACHED;*/
                     || !varargCanConsumeNextValue(argSpec, args.peek()))) {
                 args.push(fallback);
             }
-            for (
-                    int i = consumed;
-                    consumed < arity.max && !args.isEmpty();
-                    i++
+            for (int i = consumed;
+                 consumed < arity.max && !args.isEmpty();
+                 i++
             ) {
                 if (!varargCanConsumeNextValue(argSpec, args.peek())) {
                     break;
@@ -34978,7 +34888,7 @@ InitialValueState.CACHED;*/
          * @param result
          * @param index
          * @param argDescription
-         * @return
+         * @return index
          */
         private int consumeOneArgument(
                 final Model.ArgSpec argSpec,
