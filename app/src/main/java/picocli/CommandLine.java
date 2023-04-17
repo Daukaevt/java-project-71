@@ -20,7 +20,6 @@ package picocli;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.Closeable;
-import java.io.Console;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
@@ -77,7 +76,6 @@ import java.util.Currency;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.Enumeration;
-import java.util.Formatter;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
@@ -314,10 +312,10 @@ public class CommandLine {
      * @param command an annotated user object or a {@code CommandSpec} object
      *                to initialize from the command line arguments
      * @throws InitializationException if the specified command object
-     *                                 does not have a {@link Command},
-     *                                 {@link Option} or {@link Parameters} annotation
+     * does not have a {@link Command},
+     * {@link Option} or {@link Parameters} annotation
      */
-    public CommandLine(Object command) {
+    public CommandLine(final Object command) {
         this(command, new DefaultFactory());
     }
 
@@ -372,11 +370,15 @@ public class CommandLine {
      * Option} or {@link Parameters} annotation
      * @since 2.2
      */
-    public CommandLine(Object command, IFactory factory) {
+    public CommandLine(final Object command, final IFactory factory) {
         this(command, factory, true);
     }
 
-    private CommandLine(Object command, IFactory factory, boolean userCalled) {
+    private CommandLine(
+            final Object command,
+            final IFactory factory,
+            final boolean userCalled
+    ) {
         this.factory = Assert.notNull(factory, "factory");
         interpreter = new Interpreter();
         commandSpec = CommandSpec.forAnnotatedObject(command, factory);
@@ -415,14 +417,14 @@ public class CommandLine {
      * @param <T>     the type of the annotated object
      * @return the specified annotated object
      * @throws InitializationException if the specified command object does
-     *                                 not have a {@link Command}, {@link Option}
-     *                                 or {@link Parameters} annotation
+     * not have a {@link Command}, {@link Option}
+     * or {@link Parameters} annotation
      * @throws ParameterException      if the
-     *                                 specified command line arguments are invalid
+     * specified command line arguments are invalid
      * @see #execute(String...)
      * @since 0.9.7
      */
-    public static <T> T populateCommand(T command, String... args) {
+    public static <T> T populateCommand(final T command, final String... args) {
         CommandLine cli = toCommandLine(command, new DefaultFactory());
         cli.parse(args);
         return command;
@@ -482,11 +484,14 @@ public class CommandLine {
      *                                 {@link Option}
      *                                 or {@link Parameters} annotation
      * @throws ParameterException      if the
-     *                                 specified command line arguments are invalid
+     * specified command line arguments are invalid
      * @see #execute(String...)
      * @since 3.1
      */
-    public static <T> T populateSpec(Class<T> spec, String... args) {
+    public static <T> T populateSpec(
+            final Class<T> spec,
+            final String... args
+    ) {
         CommandLine cli = toCommandLine(spec, new DefaultFactory());
         cli.parse(args);
         return cli.getCommand();
@@ -497,6 +502,9 @@ public class CommandLine {
      * new DefaultExceptionHandler<List<Object>>(
      * )}.
      */
+    /**
+     * @return returns new Default ExceptionHandler
+     */
     public static DefaultExceptionHandler<List<Object>> defaultExceptionHandler(
     ) {
         return new DefaultExceptionHandler<List<Object>>();
@@ -505,22 +513,32 @@ public class CommandLine {
     /**
      * @since 2.0
      * @deprecated use {@link #printHelpIfRequested(ParseResult)} instead
+     * @param parsedCommands
+     * @param out
+     * @param ansi
+     * @return returns printHelpIfRequested
      */
     @Deprecated
     public static boolean printHelpIfRequested(
-            List<CommandLine> parsedCommands, PrintStream out, Help.Ansi ansi) {
+            final List<CommandLine> parsedCommands,
+            final PrintStream out,
+            final Help.Ansi ansi
+    ) {
         return printHelpIfRequested(parsedCommands, out, out, ansi);
     }
 
     /**
-     * Delegates to {@link #executeHelpRequest(ParseResult)}.
-     *
-     * @param parseResult contains the {@code CommandLine} objects
-     *                    found during parsing; check these to see if help was requested
+     * Delegates to
+     * {@link #executeHelpRequest(ParseResult)}.
+     * @param parseResult contains the
+     * {@code CommandLine} objects
+     * found during parsing; check these to see if help was requested
      * @return {@code true} if help was printed, {@code false} otherwise
      * @since 3.0
      */
-    public static boolean printHelpIfRequested(ParseResult parseResult) {
+    public static boolean printHelpIfRequested(
+            final ParseResult parseResult
+    ) {
         return executeHelpRequest(parseResult) != null;
     }
 
@@ -529,23 +547,24 @@ public class CommandLine {
      *ParseResult)}.
      *
      * @param parsedCommands the list of {@code CommandLine}
-     *                       objects to check if help was requested
+     * objects to check if help was requested
      * @param out            the {@code PrintStream}
      *                       to print help to if requested
      * @param err            the error string to print diagnostic
-     *                       messages to, in addition to the output from the exception handler
+     *  messages to, in addition to the output from the exception handler
      * @param ansi           for printing help
      *                       messages using ANSI styles and colors
      * @return {@code true} if help was printed, {@code false} otherwise
      * @since 3.0
-     * @deprecated use {@link #executeHelpRequest(ParseResult)} instead
+     * @deprecated use {@link
+     * #executeHelpRequest(ParseResult)} instead
      */
     @Deprecated
     public static boolean printHelpIfRequested(
-            List<CommandLine> parsedCommands,
-            PrintStream out,
-            PrintStream err,
-            Help.Ansi ansi) {
+            final List<CommandLine> parsedCommands,
+            final PrintStream out,
+            final PrintStream err,
+            final Help.Ansi ansi) {
         return printHelpIfRequested(
                 parsedCommands, out, err, Help.defaultColorScheme(ansi));
     }
@@ -554,12 +573,13 @@ public class CommandLine {
      * Delegates to the implementation of {@link #executeHelpRequest(
      *ParseResult)}.
      *
-     * @param parsedCommands the list of {@code CommandLine}
-     *                       objects to check if help was requested
+     * @param parsedCommands the list of
+     *                       {@code CommandLine}
+     * objects to check if help was requested
      * @param out            the {@code PrintStream}
      *                       to print help to if requested
-     * @param err            the error string to print diagnostic
-     *                       messages to, in addition to the output from the exception handler
+     * @param err the error string to print diagnostic
+     * messages to, in addition to the output from the exception handler
      * @param colorScheme    for printing help
      *                       messages using ANSI styles and colors
      * @return {@code true} if help was printed, {@code false} otherwise
@@ -568,10 +588,10 @@ public class CommandLine {
      */
     @Deprecated
     public static boolean printHelpIfRequested(
-            List<CommandLine> parsedCommands,
-            PrintStream out,
-            PrintStream err,
-            Help.ColorScheme colorScheme) {
+            final List<CommandLine> parsedCommands,
+            final PrintStream out,
+            final PrintStream err,
+            final Help.ColorScheme colorScheme) {
         // for backwards compatibility
         for (CommandLine cmd : parsedCommands) {
             cmd.setOut(
@@ -621,7 +641,7 @@ public class CommandLine {
      *
      * @param parseResult contains the
      *                    {@code CommandLine} objects
-     *                    found during parsing; check these to see if help was requested
+     * found during parsing; check these to see if help was requested
      * @return {@link CommandSpec#exitCodeOnUsageHelp(
      *)} if usage help was requested,
      * {@link CommandSpec#exitCodeOnVersionHelp(
@@ -629,14 +649,17 @@ public class CommandLine {
      * @see IHelpCommandInitializable2
      * @since 4.0
      */
-    public static Integer executeHelpRequest(ParseResult parseResult) {
+    public static Integer executeHelpRequest(
+            final ParseResult parseResult) {
         return executeHelpRequest(parseResult.asCommandLineList());
     }
-
     /**
      * @since 4.0
+     * @param parsedCommands
+     * @return parsed.getCommandSpec().exitCodeOnUsageHelp();
      */
-    static Integer executeHelpRequest(List<CommandLine> parsedCommands) {
+    static Integer executeHelpRequest(
+            final List<CommandLine> parsedCommands) {
         Tracer t = CommandLine.tracer();
         for (CommandLine parsed : parsedCommands) {
             Help.ColorScheme colorScheme = parsed.getColorScheme();
@@ -658,11 +681,10 @@ public class CommandLine {
                 PrintWriter err = parsed.getErr();
                 if (parsed.getCommand()
                         instanceof IHelpCommandInitializable2) {
-                    t.debug(
-                            "Initializing helpCommand '%s' (IHelpCommandInitializable2::init)...",
+                    t.debug("Initializing helpCommand '%s' "
+                                    + "(IHelpCommandInitializable2::init)...",
                             fullName);
-                    (
-                            (IHelpCommandInitializable2) parsed.getCommand()).init(parsed,
+                    ((IHelpCommandInitializable2) parsed.getCommand()).init(parsed,
                             colorScheme,
                             out,
                             err);
@@ -6133,8 +6155,9 @@ public class CommandLine {
          * no collections, maps or other array types).
          * When running on Java 6 or greater and {@link Option#echo() echo=
          * false} (the default),
-         * this will use the {@link Console#readPassword(
-         *)} API to get a value without echoing input to the console,
+         * this will use the
+         * {@link Console#readPassword()} API to get a value
+         * without echoing input to the console,
          * otherwise it will simply read a value from {@code System.in}.
          * <p>
          * For passwords, best security practice is to use type {@code char[]}
@@ -6648,8 +6671,9 @@ public class CommandLine {
          * not arrays, collections or maps).
          * When running on Java 6 or greater and {@link Option#echo() echo=
          * false} (the default),
-         * this will use the {@link Console#readPassword(
-         *)} API to get a value without echoing input to the console,
+         * this will use the
+         * {@link Console#readPassword()} API
+         * to get a value without echoing input to the console,
          * otherwise it will simply read a value from {@code System.in}.
          *
          * @return whether this positional parameter prompts
@@ -27352,8 +27376,8 @@ InitialValueState.CACHED;*/
          * {@linkplain Ansi#enabled() Ansi
          * is enabled}, and stripped out otherwise.
          *
-         * @param text   a printf-style {@linkplain Formatter
-         * format string} that may one or more embedded format specifiers
+         * @param text   a printf-style
+         * {@linkplain Formatter format string} that may one or more embedded format specifiers
          * @param params optional parameters
          *               to use when formatting the specified text string
          * @return a help section heading String
@@ -31160,6 +31184,7 @@ InitialValueState.CACHED;*/
          *               the extra arguments
          *               are ignored. The number of arguments
          *               is variable and may be zero.
+         *
          * @see Formatter
          */
         public void warn(String msg, Object... params) {
@@ -31177,6 +31202,7 @@ InitialValueState.CACHED;*/
          *               If there are more arguments than format specifiers,
          *               the extra arguments are ignored.
          *               The number of arguments is variable and may be zero.
+         *
          * @see Formatter
          */
         public void info(String msg, Object... params) {
@@ -34520,16 +34546,16 @@ InitialValueState.CACHED;*/
         }
 
         private boolean canConsumeOneMapArgument(
-                Model.ArgSpec argSpec,
-                LookBehind lookBehind,
-                boolean alreadyUnquoted,
-                Range arity,
-                int consumed,
-                String arg,
-                Class<?>[] classes,
-                ITypeConverter<?> keyConverter,
-                ITypeConverter<?> valueConverter,
-                String argDescription
+                final Model.ArgSpec argSpec,
+                final LookBehind lookBehind,
+                final boolean alreadyUnquoted,
+                final Range arity,
+                final int consumed,
+                final String arg,
+                final Class<?>[] classes,
+                final ITypeConverter<?> keyConverter,
+                final ITypeConverter<?> valueConverter,
+                final String argDescription
         ) {
             String[] values = unquoteAndSplit(
                     argSpec, lookBehind, alreadyUnquoted, arity, consumed, arg);
@@ -34554,7 +34580,9 @@ InitialValueState.CACHED;*/
             }
         }
 
-        private String[] splitKeyValue(Model.ArgSpec argSpec, String value) {
+        private String[] splitKeyValue(
+                final Model.ArgSpec argSpec,
+                final String value) {
             String[] keyValue = Model.ArgSpec.splitRespectingQuotedStrings(
                     value, 2, config(), argSpec, "=");
 
@@ -34584,7 +34612,10 @@ InitialValueState.CACHED;*/
         }
 
         private boolean assertNoMissingMandatoryParameter(
-                Model.ArgSpec argSpec, Stack<String> args, int i, Range arity) {
+                final Model.ArgSpec argSpec,
+                final Stack<String> args,
+                final int i,
+                final Range arity) {
             if (!varargCanConsumeNextValue(argSpec, args.peek())) {
                 String msg = createMissingParameterMessageFoundOtherOption(
                         argSpec, args, i, arity);
@@ -34596,7 +34627,10 @@ InitialValueState.CACHED;*/
         }
 
         private String createMissingParameterMessageFoundOtherOption(
-                Model.ArgSpec argSpec, Stack<String> args, int i, Range arity) {
+                final Model.ArgSpec argSpec,
+                final Stack<String> args,
+                final int i,
+                final Range arity) {
             String desc = arity.min > 1 ? (i + 1)
                     + " (of " + arity.min + " mandatory parameters) " : "";
             return "Expected parameter " + desc + "for "
@@ -34605,10 +34639,10 @@ InitialValueState.CACHED;*/
         }
 
         private boolean isArgResemblesOptionThereforeDiscontinue(
-                Model.ArgSpec argSpec,
-                Stack<String> args,
-                int i,
-                Range arity
+                final Model.ArgSpec argSpec,
+                final Stack<String> args,
+                final int i,
+                final Range arity
         ) throws Exception {
             boolean result = false;
             String arg = args.peek();
@@ -34645,14 +34679,14 @@ InitialValueState.CACHED;*/
         }
 
         private int applyValuesToArrayField(
-                Model.ArgSpec argSpec,
-                boolean negated,
-                LookBehind lookBehind,
-                boolean alreadyUnquoted,
-                Range arity,
-                Stack<String> args,
-                Set<Model.ArgSpec> initialized,
-                String argDescription
+                final Model.ArgSpec argSpec,
+                final boolean negated,
+                final LookBehind lookBehind,
+                final boolean alreadyUnquoted,
+                final Range arity,
+                final Stack<String> args,
+                final Set<Model.ArgSpec> initialized,
+                final String argDescription
         ) throws Exception {
             Object existing = argSpec.getValue();
             int length = existing == null ? 0 : Array.getLength(existing);
@@ -34695,14 +34729,14 @@ InitialValueState.CACHED;*/
         }
 
         private int applyValuesToCollectionField(
-                Model.ArgSpec argSpec,
-                boolean negated,
-                LookBehind lookBehind,
-                boolean alreadyUnquoted,
-                Range arity,
-                Stack<String> args,
-                Set<Model.ArgSpec> initialized,
-                String argDescription
+                final Model.ArgSpec argSpec,
+                final boolean negated,
+                final LookBehind lookBehind,
+                final boolean alreadyUnquoted,
+                final Range arity,
+                final Stack<String> args,
+                final Set<Model.ArgSpec> initialized,
+                final String argDescription
         ) throws Exception {
             Collection<Object> collection = argSpec.getValue();
             int pos = getPosition(argSpec);
@@ -34741,14 +34775,14 @@ InitialValueState.CACHED;*/
         }
 
         private List<Object> consumeArguments(
-                Model.ArgSpec argSpec,
-                boolean negated,
+                final Model.ArgSpec argSpec,
+                final boolean negated,
                 LookBehind lookBehind,
                 boolean alreadyUnquoted,
-                boolean unquoted,
-                Range arity,
-                Stack<String> args,
-                String argDescription
+                final boolean unquoted,
+                final Range arity,
+                final Stack<String> args,
+                final String argDescription
         ) throws Exception {
             List<Object> result = new ArrayList<Object>();
 
@@ -34871,22 +34905,28 @@ InitialValueState.CACHED;*/
             return result;
         }
 
-        private int consumedCount(int i, int initialSize, Model.ArgSpec arg) {
+        private int consumedCount(
+                final int i,
+                final int initialSize,
+                final Model.ArgSpec arg
+        ) {
             return commandSpec.parser().splitFirst()
                     ? arg.stringValues().size() - initialSize : i;
         }
 
         private int consumedCountMap(
-                int i, int initialSize, Model.ArgSpec arg) {
+                final int i,
+                final int initialSize,
+                final Model.ArgSpec arg) {
             return commandSpec.parser().splitFirst()
                     ? (arg.stringValues().size() - initialSize) / 2 : i;
         }
 
         private int addUserInputToList(
-                Model.ArgSpec argSpec,
-                List<Object> result,
+                final Model.ArgSpec argSpec,
+                final List<Object> result,
                 int consumed,
-                String argDescription
+                final String argDescription
         ) {
             char[] input = readUserInput(argSpec);
             String inputString = new String(input);
@@ -34922,20 +34962,22 @@ InitialValueState.CACHED;*/
             return consumed;
         }
 
-        private String getMaskedValue(Model.ArgSpec argSpec, String input) {
+        private String getMaskedValue(final Model.ArgSpec argSpec,
+                                      final String input)
+        {
             return argSpec.echo() ? input : "***";
         }
 
         private int consumeOneArgument(
-                Model.ArgSpec argSpec,
-                LookBehind lookBehind,
-                boolean alreadyUnquoted,
-                Range arity,
-                int consumed,
-                String arg,
-                List<Object> result,
+                final Model.ArgSpec argSpec,
+                final LookBehind lookBehind,
+                final boolean alreadyUnquoted,
+                final Range arity,
+                final int consumed,
+                final String arg,
+                final List<Object> result,
                 int index,
-                String argDescription
+                final String argDescription
         ) {
             if (!lookBehind.isAttached()) {
                 parseResultBuilder.nowProcessing(argSpec, arg);
@@ -34964,13 +35006,13 @@ InitialValueState.CACHED;*/
         }
 
         private boolean canConsumeOneArgument(
-                Model.ArgSpec argSpec,
-                LookBehind lookBehind,
-                boolean alreadyUnquoted,
-                Range arity,
-                int consumed,
-                String arg,
-                String argDescription
+                final Model.ArgSpec argSpec,
+                final LookBehind lookBehind,
+                final boolean alreadyUnquoted,
+                final Range arity,
+                final int consumed,
+                final String arg,
+                final String argDescription
         ) {
             if (char[].class.equals(argSpec.auxiliaryTypes()[0])
                     || char[].class.equals(argSpec.type())) {
@@ -35014,9 +35056,12 @@ InitialValueState.CACHED;*/
          * '--', a command, or another option.
          * However, if end-of-options has been reached,
          * positional parameters may consume all remaining arguments. </p>
+         * @param argSpec
+         * @return boolean
          */
-        private boolean varargCanConsumeNextValue(
-                Model.ArgSpec argSpec, String nextValue) {
+        final private boolean varargCanConsumeNextValue(
+                final Model.ArgSpec argSpec,
+                final String nextValue) {
             if (endOfOptions && argSpec.isPositional()) {
                 return true;
             }
@@ -35045,7 +35090,7 @@ InitialValueState.CACHED;*/
          * @see #isCommand(String)
          * @see #isEndOfOptionsDelimiter(String)
          */
-        private boolean isOption(String arg) {
+        private boolean isOption(final String arg) {
             if (arg == null) {
                 return false;
             }
@@ -35075,7 +35120,7 @@ InitialValueState.CACHED;*/
             );
         }
 
-        private boolean isCommand(String arg) {
+        private boolean isCommand(final String arg) {
             // [#828] Subcommands should not be parsed as option
             // values for options with optional parameters.
             if (commandSpec.subcommands().containsKey(arg)) {
@@ -35088,16 +35133,16 @@ InitialValueState.CACHED;*/
                     && parent.subcommands().containsKey(arg);
         }
 
-        private boolean isEndOfOptionsDelimiter(String arg) {
+        private boolean isEndOfOptionsDelimiter(final String arg) {
             return commandSpec.parser().endOfOptionsDelimiter().equals(arg);
         }
 
         private Object tryConvert(
-                Model.ArgSpec argSpec,
-                int index,
-                ITypeConverter<?> converter,
-                String value,
-                int typeIndex
+                final Model.ArgSpec argSpec,
+                final int index,
+                final ITypeConverter<?> converter,
+                final String value,
+                final int typeIndex
         ) throws ParameterException {
             try {
                 return converter.convert(value);
@@ -35128,11 +35173,12 @@ InitialValueState.CACHED;*/
                     || parseResultBuilder.usageHelpRequested;
         }
 
-        private void updateHelpRequested(CommandSpec command) {
+        private void updateHelpRequested(final CommandSpec command)
+        {
             isHelpRequested |= command.helpCommand();
         }
 
-        private void updateHelpRequested(Model.ArgSpec argSpec) {
+        private void updateHelpRequested(final Model.ArgSpec argSpec) {
             if (!parseResultBuilder.isInitializingDefaultValues
                     && argSpec.isOption()) {
                 Model.OptionSpec option = (Model.OptionSpec) argSpec;
@@ -35144,7 +35190,10 @@ InitialValueState.CACHED;*/
             }
         }
 
-        private boolean is(Model.ArgSpec p, String attribute, boolean value) {
+        private boolean is(
+                final Model.ArgSpec p,
+                final String attribute,
+                final boolean value) {
             if (value) {
                 if (tracer().isInfo()) {
                     tracer().info(
@@ -35159,8 +35208,8 @@ InitialValueState.CACHED;*/
 
         @SuppressWarnings("unchecked")
         private Collection<Object> createCollection(
-                Class<?> collectionClass,
-                Class<?>[] elementType
+                final Class<?> collectionClass,
+                final Class<?>[] elementType
         ) throws Exception {
             if (EnumSet.class.isAssignableFrom(collectionClass)
                     && Enum.class.isAssignableFrom(elementType[0])) {
@@ -35174,12 +35223,14 @@ InitialValueState.CACHED;*/
 
         @SuppressWarnings("unchecked")
         private Map<Object, Object> createMap(
-                Class<?> mapClass) throws Exception {
+                final Class<?> mapClass) throws Exception {
             return (Map<Object, Object>) factory.create(mapClass);
         }
 
         private ITypeConverter<?> getTypeConverter(
-                Class<?>[] types, final Model.ArgSpec argSpec, int index) {
+                final Class<?>[] types,
+                final Model.ArgSpec argSpec,
+                final int index) {
             if (argSpec.converters().length > index
                     && !argSpec.converters()[index].getClass()
                     .equals(UseDefaultConverter.class)) {
@@ -35196,7 +35247,7 @@ InitialValueState.CACHED;*/
                 final ITypeConverter<?> converter =
                         getActualTypeConverter(types[index + 1], argSpec);
                 return new ITypeConverter<Object>() {
-                    public Object convert(String value) throws Exception {
+                    public Object convert(final String value) throws Exception {
                         return value == null
                                 ? getOptionalEmpty()
                                 : getOptionalOfNullable(converter.convert(value)
@@ -35208,7 +35259,8 @@ InitialValueState.CACHED;*/
         }
 
         private ITypeConverter<?> getActualTypeConverter(
-                final Class<?> type, Model.ArgSpec argSpec) {
+                final Class<?> type,
+                final Model.ArgSpec argSpec) {
             // https://github.com/remkop/picocli/pull/648
             // consider adding ParserSpec.charArraysCanCaptureStrings()
             // to allow non-interactive options to
@@ -35236,7 +35288,7 @@ InitialValueState.CACHED;*/
         ) {
             return new ITypeConverter<Object>() {
                 @SuppressWarnings("unchecked")
-                public Object convert(String value) throws Exception {
+                public Object convert(final String value) throws Exception {
                     try {
                         return Enum.valueOf((Class<Enum>) type, value);
                     } catch (IllegalArgumentException ex) {
@@ -35282,27 +35334,30 @@ InitialValueState.CACHED;*/
             };
         }
 
-        private boolean booleanValue(Model.ArgSpec argSpec, Object value) {
-            if (value == null) {
+        private boolean booleanValue(
+                final Model.ArgSpec argSpec,
+                final Object value) {
+            Object objValue = value;
+            if (objValue == null) {
                 return false;
             }
-            if (isOptional(value.getClass())) {
+            if (isOptional(objValue.getClass())) {
                 try {
-                    value = value.getClass().getMethod(
+                    objValue = objValue.getClass().getMethod(
                             "orElse",
                             Object.class
-                    ).invoke(value, "null");
+                    ).invoke(objValue, "null");
                 } catch (Exception e) {
                     throw new TypeConversionException(
                             "Could not convert '"
-                                    + value + "' to an Optional<Boolean>: "
+                                    + objValue + "' to an Optional<Boolean>: "
                                     + e.getMessage());
                 }
             }
-            String stringValue = String.valueOf(value);
+            String stringValue = String.valueOf(objValue);
             if (empty(stringValue)
                     || "null".equals(stringValue)
-                    || "Optional.empty".equals(value)
+                    || "Optional.empty".equals(objValue)
             ) {
                 return false;
             }
@@ -35315,9 +35370,9 @@ InitialValueState.CACHED;*/
         }
 
         private boolean assertNoMissingParameters(
-                Model.ArgSpec argSpec,
-                Range arity,
-                Stack<String> args
+                final Model.ArgSpec argSpec,
+                final Range arity,
+                final Stack<String> args
         ) {
             if (argSpec.interactive()) {
                 return true;
@@ -35352,7 +35407,7 @@ InitialValueState.CACHED;*/
             return true;
         }
 
-        char[] readUserInput(Model.ArgSpec argSpec) {
+        char[] readUserInput(final Model.ArgSpec argSpec) {
             String name = argSpec.isOption()
                     ? ((Model.OptionSpec) argSpec).longestName()
                     : "position " + position;
@@ -35384,7 +35439,10 @@ InitialValueState.CACHED;*/
         }
 
         private String createUserInputDebugString(
-                Model.ArgSpec argSpec, char[] result, String name) {
+                final Model.ArgSpec argSpec,
+                final char[] result,
+                final String name
+        ) {
             return argSpec.echo()
                     ? String.format("User entered %s for %s.%n",
                     new String(result), name)
@@ -35393,7 +35451,7 @@ InitialValueState.CACHED;*/
             );
         }
 
-        char[] readPassword(String prompt) {
+        char[] readPassword(final String prompt) {
             try {
                 Object console = System.class
                         .getDeclaredMethod("console").invoke(null);
@@ -35410,7 +35468,7 @@ InitialValueState.CACHED;*/
             }
         }
 
-        char[] readUserInputWithEchoing(String prompt) {
+        char[] readUserInputWithEchoing(final String prompt) {
             System.out.print(prompt);
             InputStreamReader isr = new InputStreamReader(System.in);
             BufferedReader in = new BufferedReader(isr);
@@ -35422,7 +35480,7 @@ InitialValueState.CACHED;*/
             }
         }
 
-        int getPosition(Model.ArgSpec arg) {
+        int getPosition(final Model.ArgSpec arg) {
             if (arg.group() == null) {
                 return position;
             }
@@ -35432,7 +35490,7 @@ InitialValueState.CACHED;*/
             return container == null ? 0 : container.lastMatch().position;
         }
 
-        String positionDesc(Model.ArgSpec arg) {
+        String positionDesc(final Model.ArgSpec arg) {
             int pos = getPosition(arg);
             return (arg.group() == null)
                     ? pos + " (command-local)"
