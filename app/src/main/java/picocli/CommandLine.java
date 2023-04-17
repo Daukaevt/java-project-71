@@ -34108,8 +34108,7 @@ InitialValueState.CACHED;*/
                 boolean optionalValueExists = true; consumed = 1;
                 if (cls == Boolean.class || cls == Boolean.TYPE) {
                     boolean optionalWithBooleanValue = arity.max > 0
-                            && ("true".equalsIgnoreCase(value)
-                            || "false".equalsIgnoreCase(value));
+                            && ("true".equalsIgnoreCase(value) || "false".equalsIgnoreCase(value));
                     if (!optionalWithBooleanValue
                             && lookBehind != LookBehind
                             .ATTACHED_WITH_SEPARATOR) {
