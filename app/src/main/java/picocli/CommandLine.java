@@ -34087,25 +34087,25 @@ InitialValueState.CACHED;*/
             Range arity = argSpec.arity().isUnspecified
                     ? derivedArity : argSpec.arity(); // #509
             if (arity.max == 0 && !arity.isUnspecified
-                            && lookBehind == LookBehind.ATTACHED_WITH_SEPARATOR
-            ) { throw new MaxValuesExceededException(
+                            && lookBehind == LookBehind.ATTACHED_WITH_SEPARATOR) {
+                throw new MaxValuesExceededException(
                         CommandLine.this, optionDescription("", argSpec, 0)
                         + " should be specified without '" + value + "' parameter");
             }
-            if (arity.min > 0) { args.push(quotedValue);
+            if (arity.min > 0) {
+                args.push(quotedValue);
                 boolean discontinue = assertNoMissingMandatoryParameter(
                         argSpec, args, 0, arity) // #1055
                         || isArgResemblesOptionThereforeDiscontinue(
-                        argSpec, args, 0, arity); args.pop();
-                if (discontinue) {
-                    return 0;
-                }
+                                argSpec, args, 0, arity); args.pop();
+                if (discontinue) { return 0; }
             }
             int consumed = arity.min; // the number or args we need to consume
             String actualValue = value;
             char[] interactiveValue = null;
             Class<?> cls = argSpec.auxiliaryTypes()[0];
-            if (arity.min <= 0) { boolean optionalValueExists = true; consumed = 1;
+            if (arity.min <= 0) {
+                boolean optionalValueExists = true; consumed = 1;
                 if (cls == Boolean.class || cls == Boolean.TYPE) {
                     boolean optionalWithBooleanValue = arity.max > 0
                             && ("true".equalsIgnoreCase(value)
@@ -34133,10 +34133,11 @@ InitialValueState.CACHED;*/
                         optionalValueExists = false;
                         consumed = 0;
                     }
-                } else { String fallbackValue = argSpec.isOption()
+                } else {
+                    String fallbackValue = argSpec.isOption()
                             ? ((Model.OptionSpec) argSpec).fallbackValue() : "";
-                    if (!varargCanConsumeNextValue(argSpec, value)
-                            || value == null) {actualValue = fallbackValue;
+                    if (!varargCanConsumeNextValue(argSpec, value) || value == null) {
+                        actualValue = fallbackValue;
                         optionalValueExists = false; consumed = 0;
                     }
                 }
@@ -34161,10 +34162,10 @@ InitialValueState.CACHED;*/
             Object newValue = interactiveValue != null ? interactiveValue : actualValue;
             if (noMoreValues && actualValue == null && interactiveValue == null) {
                 consumed = 0;
-            } else {consumed = 1;
+            } else { consumed = 1;
                 if (interactiveValue != null) {
-                    if (argSpec.echo()) {initValueMessage = "Setting %s to %3$s "
-                                + "(interactive value) for %4$s on %5$s";
+                    if (argSpec.echo()) {
+                        initValueMessage = "Setting %s to %3$s (interactive value) for %4$s on %5$s";
                         overwriteValueMessage = "Overwriting %s value "
                                 + "with %3$s (interactive value) for %s on %5$s";
                     } else {
@@ -34176,8 +34177,8 @@ InitialValueState.CACHED;*/
                 }
                 if ((cls == Boolean.class || cls == Boolean.TYPE) && arity.min >= 1) {
                     Boolean boolValue = booleanValue(argSpec, value);
-                    if (argSpec.isOption() && ((Model.OptionSpec) argSpec).negatable()
-                            && negated) {actualValue = String.valueOf(!boolValue);
+                    if (argSpec.isOption() && ((Model.OptionSpec) argSpec).negatable() && negated) {
+                        actualValue = String.valueOf(!boolValue);
                     } else {
                         actualValue = String.valueOf(boolValue);
                     }
@@ -34194,8 +34195,8 @@ InitialValueState.CACHED;*/
                 } else { // type is char[], no type conversion needed
                     if (interactiveValue == null) {
                         newValue = actualValue.toCharArray();
-                    } else { actualValue = getMaskedValue(
-                                argSpec, new String(interactiveValue));
+                    } else {
+                        actualValue = getMaskedValue(argSpec, new String(interactiveValue));
                         newValue = interactiveValue;
                     }
                 }
@@ -34214,8 +34215,8 @@ InitialValueState.CACHED;*/
             if (argSpec.typeInfo().isOptional()) {
                 newValue = getOptionalOfNullable(newValue);
             }
-            if (tracer.isInfo()) {tracer.info(
-                    traceMessage, argSpec.toString(), String.valueOf(oldValue),
+            if (tracer.isInfo()) {
+                tracer.info(traceMessage, argSpec.toString(), String.valueOf(oldValue),
                     String.valueOf(newValue), argDescription, argSpec.scopeString());
             }
             int pos = getPosition(argSpec);
