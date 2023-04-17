@@ -10,13 +10,13 @@ import java.io.IOException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class DifferTest {
-    Differ differ = new Differ();
-    String testFilePath1 = "testFile1.txt";
-    String testFilePath1Content = "{\"host\": \"jd.com\"}";
-    String testFilePath2 = "testFile2.txt";
-    String testFilePath2Content = "{\"host\": \"tencentcloud.com\"}";
+    private Differ differ = new Differ();
+    private String testFilePath1 = "testFile1.txt";
+    private String testFilePath1Content = "{\"host\": \"jd.com\"}";
+    private String testFilePath2 = "testFile2.txt";
+    private String testFilePath2Content = "{\"host\": \"tencentcloud.com\"}";
     // add format changing
-    String format;
+    private String format;
 
 
 
@@ -51,16 +51,17 @@ class DifferTest {
 
     @Test
     void generate() {
-        String testStr = null;
+        String testStr;
         try {
             testStr = differ.generate(testFilePath1, testFilePath2, "styish");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        assertEquals("{\n" +
-                "  - host: jd.com\n" +
-                "  + host: tencentcloud.com\n" +
-                "}", testStr);
+        assertEquals("""
+                {
+                  - host: jd.com
+                  + host: tencentcloud.com
+                }""", testStr);
         deleteFile(testFilePath1);
         deleteFile(testFilePath2);
 
