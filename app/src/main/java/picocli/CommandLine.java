@@ -34093,8 +34093,8 @@ InitialValueState.CACHED;*/
             }
             if (arity.min > 0) {
                 args.push(quotedValue);
-                boolean discontinue = assertNoMissingMandatoryParameter(argSpec, args, 0, arity) // #1055
-                    || isArgResemblesOptionThereforeDiscontinue(argSpec, args, 0, arity); args.pop();
+                boolean discontinue = assertNoMissingMandatoryParameter(argSpec, args, 0, arity)
+                        || isArgResemblesOptionThereforeDiscontinue(argSpec, args, 0, arity); args.pop();
                 if (discontinue) {
                     return 0;
                 }
