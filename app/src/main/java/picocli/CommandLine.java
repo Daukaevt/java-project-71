@@ -34962,12 +34962,24 @@ InitialValueState.CACHED;*/
             return consumed;
         }
 
-        private String getMaskedValue(final Model.ArgSpec argSpec,
-                                      final String input)
-        {
+        private String getMaskedValue(
+                final Model.ArgSpec argSpec,
+                final String input) {
             return argSpec.echo() ? input : "***";
         }
 
+        /**
+         * @param argSpec
+         * @param lookBehind
+         * @param alreadyUnquoted
+         * @param arity
+         * @param consumed
+         * @param arg
+         * @param result
+         * @param index
+         * @param argDescription
+         * @return
+         */
         private int consumeOneArgument(
                 final Model.ArgSpec argSpec,
                 final LookBehind lookBehind,
@@ -35004,7 +35016,6 @@ InitialValueState.CACHED;*/
             parseResultBuilder.addOriginalStringValue(argSpec, arg);
             return ++index;
         }
-
         private boolean canConsumeOneArgument(
                 final Model.ArgSpec argSpec,
                 final LookBehind lookBehind,
@@ -35057,9 +35068,10 @@ InitialValueState.CACHED;*/
          * However, if end-of-options has been reached,
          * positional parameters may consume all remaining arguments. </p>
          * @param argSpec
+         * @param nextValue
          * @return boolean
          */
-        final private boolean varargCanConsumeNextValue(
+        private boolean varargCanConsumeNextValue(
                 final Model.ArgSpec argSpec,
                 final String nextValue) {
             if (endOfOptions && argSpec.isPositional()) {
@@ -35117,9 +35129,8 @@ InitialValueState.CACHED;*/
             }
             return (arg.length() > 2 && arg.startsWith("-")
                     && commandSpec.posixOptionsMap().containsKey(arg.charAt(1))
-            );
+                );
         }
-
         private boolean isCommand(final String arg) {
             // [#828] Subcommands should not be parsed as option
             // values for options with optional parameters.
@@ -35132,11 +35143,9 @@ InitialValueState.CACHED;*/
             return parent != null && parent.subcommandsRepeatable()
                     && parent.subcommands().containsKey(arg);
         }
-
         private boolean isEndOfOptionsDelimiter(final String arg) {
             return commandSpec.parser().endOfOptionsDelimiter().equals(arg);
         }
-
         private Object tryConvert(
                 final Model.ArgSpec argSpec,
                 final int index,
@@ -35173,11 +35182,9 @@ InitialValueState.CACHED;*/
                     || parseResultBuilder.usageHelpRequested;
         }
 
-        private void updateHelpRequested(final CommandSpec command)
-        {
+        private void updateHelpRequested(final CommandSpec command) {
             isHelpRequested |= command.helpCommand();
         }
-
         private void updateHelpRequested(final Model.ArgSpec argSpec) {
             if (!parseResultBuilder.isInitializingDefaultValues
                     && argSpec.isOption()) {
@@ -35189,7 +35196,6 @@ InitialValueState.CACHED;*/
                         is(argSpec, "usageHelp", option.usageHelp());
             }
         }
-
         private boolean is(
                 final Model.ArgSpec p,
                 final String attribute,
@@ -35445,7 +35451,7 @@ InitialValueState.CACHED;*/
         ) {
             return argSpec.echo()
                     ? String.format("User entered %s for %s.%n",
-                    new String(result), name)
+                        new String(result), name)
                     : String.format("User entered %d characters for %s.%n",
                     result.length, name
             );
