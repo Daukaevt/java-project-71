@@ -34070,7 +34070,6 @@ InitialValueState.CACHED;*/
                 initialized.add(rootArgSpec);
             }
         }
-
         private int applyValueToSingleValuedField(
                 Model.ArgSpec argSpec, boolean negated,
                 LookBehind lookBehind, boolean alreadyUnquoted,
@@ -34094,11 +34093,11 @@ InitialValueState.CACHED;*/
             }
             if (arity.min > 0) {
                 args.push(quotedValue);
-                boolean discontinue = assertNoMissingMandatoryParameter(
-                        argSpec, args, 0, arity) // #1055
-                        || isArgResemblesOptionThereforeDiscontinue(
-                                argSpec, args, 0, arity); args.pop();
-                if (discontinue) { return 0; }
+                boolean discontinue = assertNoMissingMandatoryParameter(argSpec, args, 0, arity) // #1055
+                        || isArgResemblesOptionThereforeDiscontinue(argSpec, args, 0, arity); args.pop();
+                        if (discontinue) {
+                            return 0;
+                        }
             }
             int consumed = arity.min; // the number or args we need to consume
             String actualValue = value;
@@ -34130,8 +34129,7 @@ InitialValueState.CACHED;*/
                                 .negatable() && negated) {
                             actualValue = String.valueOf(oppositeValue);
                         }
-                        optionalValueExists = false;
-                        consumed = 0;
+                        optionalValueExists = false; consumed = 0;
                     }
                 } else {
                     String fallbackValue = argSpec.isOption()
@@ -34142,8 +34140,7 @@ InitialValueState.CACHED;*/
                     }
                 }
                 if (argSpec.interactive() && (arity.max == 0 || !optionalValueExists)) {
-                    interactiveValue = readUserInput(argSpec);
-                    consumed = 0;
+                    interactiveValue = readUserInput(argSpec); consumed = 0;
                 }
             }
             if (consumed == 0) {
@@ -34162,7 +34159,8 @@ InitialValueState.CACHED;*/
             Object newValue = interactiveValue != null ? interactiveValue : actualValue;
             if (noMoreValues && actualValue == null && interactiveValue == null) {
                 consumed = 0;
-            } else { consumed = 1;
+            } else {
+                consumed = 1;
                 if (interactiveValue != null) {
                     if (argSpec.echo()) {
                         initValueMessage = "Setting %s to %3$s (interactive value) for %4$s on %5$s";
@@ -34227,7 +34225,6 @@ InitialValueState.CACHED;*/
             parseResultBuilder.add(argSpec, pos);
             return consumed;
         }
-
         private int applyValuesToMapField(
                 Model.ArgSpec argSpec,
                 LookBehind lookBehind,
