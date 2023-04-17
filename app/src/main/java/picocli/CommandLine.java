@@ -34093,7 +34093,8 @@ InitialValueState.CACHED;*/
             }
             if (arity.min > 0) {
                 args.push(quotedValue);
-                boolean discontinue = assertNoMissingMandatoryParameter(argSpec, args, 0, arity)
+                boolean discontinue
+                        = assertNoMissingMandatoryParameter(argSpec, args, 0, arity)
                         || isArgResemblesOptionThereforeDiscontinue(argSpec, args, 0, arity); args.pop();
                 if (discontinue) {
                     return 0;
