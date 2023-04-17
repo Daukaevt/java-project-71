@@ -34095,9 +34095,9 @@ InitialValueState.CACHED;*/
                 args.push(quotedValue);
                 boolean discontinue = assertNoMissingMandatoryParameter(argSpec, args, 0, arity) // #1055
                         || isArgResemblesOptionThereforeDiscontinue(argSpec, args, 0, arity); args.pop();
-                        if (discontinue) {
-                            return 0;
-                        }
+                if (discontinue) {
+                    return 0;
+                }
             }
             int consumed = arity.min; // the number or args we need to consume
             String actualValue = value;
