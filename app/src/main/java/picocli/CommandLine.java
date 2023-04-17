@@ -34077,7 +34077,8 @@ InitialValueState.CACHED;*/
                 Set<Model.ArgSpec> initialized, String argDescription
         ) throws Exception {
             Tracer tracer = CommandLine.tracer();
-            boolean noMoreValues = args.isEmpty(); String value = noMoreValues ? null : args.pop();
+            boolean noMoreValues = args.isEmpty();
+            String value = noMoreValues ? null : args.pop();
             String quotedValue = value;
             if (commandSpec.parser().trimQuotes() && !alreadyUnquoted) {
                 value = unquote(value);
@@ -34092,13 +34093,16 @@ InitialValueState.CACHED;*/
             }
             if (arity.min > 0) {
                 args.push(quotedValue);
-                boolean discontinue = assertNoMissingMandatoryParameter(argSpec, args, 0, arity) || isArgResemblesOptionThereforeDiscontinue(argSpec, args, 0, arity); args.pop();
+                boolean discontinue = assertNoMissingMandatoryParameter(argSpec, args, 0, arity)
+                        || isArgResemblesOptionThereforeDiscontinue(argSpec, args, 0, arity); args.pop();
                 if (discontinue) {
                     return 0;
                 }
             }
-            int consumed = arity.min; String actualValue = value;
-            char[] interactiveValue = null; Class<?> cls = argSpec.auxiliaryTypes()[0];
+            int consumed = arity.min;
+            String actualValue = value;
+            char[] interactiveValue = null;
+            Class<?> cls = argSpec.auxiliaryTypes()[0];
             if (arity.min <= 0) {
                 boolean optionalValueExists = true; consumed = 1;
                 if (cls == Boolean.class || cls == Boolean.TYPE) {
@@ -34195,7 +34199,8 @@ InitialValueState.CACHED;*/
                     }
                 }
             }
-            Object oldValue = argSpec.getValue(); String traceMessage = initValueMessage;
+            Object oldValue = argSpec.getValue();
+            String traceMessage = initValueMessage;
             if (argSpec.group() == null && initialized.contains(argSpec)) {
                 if (!isOverwrittenOptionsAllowed()) {
                     throw new OverwrittenOptionException(CommandLine.this, argSpec,
