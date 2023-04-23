@@ -20,6 +20,7 @@ package picocli;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.Closeable;
+import java.io.Console;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
@@ -32469,7 +32470,6 @@ InitialValueState.CACHED;*/
                     BuiltIn.handle(e, "java.sql.Timestamp");
                 }
             }
-
             if (!excl("java.time.Duration")) {
                 try {
                     reg(Class.forName("java.time.Duration"),
@@ -32747,10 +32747,10 @@ InitialValueState.CACHED;*/
                 List<String> arguments,
                 Set<String> visited
         ) {
+            int hiestWordChar = 255;
             List<String> result = new ArrayList<String>();
             LineNumberReader reader = null;
             try {
-                int hiestWordChar = 255;
                 visited.add(file.getAbsolutePath());
                 reader = new LineNumberReader(new FileReader(file));
                 if (commandSpec.parser().useSimplifiedAtFiles()) {
