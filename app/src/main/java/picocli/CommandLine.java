@@ -33234,13 +33234,11 @@ InitialValueState.CACHED;*/
                 parseResultBuilder.originalArgs(originalArgs);
                 parseResultBuilder.nowProcessing = nowProcessing;
             }
-
             String separator = config().separator();
             Tracer tracer = CommandLine.tracer();
             while (!args.isEmpty()) {
                 if (endOfOptions) {
-                    processRemainderAsPositionalParameters(
-                            required, initialized, args);
+                    processRemainderAsPositionalParameters(required, initialized, args);
                     return;
                 }
                 String originalArg = args.pop();
@@ -33265,14 +33263,12 @@ InitialValueState.CACHED;*/
                             commandSpec.parser.endOfOptionsDelimiter()
                     );
                     endOfOptions = true;
-                    processRemainderAsPositionalParameters(
-                            required, initialized, args);
+                    processRemainderAsPositionalParameters(required, initialized, args);
                     return; // we are done
                 }
                 CommandLine subcommand = commandSpec.subcommands().get(arg);
                 if (subcommand == null
-                        && commandSpec.parser()
-                        .abbreviatedSubcommandsAllowed()) {
+                        && commandSpec.parser().abbreviatedSubcommandsAllowed()) {
                     subcommand = AbbreviationMatcher.match(
                             commandSpec.subcommands(), arg,
                             commandSpec.subcommandsCaseInsensitive(),
@@ -33280,20 +33276,17 @@ InitialValueState.CACHED;*/
                 }
                 if (subcommand != null) {
                     processSubcommand(subcommand,
-                            parseResultBuilder, parsedCommands, args,
-                            required, initialized, originalArgs,
-                            nowProcessing, separator, arg);
+                            parseResultBuilder, parsedCommands, args, required,
+                            initialized, originalArgs, nowProcessing, separator, arg);
                     return; // remainder done by the command
                 }
                 CommandSpec parent = commandSpec.parent();
                 if (parent != null && parent.subcommandsRepeatable()) {
                     subcommand = parent.subcommands().get(arg);
                     if (subcommand == null
-                            && parent.parser()
-                            .abbreviatedSubcommandsAllowed()) {
-                        subcommand = AbbreviationMatcher
-                                .match(parent.subcommands(), arg,
-                                        parent.subcommandsCaseInsensitive(),
+                            && parent.parser().abbreviatedSubcommandsAllowed()) {
+                        subcommand = AbbreviationMatcher.match(parent.subcommands(),
+                                arg, parent.subcommandsCaseInsensitive(),
                                         CommandLine.this).getValue();
                     }
                     if (subcommand != null) {
@@ -33301,20 +33294,16 @@ InitialValueState.CACHED;*/
                                 arg, commandSpec.parent().qualifiedName());
                         Set<Model.ArgSpec> inheritedInitialized = initialized;
                         if (subcommand.interpreter.parseResultBuilder != null) {
-                            tracer.debug("Subcommand '%s' "
-                                            + "has been matched before. Making a copy...",
-                                    subcommand.getCommandName());
+                            tracer.debug("Subcommand '%s' has been matched before. "
+                                            + "Making a copy...", subcommand.getCommandName());
                             subcommand = subcommand.copy();
-                            subcommand.getCommandSpec().parent(
-                                    commandSpec.parent()); // hook it up with its parent
+                            subcommand.getCommandSpec().parent(commandSpec.parent());
                             inheritedInitialized =
                                     new LinkedHashSet<Model.ArgSpec>(inheritedInitialized);
                         }
-                        processSubcommand(
-                                subcommand, getParent().interpreter.parseResultBuilder,
+                        processSubcommand(subcommand, getParent().interpreter.parseResultBuilder,
                                 parsedCommands, args, required, inheritedInitialized,
-                                originalArgs, nowProcessing, separator, arg
-                        );
+                                originalArgs, nowProcessing, separator, arg);
                         continue;
                     }
                 }
@@ -33323,8 +33312,7 @@ InitialValueState.CACHED;*/
                 if (commandSpec.parser().abbreviatedOptionsAllowed()) {
                     aggregatedOptions.putAll(commandSpec.optionsMap());
                     aggregatedOptions.putAll(commandSpec.negatedOptionsMap());
-                    arg = AbbreviationMatcher.match(
-                            aggregatedOptions, arg,
+                    arg = AbbreviationMatcher.match(aggregatedOptions, arg,
                             commandSpec.optionsCaseInsensitive(),
                             CommandLine.this).getFullName();
                 }
@@ -33337,8 +33325,7 @@ InitialValueState.CACHED;*/
                             commandSpec.optionsCaseInsensitive(),
                             CommandLine.this).getFullName();
                     if (isStandaloneOption(key) && isStandaloneOption(arg)) {
-                        tracer.warn("Both '%s' and '%s' "
-                                        + "are valid option names in %s. "
+                        tracer.warn("Both '%s' and '%s' are valid option names in %s. "
                                         + "Using '%s'...", arg, key, getCommandName(), arg
                         );
                     } else if (isStandaloneOption(key)) {
@@ -33353,9 +33340,8 @@ InitialValueState.CACHED;*/
                         }
                     } else {
                         if (tracer.isDebug()) {
-                            tracer.debug("'%s' contains separator '%s' "
-                                            + "but '%s' is not a known option", arg, separator, key
-                            );
+                            tracer.debug("'%s' contains separator '%s' but '%s' " +
+                                    "is not a known option", arg, separator, key);
                         }
                     }
                 } else {
@@ -33367,8 +33353,7 @@ InitialValueState.CACHED;*/
                 if (isStandaloneOption(arg)) {
                     processStandaloneOption(required, initialized,
                             arg, actuallyUnquoted, args, lookBehind);
-                }
-                else if (config().posixClusteredShortOptionsAllowed()
+                } else if (config().posixClusteredShortOptionsAllowed()
                         && arg.length() > 2 && arg.startsWith("-")) {
                     if (tracer.isDebug()) {
                         tracer.debug("Trying to process '%s' "
@@ -33376,20 +33361,17 @@ InitialValueState.CACHED;*/
                     }
                     processClusteredShortOptions(required, initialized,
                             arg, actuallyUnquoted, args);
-                }
-                else {
+                } else {
                     args.push(arg);
                     if (tracer.isDebug()) {
-                        tracer.debug("Could not find option '%s',"
-                                        + " deciding whether to treat as unmatched option "
-                                        + "or positional parameter...", arg);
+                        tracer.debug("Could not find option '%s', deciding whether to "
+                                + "treat as unmatched option or positional parameter...", arg);
                     }
                     if (tracer.isDebug()) {
                         tracer.debug("No option named '%s' found. "
                                 + "Processing as positional parameter", arg);
                     }
-                    processPositionalParameter(required, initialized,
-                            actuallyUnquoted, args);
+                    processPositionalParameter(required, initialized, actuallyUnquoted, args);
                 }
             }
         }
