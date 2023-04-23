@@ -510,7 +510,6 @@ public class CommandLine {
     ) {
         return new DefaultExceptionHandler<List<Object>>();
     }
-
     /**
      * @since 2.0
      * @deprecated use {@link #printHelpIfRequested(ParseResult)} instead
@@ -31209,7 +31208,6 @@ InitialValueState.CACHED;*/
         public void info(String msg, Object... params) {
             TraceLevel.INFO.print(this, msg, params);
         }
-
         /**
          * Prints the specified message if
          * the current trace level is DEBUG or higher.
@@ -32747,7 +32745,7 @@ InitialValueState.CACHED;*/
                 List<String> arguments,
                 Set<String> visited
         ) {
-            int hiestWordChar = 255;
+            final int HIEST_WORD_CHAR = 255;
             List<String> result = new ArrayList<String>();
             LineNumberReader reader = null;
             try {
@@ -32769,7 +32767,7 @@ InitialValueState.CACHED;*/
                 } else {
                     StreamTokenizer tok = new StreamTokenizer(reader);
                     tok.resetSyntax();
-                    tok.wordChars(' ', hiestWordChar);
+                    tok.wordChars(' ', HIEST_WORD_CHAR);
                     tok.whitespaceChars(0, ' ');
                     tok.quoteChar('"');
                     tok.quoteChar('\'');
