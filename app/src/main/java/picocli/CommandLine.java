@@ -32153,7 +32153,7 @@ InitialValueState.CACHED;*/
         }
 
         @Override
-        public String toString() {
+        final public String toString() {
             return getClass().getSimpleName() + "[" + location + "]";
         }
     }
@@ -32200,7 +32200,8 @@ InitialValueState.CACHED;*/
         public static List<String> splitIntoChunks(
                 String command, boolean caseInsensitive) {
             List<String> result = new ArrayList<String>();
-            int start = 0, codepoint;
+            int start = 0;
+            int codepoint;
             StringBuilder nonAlphabeticPrefix = new StringBuilder();
             while (start < command.length()) {
                 codepoint = command.codePointAt(start);
@@ -32217,10 +32218,9 @@ InitialValueState.CACHED;*/
 //                    to canonicalize the first chunk
 //                }
             }
-            for (
-                    int i = start;
-                    i < command.length();
-                    i += Character.charCount(codepoint)
+            for (int i = start;
+                 i < command.length();
+                 i += Character.charCount(codepoint)
             ) {
                 codepoint = command.codePointAt(i);
                 if (
@@ -32259,6 +32259,12 @@ InitialValueState.CACHED;*/
         /**
          * Returns the non-abbreviated name if found,
          * otherwise returns the specified original abbreviation name.
+         * @param <T>
+         * @param map
+         * @param abbreviation
+         * @param caseInsensitive
+         * @param source
+         * @return result
          */
         public static <T> MatchResult<T> match(Map<String, T> map,
                                                String abbreviation,
@@ -32318,14 +32324,13 @@ InitialValueState.CACHED;*/
                 return false;
             }
             matchCount++;
-            for (
-                    int i = matchCount, lastMatchChunk = matchCount;
-                    i < abbreviatedKeyChunks.size();
-                    i++, matchCount++
+            for (int i = matchCount, lastMatchChunk = matchCount;
+                 i < abbreviatedKeyChunks.size();
+                 i++, matchCount++
             ) {
                 boolean found = false;
                 for (int j = lastMatchChunk; j < keyChunks.size(); j++) {
-                    if ((found = startsWith(keyChunks.get(j),
+                    if ((found == startsWith(keyChunks.get(j),
                             abbreviatedKeyChunks.get(i), caseInsensitive))) {
                         lastMatchChunk = j + 1;
                         break;
@@ -32350,10 +32355,9 @@ InitialValueState.CACHED;*/
         }
 
         private static boolean isNonAlphabetic(String str) {
-            for (
-                    int i = 0, codepoint;
-                    i < str.length();
-                    i += Character.charCount(codepoint)
+            for (int i = 0, codepoint;
+                 i < str.length();
+                 i += Character.charCount(codepoint)
             ) {
                 codepoint = str.codePointAt(i);
                 if (Character.isLetterOrDigit(codepoint)) {
