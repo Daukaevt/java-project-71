@@ -32511,14 +32511,7 @@ InitialValueState.CACHED;*/
                 }
             }
             if (!excl("java.time.LocalTime")) {
-                try {
-                    reg(Class.forName("java.time.LocalTime"),
-                            Class.forName("java.time.LocalTime")
-                                    .getDeclaredMethod("parse", CharSequence.class),
-                            CharSequence.class);
-                } catch (Exception e) {
-                    BuiltIn.handle(e, "java.time.LocalTime");
-                }
+                notJavaTimeLocalTime();
             }
             if (!excl("java.time.MonthDay")) {
                 notJavaTimeMonthDay();
@@ -32549,6 +32542,16 @@ InitialValueState.CACHED;*/
             }
             if (!excl("java.nio.file.Path")) {
                 notJavaNioFilePath();
+            }
+        }
+        void notJavaTimeLocalTime() {
+            try {
+                reg(Class.forName("java.time.LocalTime"),
+                        Class.forName("java.time.LocalTime")
+                                .getDeclaredMethod("parse", CharSequence.class),
+                        CharSequence.class);
+            } catch (Exception e) {
+                BuiltIn.handle(e, "java.time.LocalTime");
             }
         }
         void notJavaTimeMonthDay() {
@@ -32611,7 +32614,7 @@ InitialValueState.CACHED;*/
                 BuiltIn.handle(e, "java.time.YearMonth");
             }
         }
-        void notJavaTimeZonedDateTime(){
+        void notJavaTimeZonedDateTime() {
             try {
                 reg(Class.forName("java.time.ZonedDateTime"),
                         Class.forName("java.time.ZonedDateTime")
