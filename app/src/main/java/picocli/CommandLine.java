@@ -32442,7 +32442,6 @@ InitialValueState.CACHED;*/
                     BuiltIn.handle(e, "java.sql.Time");
                 }
             }
-
             if (!excl("java.sql.Connection")) {
                 try {
                     reg(Class.forName("java.sql.Connection"),
@@ -32609,14 +32608,12 @@ InitialValueState.CACHED;*/
                     BuiltIn.handle(e, "java.time.ZoneOffset");
                 }
             }
-
             if (!excl("java.nio.file.Path")) {
                 try {
                     reg(Class.forName("java.nio.file.Path"),
                             Class.forName("java.nio.file.Paths")
-                                    .getDeclaredMethod("get",
-                                            String.class, String[].class),
-                            String.class, String[].class);
+                                    .getDeclaredMethod("get", String.class,
+                                            String[].class), String.class, String[].class);
                 } catch (Exception e) {
                     BuiltIn.handle(e, "java.nio.file.Path");
                 }
