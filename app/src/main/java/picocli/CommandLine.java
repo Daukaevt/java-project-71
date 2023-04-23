@@ -32521,44 +32521,16 @@ InitialValueState.CACHED;*/
                 }
             }
             if (!excl("java.time.MonthDay")) {
-                try {
-                    reg(Class.forName("java.time.MonthDay"),
-                            Class.forName("java.time.MonthDay")
-                                    .getDeclaredMethod("parse", CharSequence.class),
-                            CharSequence.class);
-                } catch (Exception e) {
-                    BuiltIn.handle(e, "java.time.MonthDay");
-                }
+                notJavaTimeMonthDay();
             }
             if (!excl("java.time.OffsetDateTime")) {
-                try {
-                    reg(Class.forName("java.time.OffsetDateTime"),
-                            Class.forName("java.time.OffsetDateTime")
-                                    .getDeclaredMethod("parse", CharSequence.class),
-                            CharSequence.class);
-                } catch (Exception e) {
-                    BuiltIn.handle(e, "java.time.OffsetDateTime");
-                }
+                notJavaTimeOffsetDateTime();
             }
             if (!excl("java.time.OffsetTime")) {
-                try {
-                    reg(Class.forName("java.time.OffsetTime"),
-                            Class.forName("java.time.OffsetTime")
-                                    .getDeclaredMethod("parse", CharSequence.class),
-                            CharSequence.class);
-                } catch (Exception e) {
-                    BuiltIn.handle(e, "java.time.OffsetTime");
-                }
+                notJavaTimeOffsetTime();
             }
             if (!excl("java.time.Period")) {
-                try {
-                    reg(Class.forName("java.time.Period"),
-                            Class.forName("java.time.Period")
-                                    .getDeclaredMethod("parse", CharSequence.class),
-                            CharSequence.class);
-                } catch (Exception e) {
-                    BuiltIn.handle(e, "java.time.Period");
-                }
+                notJavaTimePeriod();
             }
             if (!excl("java.time.Year")) {
                 notJavaTimeYear();
@@ -32568,7 +32540,6 @@ InitialValueState.CACHED;*/
             }
             if (!excl("java.time.ZonedDateTime")) {
                 notJavaTimeZonedDateTime();
-
             }
             if (!excl("java.time.ZoneId")) {
                 notJavaTimeZoneId();
@@ -32578,6 +32549,46 @@ InitialValueState.CACHED;*/
             }
             if (!excl("java.nio.file.Path")) {
                 notJavaNioFilePath();
+            }
+        }
+        void notJavaTimeMonthDay() {
+            try {
+                reg(Class.forName("java.time.MonthDay"),
+                        Class.forName("java.time.MonthDay")
+                                .getDeclaredMethod("parse", CharSequence.class),
+                        CharSequence.class);
+            } catch (Exception e) {
+                BuiltIn.handle(e, "java.time.MonthDay");
+            }
+        }
+        void notJavaTimeOffsetDateTime() {
+            try {
+                reg(Class.forName("java.time.OffsetDateTime"),
+                        Class.forName("java.time.OffsetDateTime")
+                                .getDeclaredMethod("parse", CharSequence.class),
+                        CharSequence.class);
+            } catch (Exception e) {
+                BuiltIn.handle(e, "java.time.OffsetDateTime");
+            }
+        }
+        void notJavaTimeOffsetTime() {
+            try {
+                reg(Class.forName("java.time.OffsetTime"),
+                        Class.forName("java.time.OffsetTime")
+                                .getDeclaredMethod("parse", CharSequence.class),
+                        CharSequence.class);
+            } catch (Exception e) {
+                BuiltIn.handle(e, "java.time.OffsetTime");
+            }
+        }
+        void notJavaTimePeriod() {
+            try {
+                reg(Class.forName("java.time.Period"),
+                        Class.forName("java.time.Period")
+                                .getDeclaredMethod("parse", CharSequence.class),
+                        CharSequence.class);
+            } catch (Exception e) {
+                BuiltIn.handle(e, "java.time.Period");
             }
         }
         void notJavaTimeYear() {
