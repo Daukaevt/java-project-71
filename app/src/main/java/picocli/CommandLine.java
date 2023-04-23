@@ -32399,25 +32399,18 @@ InitialValueState.CACHED;*/
         private void registerBuiltInConverters() {
             converterRegistry.put(Object.class, new BuiltIn.StringConverter());
             converterRegistry.put(String.class, new BuiltIn.StringConverter());
-            converterRegistry.put(StringBuilder.class,
-                    new BuiltIn.StringBuilderConverter());
-            converterRegistry.put(char[].class,
-                    new BuiltIn.CharArrayConverter());
-            converterRegistry.put(CharSequence.class,
-                    new BuiltIn.CharSequenceConverter());
+            converterRegistry.put(StringBuilder.class, new BuiltIn.StringBuilderConverter());
+            converterRegistry.put(char[].class, new BuiltIn.CharArrayConverter());
+            converterRegistry.put(CharSequence.class, new BuiltIn.CharSequenceConverter());
             converterRegistry.put(Byte.class, new BuiltIn.ByteConverter());
             converterRegistry.put(Byte.TYPE, new BuiltIn.ByteConverter());
-            converterRegistry.put(Boolean.class,
-                    new BuiltIn.BooleanConverter());
+            converterRegistry.put(Boolean.class, new BuiltIn.BooleanConverter());
             converterRegistry.put(Boolean.TYPE, new BuiltIn.BooleanConverter());
-            converterRegistry.put(Character.class,
-                    new BuiltIn.CharacterConverter());
-            converterRegistry.put(Character.TYPE,
-                    new BuiltIn.CharacterConverter());
+            converterRegistry.put(Character.class, new BuiltIn.CharacterConverter());
+            converterRegistry.put(Character.TYPE, new BuiltIn.CharacterConverter());
             converterRegistry.put(Short.class, new BuiltIn.ShortConverter());
             converterRegistry.put(Short.TYPE, new BuiltIn.ShortConverter());
-            converterRegistry.put(Integer.class,
-                    new BuiltIn.IntegerConverter());
+            converterRegistry.put(Integer.class, new BuiltIn.IntegerConverter());
             converterRegistry.put(Integer.TYPE, new BuiltIn.IntegerConverter());
             converterRegistry.put(Long.class, new BuiltIn.LongConverter());
             converterRegistry.put(Long.TYPE, new BuiltIn.LongConverter());
@@ -32428,40 +32421,23 @@ InitialValueState.CACHED;*/
             converterRegistry.put(File.class, new BuiltIn.FileConverter());
             converterRegistry.put(URI.class, new BuiltIn.URIConverter());
             converterRegistry.put(URL.class, new BuiltIn.URLConverter());
-            converterRegistry.put(Date.class,
-                    new BuiltIn.ISO8601DateConverter());
-            converterRegistry.put(BigDecimal.class,
-                    new BuiltIn.BigDecimalConverter());
-            converterRegistry.put(BigInteger.class,
-                    new BuiltIn.BigIntegerConverter());
-            converterRegistry.put(Charset.class,
-                    new BuiltIn.CharsetConverter());
-            converterRegistry.put(InetAddress.class,
-                    new BuiltIn.InetAddressConverter());
-            converterRegistry.put(Pattern.class,
-                    new BuiltIn.PatternConverter());
+            converterRegistry.put(Date.class, new BuiltIn.ISO8601DateConverter());
+            converterRegistry.put(BigDecimal.class, new BuiltIn.BigDecimalConverter());
+            converterRegistry.put(BigInteger.class, new BuiltIn.BigIntegerConverter());
+            converterRegistry.put(Charset.class, new BuiltIn.CharsetConverter());
+            converterRegistry.put(InetAddress.class, new BuiltIn.InetAddressConverter());
+            converterRegistry.put(Pattern.class, new BuiltIn.PatternConverter());
             converterRegistry.put(UUID.class, new BuiltIn.UUIDConverter());
-            converterRegistry.put(Currency.class,
-                    new BuiltIn.CurrencyConverter());
-            converterRegistry.put(TimeZone.class,
-                    new BuiltIn.TimeZoneConverter());
-            converterRegistry.put(ByteOrder.class,
-                    new BuiltIn.ByteOrderConverter());
+            converterRegistry.put(Currency.class, new BuiltIn.CurrencyConverter());
+            converterRegistry.put(TimeZone.class, new BuiltIn.TimeZoneConverter());
+            converterRegistry.put(ByteOrder.class, new BuiltIn.ByteOrderConverter());
             converterRegistry.put(Class.class, new BuiltIn.ClassConverter());
-            converterRegistry.put(NetworkInterface.class,
-                    new BuiltIn.NetworkInterfaceConverter());
-
-            // #698 use direct calls to
-            // Class.forName() and Class.getDeclaredMethod()
-            // with constant Strings
-            // to allow GraalVM static analysis to resolve the target elements
+            converterRegistry.put(NetworkInterface.class, new BuiltIn.NetworkInterfaceConverter());
             if (!excl("java.sql.Time")) {
                 try {
                     reg(Class.forName("java.sql.Time"),
-                            new BuiltIn.ISO8601TimeConverter(
-                                    Class.forName("java.sql.Time")
-                                            .getDeclaredConstructor(
-                                                    long.class)));
+                            new BuiltIn.ISO8601TimeConverter(Class.forName("java.sql.Time")
+                                            .getDeclaredConstructor(long.class)));
                 } catch (Exception e) {
                     BuiltIn.handle(e, "java.sql.Time");
                 }
@@ -32471,9 +32447,7 @@ InitialValueState.CACHED;*/
                 try {
                     reg(Class.forName("java.sql.Connection"),
                             Class.forName("java.sql.DriverManager")
-                                    .getDeclaredMethod(
-                                            "getConnection", String.class),
-                            String.class);
+                                    .getDeclaredMethod("getConnection", String.class), String.class);
                 } catch (Exception e) {
                     BuiltIn.handle(e, "java.sql.Connection");
                 }
@@ -32482,9 +32456,7 @@ InitialValueState.CACHED;*/
                 try {
                     reg(Class.forName("java.sql.Driver"),
                             Class.forName("java.sql.DriverManager")
-                                    .getDeclaredMethod("getDriver",
-                                            String.class),
-                            String.class);
+                                    .getDeclaredMethod("getDriver", String.class), String.class);
                 } catch (Exception e) {
                     BuiltIn.handle(e, "java.sql.DriverManager");
                 }
@@ -32493,8 +32465,7 @@ InitialValueState.CACHED;*/
                 try {
                     reg(Class.forName("java.sql.Timestamp"),
                             Class.forName("java.sql.Timestamp")
-                                    .getDeclaredMethod("valueOf", String.class),
-                            String.class);
+                                    .getDeclaredMethod("valueOf", String.class), String.class);
                 } catch (Exception e) {
                     BuiltIn.handle(e, "java.sql.Timestamp");
                 }
@@ -32505,8 +32476,7 @@ InitialValueState.CACHED;*/
                     reg(Class.forName("java.time.Duration"),
                             Class.forName("java.time.Duration")
                                     .getDeclaredMethod("parse",
-                                            CharSequence.class),
-                            CharSequence.class);
+                                            CharSequence.class), CharSequence.class);
                 } catch (Exception e) {
                     BuiltIn.handle(e, "java.time.Duration");
                 }
@@ -32516,8 +32486,7 @@ InitialValueState.CACHED;*/
                     reg(Class.forName("java.time.Instant"),
                             Class.forName("java.time.Instant")
                                     .getDeclaredMethod("parse",
-                                            CharSequence.class),
-                            CharSequence.class);
+                                            CharSequence.class), CharSequence.class);
                 } catch (Exception e) {
                     BuiltIn.handle(e, "java.time.Instant");
                 }
@@ -32527,8 +32496,7 @@ InitialValueState.CACHED;*/
                     reg(Class.forName("java.time.LocalDate"),
                             Class.forName("java.time.LocalDate")
                                     .getDeclaredMethod("parse",
-                                            CharSequence.class),
-                            CharSequence.class);
+                                            CharSequence.class), CharSequence.class);
                 } catch (Exception e) {
                     BuiltIn.handle(e, "java.time.LocalDate");
                 }
@@ -32538,8 +32506,7 @@ InitialValueState.CACHED;*/
                     reg(Class.forName("java.time.LocalDateTime"),
                             Class.forName("java.time.LocalDateTime")
                                     .getDeclaredMethod("parse",
-                                            CharSequence.class),
-                            CharSequence.class);
+                                            CharSequence.class), CharSequence.class);
                 } catch (Exception e) {
                     BuiltIn.handle(e, "java.time.LocalDateTime");
                 }
@@ -32548,8 +32515,7 @@ InitialValueState.CACHED;*/
                 try {
                     reg(Class.forName("java.time.LocalTime"),
                             Class.forName("java.time.LocalTime")
-                                    .getDeclaredMethod("parse",
-                                            CharSequence.class),
+                                    .getDeclaredMethod("parse", CharSequence.class),
                             CharSequence.class);
                 } catch (Exception e) {
                     BuiltIn.handle(e, "java.time.LocalTime");
@@ -32559,8 +32525,7 @@ InitialValueState.CACHED;*/
                 try {
                     reg(Class.forName("java.time.MonthDay"),
                             Class.forName("java.time.MonthDay")
-                                    .getDeclaredMethod("parse",
-                                            CharSequence.class),
+                                    .getDeclaredMethod("parse", CharSequence.class),
                             CharSequence.class);
                 } catch (Exception e) {
                     BuiltIn.handle(e, "java.time.MonthDay");
@@ -32570,8 +32535,7 @@ InitialValueState.CACHED;*/
                 try {
                     reg(Class.forName("java.time.OffsetDateTime"),
                             Class.forName("java.time.OffsetDateTime")
-                                    .getDeclaredMethod("parse",
-                                            CharSequence.class),
+                                    .getDeclaredMethod("parse", CharSequence.class),
                             CharSequence.class);
                 } catch (Exception e) {
                     BuiltIn.handle(e, "java.time.OffsetDateTime");
@@ -32581,8 +32545,7 @@ InitialValueState.CACHED;*/
                 try {
                     reg(Class.forName("java.time.OffsetTime"),
                             Class.forName("java.time.OffsetTime")
-                                    .getDeclaredMethod("parse",
-                                            CharSequence.class),
+                                    .getDeclaredMethod("parse", CharSequence.class),
                             CharSequence.class);
                 } catch (Exception e) {
                     BuiltIn.handle(e, "java.time.OffsetTime");
@@ -32592,8 +32555,7 @@ InitialValueState.CACHED;*/
                 try {
                     reg(Class.forName("java.time.Period"),
                             Class.forName("java.time.Period")
-                                    .getDeclaredMethod("parse",
-                                            CharSequence.class),
+                                    .getDeclaredMethod("parse", CharSequence.class),
                             CharSequence.class);
                 } catch (Exception e) {
                     BuiltIn.handle(e, "java.time.Period");
@@ -32603,8 +32565,7 @@ InitialValueState.CACHED;*/
                 try {
                     reg(Class.forName("java.time.Year"),
                             Class.forName("java.time.Year")
-                                    .getDeclaredMethod("parse",
-                                            CharSequence.class),
+                                    .getDeclaredMethod("parse", CharSequence.class),
                             CharSequence.class);
                 } catch (Exception e) {
                     BuiltIn.handle(e, "java.time.Year");
@@ -32614,8 +32575,7 @@ InitialValueState.CACHED;*/
                 try {
                     reg(Class.forName("java.time.YearMonth"),
                             Class.forName("java.time.YearMonth")
-                                    .getDeclaredMethod("parse",
-                                            CharSequence.class),
+                                    .getDeclaredMethod("parse", CharSequence.class),
                             CharSequence.class);
                 } catch (Exception e) {
                     BuiltIn.handle(e, "java.time.YearMonth");
@@ -32626,8 +32586,7 @@ InitialValueState.CACHED;*/
                     reg(Class.forName("java.time.ZonedDateTime"),
                             Class.forName("java.time.ZonedDateTime")
                                     .getDeclaredMethod("parse",
-                                            CharSequence.class),
-                            CharSequence.class);
+                                            CharSequence.class), CharSequence.class);
                 } catch (Exception e) {
                     BuiltIn.handle(e, "java.time.ZonedDateTime");
                 }
@@ -32636,8 +32595,7 @@ InitialValueState.CACHED;*/
                 try {
                     reg(Class.forName("java.time.ZoneId"),
                             Class.forName("java.time.ZoneId")
-                                    .getDeclaredMethod(
-                                            "of", String.class), String.class);
+                                    .getDeclaredMethod("of", String.class), String.class);
                 } catch (Exception e) {
                     BuiltIn.handle(e, "java.time.ZoneId");
                 }
@@ -32646,8 +32604,7 @@ InitialValueState.CACHED;*/
                 try {
                     reg(Class.forName("java.time.ZoneOffset"),
                             Class.forName("java.time.ZoneOffset")
-                                    .getDeclaredMethod(
-                                            "of", String.class), String.class);
+                                    .getDeclaredMethod("of", String.class), String.class);
                 } catch (Exception e) {
                     BuiltIn.handle(e, "java.time.ZoneOffset");
                 }
@@ -32656,13 +32613,10 @@ InitialValueState.CACHED;*/
             if (!excl("java.nio.file.Path")) {
                 try {
                     reg(Class.forName("java.nio.file.Path"),
-                            Class.forName(
-                                            "java.nio.file.Paths")
+                            Class.forName("java.nio.file.Paths")
                                     .getDeclaredMethod("get",
-                                            String.class,
-                                            String[].class),
-                            String.class,
-                            String[].class);
+                                            String.class, String[].class),
+                            String.class, String[].class);
                 } catch (Exception e) {
                     BuiltIn.handle(e, "java.nio.file.Path");
                 }
@@ -32799,6 +32753,7 @@ InitialValueState.CACHED;*/
             List<String> result = new ArrayList<String>();
             LineNumberReader reader = null;
             try {
+                int hiestWordChar = 255;
                 visited.add(file.getAbsolutePath());
                 reader = new LineNumberReader(new FileReader(file));
                 if (commandSpec.parser().useSimplifiedAtFiles()) {
@@ -32817,7 +32772,7 @@ InitialValueState.CACHED;*/
                 } else {
                     StreamTokenizer tok = new StreamTokenizer(reader);
                     tok.resetSyntax();
-                    tok.wordChars(' ', 255);
+                    tok.wordChars(' ', hiestWordChar);
                     tok.whitespaceChars(0, ' ');
                     tok.quoteChar('"');
                     tok.quoteChar('\'');
@@ -33340,8 +33295,8 @@ InitialValueState.CACHED;*/
                         }
                     } else {
                         if (tracer.isDebug()) {
-                            tracer.debug("'%s' contains separator '%s' but '%s' " +
-                                    "is not a known option", arg, separator, key);
+                            tracer.debug("'%s' contains separator '%s' but '%s' "
+                                    + "is not a known option", arg, separator, key);
                         }
                     }
                 } else {
