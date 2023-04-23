@@ -32561,64 +32561,84 @@ InitialValueState.CACHED;*/
                 }
             }
             if (!excl("java.time.Year")) {
-                try {
-                    reg(Class.forName("java.time.Year"),
-                            Class.forName("java.time.Year")
-                                    .getDeclaredMethod("parse", CharSequence.class),
-                            CharSequence.class);
-                } catch (Exception e) {
-                    BuiltIn.handle(e, "java.time.Year");
-                }
+                notJavaTimeYear();
             }
             if (!excl("java.time.YearMonth")) {
-                try {
-                    reg(Class.forName("java.time.YearMonth"),
-                            Class.forName("java.time.YearMonth")
-                                    .getDeclaredMethod("parse", CharSequence.class),
-                            CharSequence.class);
-                } catch (Exception e) {
-                    BuiltIn.handle(e, "java.time.YearMonth");
-                }
+                notJavaTimeYearMonth();
             }
             if (!excl("java.time.ZonedDateTime")) {
-                try {
-                    reg(Class.forName("java.time.ZonedDateTime"),
-                            Class.forName("java.time.ZonedDateTime")
-                                    .getDeclaredMethod("parse",
-                                            CharSequence.class), CharSequence.class);
-                } catch (Exception e) {
-                    BuiltIn.handle(e, "java.time.ZonedDateTime");
-                }
+                notJavaTimeZonedDateTime();
+
             }
             if (!excl("java.time.ZoneId")) {
-                try {
-                    reg(Class.forName("java.time.ZoneId"),
-                            Class.forName("java.time.ZoneId")
-                                    .getDeclaredMethod("of", String.class), String.class);
-                } catch (Exception e) {
-                    BuiltIn.handle(e, "java.time.ZoneId");
-                }
+                notJavaTimeZoneId();
             }
             if (!excl("java.time.ZoneOffset")) {
-                try {
-                    reg(Class.forName("java.time.ZoneOffset"),
-                            Class.forName("java.time.ZoneOffset")
-                                    .getDeclaredMethod("of", String.class), String.class);
-                } catch (Exception e) {
-                    BuiltIn.handle(e, "java.time.ZoneOffset");
-                }
+                notJavaTimeZoneOffset();
             }
             if (!excl("java.nio.file.Path")) {
-                try {
-                    reg(Class.forName("java.nio.file.Path"),
-                            Class.forName("java.nio.file.Paths")
-                                    .getDeclaredMethod("get", String.class,
-                                            String[].class), String.class, String[].class);
-                } catch (Exception e) {
-                    BuiltIn.handle(e, "java.nio.file.Path");
-                }
+                notJavaNioFilePath();
             }
         }
+        void notJavaTimeYear() {
+            try {
+                reg(Class.forName("java.time.Year"),
+                        Class.forName("java.time.Year")
+                                .getDeclaredMethod("parse", CharSequence.class),
+                        CharSequence.class);
+            } catch (Exception e) {
+                BuiltIn.handle(e, "java.time.Year");
+            }
+        }
+        void notJavaTimeYearMonth() {
+            try {
+                reg(Class.forName("java.time.YearMonth"),
+                        Class.forName("java.time.YearMonth")
+                                .getDeclaredMethod("parse", CharSequence.class),
+                        CharSequence.class);
+            } catch (Exception e) {
+                BuiltIn.handle(e, "java.time.YearMonth");
+            }
+        }
+        void notJavaTimeZonedDateTime(){
+            try {
+                reg(Class.forName("java.time.ZonedDateTime"),
+                        Class.forName("java.time.ZonedDateTime")
+                                .getDeclaredMethod("parse",
+                                        CharSequence.class), CharSequence.class);
+            } catch (Exception e) {
+                BuiltIn.handle(e, "java.time.ZonedDateTime");
+            }
+        }
+        void notJavaTimeZoneId() {
+            try {
+                reg(Class.forName("java.time.ZoneId"),
+                        Class.forName("java.time.ZoneId")
+                                .getDeclaredMethod("of", String.class), String.class);
+            } catch (Exception e) {
+                BuiltIn.handle(e, "java.time.ZoneId");
+            }
+        }
+        void notJavaTimeZoneOffset() {
+            try {
+                reg(Class.forName("java.time.ZoneOffset"),
+                        Class.forName("java.time.ZoneOffset")
+                                .getDeclaredMethod("of", String.class), String.class);
+            } catch (Exception e) {
+                BuiltIn.handle(e, "java.time.ZoneOffset");
+            }
+        }
+        void notJavaNioFilePath() {
+            try {
+                reg(Class.forName("java.nio.file.Path"),
+                        Class.forName("java.nio.file.Paths")
+                                .getDeclaredMethod("get", String.class,
+                                        String[].class), String.class, String[].class);
+            } catch (Exception e) {
+                BuiltIn.handle(e, "java.nio.file.Path");
+            }
+        }
+
 
         private boolean excl(String fqcn) {
             return BuiltIn.excluded(fqcn);
