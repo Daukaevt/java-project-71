@@ -33582,8 +33582,7 @@ InitialValueState.CACHED;*/
                 }
                 if (tracer.isDebug()) {
                     tracer.debug("Parser is configured to "
-                            + "treat all unmatched options"
-                            + " as positional parameter", arg);
+                            + "treat all unmatched options as positional parameter", arg);
                 }
             }
             int argIndex = parseResultBuilder
@@ -33592,17 +33591,13 @@ InitialValueState.CACHED;*/
                 tracer.debug(
                         "[%d] Processing next arg as a positional parameter."
                                 + " Command-local position=%d. Remainder=%s",
-                        argIndex,
-                        position,
-                        reverse(copy(args))
+                        argIndex, position, reverse(copy(args))
                 );
             }
             if (config().stopAtPositional()) {
                 if (!endOfOptions && tracer.isDebug()) {
-                    tracer.debug("Parser was configured "
-                            + "with stopAtPositional=true, "
-                            + "treating remaining arguments "
-                            + "as positional parameters.");
+                    tracer.debug("Parser was configured with stopAtPositional=true, "
+                            + "treating remaining arguments as positional parameters.");
                 }
                 endOfOptions = true;
             }
@@ -33613,20 +33608,15 @@ InitialValueState.CACHED;*/
             int originalNowProcessingSize =
                     parseResultBuilder.nowProcessing.size();
             List<Runnable> bookKeeping = new ArrayList<Runnable>();
-            for (
-                    int i = 0;
-                    i < commandSpec.positionalParameters().size();
-                    i++
-            ) {
+            for (int i = 0; i < commandSpec
+                    .positionalParameters().size(); i++) {
                 Model.PositionalParamSpec positionalParam
                         = commandSpec.positionalParameters().get(i);
                 Range indexRange = positionalParam.index();
                 int localPosition = getPosition(positionalParam);
                 if (positionalParam
                         .group(
-                        ) != null) { // does the positionalParam's index range
-                    // contain the current position in
-                    // the currently matching group
+                        ) != null) {
                     GroupMatchContainer groupMatchContainer = parseResultBuilder
                             .groupMatchContainer
                             .findOrCreateMatchingGroup(positionalParam,
@@ -33648,10 +33638,8 @@ InitialValueState.CACHED;*/
                     tracer.debug(
                             "Position %s is in index range %s. Trying to "
                                     + "assign args to %s, arity=%s",
-                            positionDesc(positionalParam),
-                            indexRange.internalToString(),
-                            positionalParam,
-                            arity
+                            positionDesc(positionalParam), indexRange.internalToString(),
+                            positionalParam, arity
                     );
                 }
                 if (
@@ -33662,13 +33650,8 @@ InitialValueState.CACHED;*/
                 } // #389 collectErrors parsing
                 int originalSize = argsCopy.size();
                 int actuallyConsumed = applyOption(
-                        positionalParam,
-                        false,
-                        LookBehind.SEPARATE,
-                        alreadyUnquoted,
-                        arity,
-                        argsCopy,
-                        initialized,
+                        positionalParam, false, LookBehind.SEPARATE,
+                        alreadyUnquoted, arity, argsCopy, initialized,
                         "args[" + indexRange.internalToString()
                                 + "] at position " + localPosition);
                 int count = originalSize - argsCopy.size();
@@ -33677,8 +33660,7 @@ InitialValueState.CACHED;*/
                     interactiveConsumed =
                             this.interactiveCount - originalInteractiveCount;
                 }
-                if (positionalParam.group() == null) { // don't update
-                    // the command-level position for group args
+                if (positionalParam.group() == null) {
                     argsConsumed = Math.max(argsConsumed, count);
                 } else {
                     final int updatedPosition = localPosition + count;
@@ -33713,7 +33695,6 @@ InitialValueState.CACHED;*/
                             parseResultBuilder.nowProcessing.size() - 1);
                 }
             }
-            // remove processed args from the stack
             int maxConsumed = Math.max(consumedByGroup, argsConsumed);
             for (int i = 0; i < maxConsumed; i++) {
                 args.pop();
@@ -33723,9 +33704,7 @@ InitialValueState.CACHED;*/
                 tracer.debug(
                         "Consumed %d arguments and %d interactive values,"
                                 + " moving command-local position to index %d.",
-                        argsConsumed,
-                        interactiveConsumed,
-                        position
+                        argsConsumed, interactiveConsumed, position
                 );
             }
             for (Runnable task : bookKeeping) {
@@ -33737,35 +33716,7 @@ InitialValueState.CACHED;*/
                             && interactiveConsumed == 0
                             && !args.isEmpty()
             ) {
-                handleUnmatchedArgument(args); // this gives error msg:
-                // "Unmatched argument at index 1: 'val2'"
-//                // instead, we want a "positional
-//                parameter at index 0..* (<str>)
-//                should be specified only once"
-//                List<String> unmatched = new ArrayList<String>();
-//                while (!args.isEmpty()) {unmatched.add(args.pop());}
-//                // positional parameter at index 0..* (<str>)
-//                should be specified only once
-//                String msg = null; // FIXME report which positional
-//                 has been fully filled and cannot take more args
-//                for (
-//                  int i = 0;
-//                  i < commandSpec.positionalParameters().size();
-//                  i++
-//                ) {
-//                    PositionalParamSpec positionalParam =
-//                      commandSpec.positionalParameters().get(i);
-//                    Range indexRange = positionalParam.index();
-//                    if (indexRange.contains(position - 1)
-//                    && positionalParam.typedValueAtPosition
-//                      .get(position - 1) == null) {
-//                        aaaaa;
-//                    }
-//                }
-//                if (!isUnmatchedArgumentsAllowed()) {
-//                    maybeThrow(new UnmatchedArgumentException(
-//                      CommandLine.this, unmatched, msg));
-//                }
+                handleUnmatchedArgument(args);
             }
         }
 
