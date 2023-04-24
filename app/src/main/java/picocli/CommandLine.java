@@ -246,6 +246,10 @@ public class CommandLine {
 
     public static final int MIN_FOR_MOST_SIMILAR = 3;
 
+    public static final int FOUR = 4;
+
+    public static final int FIVE = 5;
+
     public static final int SEVENTHEEN = 17;
 
     public static final int THIRTY_SEVEN = 37;
@@ -29048,7 +29052,8 @@ InitialValueState.CACHED;*/
             private final String requiredMarker;
             private final boolean showDefaultValues;
 
-            public DefaultParameterRenderer(
+            private DefaultParameterRenderer(
+            //public DefaultParameterRenderer(
                     boolean showDefaultValues, String requiredMarker) {
                 this.showDefaultValues = showDefaultValues;
                 this.requiredMarker =
@@ -29063,10 +29068,10 @@ InitialValueState.CACHED;*/
                         paramLabelRenderer.renderParameterLabel(
                                 param, scheme.ansi(), scheme.parameterStyles);
                 Text requiredParameter =
-                        scheme.parameterText(
-                                param.arity().min > 0 ? requiredMarker : "");
+                        scheme.parameterText(param.arity().min
+                                > 0 ? requiredMarker : "");
 
-                Text EMPTY = Ansi.EMPTY_TEXT;
+                Text empty = Ansi.EMPTY_TEXT;
                 boolean[] showDefault =
                         {param.internalShowDefaultValue(showDefaultValues)};
                 List<Text[]> result = new ArrayList<Text[]>();
@@ -29075,29 +29080,24 @@ InitialValueState.CACHED;*/
                         createDescriptionFirstLines(
                                 scheme, param, description, showDefault);
                 result.add(
-                        new Text[]{requiredParameter,
-                                EMPTY,
-                                EMPTY,
-                                label,
-                                descriptionFirstLines[0]});
+                        new Text[]{requiredParameter, empty,
+                                empty, label, descriptionFirstLines[0]});
                 for (int i = 1; i < descriptionFirstLines.length; i++) {
-                    result.add(
-                            new Text[]{EMPTY,
-                                    EMPTY,
-                                    EMPTY,
-                                    EMPTY,
-                                    descriptionFirstLines[i]});
+                    result.add(new Text[]{empty,
+                            empty,
+                            empty,
+                            empty,
+                            descriptionFirstLines[i]});
                 }
                 for (int i = 1; i < description.length; i++) {
                     Text[] descriptionNextLines =
                             scheme.ansi(
                             ).new Text(description[i], scheme).splitLines();
-                    for (Text line : descriptionNextLines) {
-                        result.add(new Text[]{EMPTY,
-                                EMPTY,
-                                EMPTY,
-                                EMPTY,
-                                line});
+                    for (Text line : descriptionNextLines) {result.add(new Text[]{empty,
+                            empty,
+                            empty,
+                            empty,
+                            line});
                     }
                 }
                 if (showDefault[0]) {
@@ -29125,8 +29125,11 @@ InitialValueState.CACHED;*/
             /**
              * Constructs a new DefaultParamLabelRenderer
              * with the specified separator string.
+             *
+             * @param commandSpec
              */
-            public DefaultParamLabelRenderer(CommandSpec commandSpec) {
+            private DefaultParamLabelRenderer(CommandSpec commandSpec) {
+            //public DefaultParamLabelRenderer(CommandSpec commandSpec) {
                 this.commandSpec = Assert.notNull(commandSpec, "commandSpec");
             }
 
@@ -29258,10 +29261,14 @@ InitialValueState.CACHED;*/
          * @see TextTable showing values in a tabular format
          */
         public static class Layout {
-            protected final ColorScheme colorScheme;
-            protected final TextTable table;
-            protected IOptionRenderer optionRenderer;
-            protected IParameterRenderer parameterRenderer;
+            private final ColorScheme colorScheme;
+            //protected final ColorScheme colorScheme;
+            private final TextTable table;
+            //protected final TextTable table;
+            private IOptionRenderer optionRenderer;
+            //protected IOptionRenderer optionRenderer;
+            private IParameterRenderer parameterRenderer;
+            //protected IParameterRenderer parameterRenderer;
 
             /**
              * Constructs a Layout with the specified
@@ -29273,13 +29280,15 @@ InitialValueState.CACHED;*/
              *
              * @param colorScheme the color scheme to use
              * for common, auto-generated parts of the usage help message
+             *
+             * @param tableWidth
              */
             public Layout(ColorScheme colorScheme, int tableWidth) {
                 this(
                         colorScheme,
                         TextTable.forDefaultColumns(colorScheme,
                                 Model.UsageMessageSpec
-                                        .DEFAULT_USAGE_LONG_OPTIONS_WIDTH + 4,
+                                        .DEFAULT_USAGE_LONG_OPTIONS_WIDTH + FOUR,
                                 tableWidth));
             }
 
@@ -29501,6 +29510,7 @@ InitialValueState.CACHED;*/
              * Returns the ColorScheme used
              * to create Text objects in this layout.
              *
+             * @return colorScheme
              * @since 4.6
              */
             public ColorScheme colorScheme() {
@@ -29510,6 +29520,7 @@ InitialValueState.CACHED;*/
             /**
              * Returns the TextTable used in this layout.
              *
+             * @return the TextTable used in this layout.
              * @since 4.6
              */
             public TextTable textTable() {
@@ -29520,6 +29531,7 @@ InitialValueState.CACHED;*/
              * Returns the IOptionRenderer used to render options
              * to Text before adding this text to the TextTable in this layout.
              *
+             * @return optionRenderer
              * @since 4.6
              */
             public IOptionRenderer optionRenderer() {
@@ -29531,6 +29543,7 @@ InitialValueState.CACHED;*/
              * params to Text before adding
              * this text to the TextTable in this layout.
              *
+             * @return parameterRenderer
              * @since 4.6
              */
             public IParameterRenderer parameterRenderer() {
@@ -29549,6 +29562,9 @@ InitialValueState.CACHED;*/
             /**
              * Sorts the specified array
              * of Strings shortest-first and returns it.
+             *
+             * @param names
+             * @return names
              */
             public static String[] sort(String[] names) {
                 Arrays.sort(names, new ShortestFirst());
@@ -29558,6 +29574,9 @@ InitialValueState.CACHED;*/
             /**
              * Sorts the specified array
              * of Strings longest-first and returns it.
+             *
+             * @param names
+             * @return names
              */
             public static String[] longestFirst(String[] names) {
                 Arrays.sort(names,
@@ -29641,7 +29660,8 @@ InitialValueState.CACHED;*/
              * The {@code char[]} slots of the
              * {@code TextTable} to copy text values into.
              */
-            protected final List<Text> columnValues = new ArrayList<Text>();
+            private final List<Text> columnValues = new ArrayList<Text>();
+            //protected final List<Text> columnValues = new ArrayList<Text>();
 
             private static final int OPTION_SEPARATOR_COLUMN = 2;
             private static final int LONG_OPTION_COLUMN = 3;
@@ -29652,13 +29672,16 @@ InitialValueState.CACHED;*/
             /**
              * By default, indent wrapped lines by 2 spaces.
              */
-            public int indentWrappedLines = 2;
+            private int indentWrappedLines = 2;
 
             /**
              * @deprecated use
              * {@link picocli.CommandLine.Help.TextTable#TextTable(
-             *picocli.CommandLine.Help.ColorScheme,
-             * picocli.CommandLine.Help.Column[])}  instead
+             * picocli.CommandLine.Help.ColorScheme,
+             * picocli.CommandLine.Help.Column[])}  instead.
+             *
+             * @param columns
+             * @param ansi
              */
             @Deprecated
             protected TextTable(Ansi ansi, Column[] columns) {
@@ -29701,8 +29724,9 @@ InitialValueState.CACHED;*/
              *
              * @param ansi           whether to emit ANSI escape codes or not
              * @param usageHelpWidth the total width of the columns combined
-             * @deprecated use {@link #forDefaultColumns(
-             *CommandLine.Help.Ansi, int, int)} instead
+             * @deprecated use {@link #forDefaultColumns
+             * (CommandLine.Help.Ansi, int, int)} instead
+             * @return forDefaultColumns
              */
             @Deprecated
             public static TextTable forDefaultColumns(
@@ -29712,7 +29736,7 @@ InitialValueState.CACHED;*/
                 return forDefaultColumns(
                         Help.defaultColorScheme(ansi),
                         Model.UsageMessageSpec
-                                .DEFAULT_USAGE_LONG_OPTIONS_WIDTH + 4,
+                                .DEFAULT_USAGE_LONG_OPTIONS_WIDTH + FOUR,
                         usageHelpWidth);
             }
 
@@ -29729,7 +29753,7 @@ InitialValueState.CACHED;*/
              * s) (width: 24, indent: 1, SPAN multiple columns on overflow)</li>
              * <li>description line(
              * s) (width: 51, indent: 1, WRAP to next row on overflow)</li>
-             * </ol>
+             * </ol>.
              *
              * @param ansi                   whether
              * to emit ANSI escape codes or not
@@ -29737,8 +29761,9 @@ InitialValueState.CACHED;*/
              * of the long options column
              * @param usageHelpWidth         the total width
              * of the columns combined
-             * @deprecated use {@link #forDefaultColumns(
-             *CommandLine.Help.ColorScheme, int, int)} instead
+             * @deprecated use {@link
+             * #forDefaultColumns(CommandLine.Help.ColorScheme, int, int)} instead
+             * @return forDefaultColumns
              */
             @Deprecated
             public static TextTable forDefaultColumns(
@@ -29762,7 +29787,7 @@ InitialValueState.CACHED;*/
              * s) (width: 24, indent: 1, SPAN multiple columns on overflow)</li>
              * <li>description line(
              * s) (width: 51, indent: 1, WRAP to next row on overflow)</li>
-             * </ol>
+             * </ol>.
              *
              * @param colorScheme            the
              * styles and ANSI mode to use for embedded markup
@@ -29770,6 +29795,7 @@ InitialValueState.CACHED;*/
              * of the long options column
              * @param usageHelpWidth         the total width
              *  of the columns combined
+             * @return forColumns
              * @since 4.2
              */
             public static TextTable forDefaultColumns(
@@ -29778,7 +29804,7 @@ InitialValueState.CACHED;*/
                     int usageHelpWidth) {
                 // "* -c, --create                Creates a ...."
                 int descriptionWidth =
-                        usageHelpWidth - 5 - longOptionsColumnWidth;
+                        usageHelpWidth - FIVE - longOptionsColumnWidth;
                 return forColumns(colorScheme,
                         new Column(2,
                                 0,
@@ -29806,6 +29832,7 @@ InitialValueState.CACHED;*/
              * @deprecated use {@link #forColumns(
              *CommandLine.Help.ColorScheme,
              * CommandLine.Help.Column...)} instead
+             * @return for Column Widths
              */
             @Deprecated
             public static TextTable forColumnWidths(
@@ -29823,6 +29850,7 @@ InitialValueState.CACHED;*/
              *                     and ANSI mode to use for embedded markup
              * @param columnWidths the width of each table column (
              *                     all columns have zero indent)
+             * @return TextTable
              * @since 4.2
              */
             public static TextTable forColumnWidths(
@@ -29846,6 +29874,8 @@ InitialValueState.CACHED;*/
              * @deprecated use {@link #forColumns(
              *CommandLine.Help.ColorScheme,
              * CommandLine.Help.Column...)} instead
+             *
+             * @return TextTable
              */
             @Deprecated
             public static TextTable forColumns(Ansi ansi, Column... columns) {
@@ -29858,6 +29888,7 @@ InitialValueState.CACHED;*/
              * @param colorScheme the styles
              * and ANSI mode to use for embedded markup
              * @param columns     columns to construct this TextTable with
+             * @return TextTable
              * @since 4.2
              */
             public static TextTable forColumns(
@@ -29868,6 +29899,8 @@ InitialValueState.CACHED;*/
             /**
              * @see Model.UsageMessageSpec
              * #adjustLineBreaksForWideCJKCharacters()
+             *
+             * @return adjustLineBreaksForWideCJKCharacters
              * @since 4.0
              */
             public boolean isAdjustLineBreaksForWideCJKCharacters() {
@@ -29877,17 +29910,22 @@ InitialValueState.CACHED;*/
             /**
              * @see Model.UsageMessageSpec#adjustLineBreaksForWideCJKCharacters(
              *boolean)
+             *
+             * @param adjustLineBreaksForWideCJKCharacters1
+             * @return adjustLineBreaksForWideCJKCharacters1
              * @since 4.0
              */
             public TextTable setAdjustLineBreaksForWideCJKCharacters(
-                    boolean adjustLineBreaksForWideCJKCharacters) {
+                    boolean adjustLineBreaksForWideCJKCharacters1) {
                 this.adjustLineBreaksForWideCJKCharacters =
-                        adjustLineBreaksForWideCJKCharacters;
+                        adjustLineBreaksForWideCJKCharacters1;
                 return this;
             }
 
             /**
              * The column definitions of this table.
+             *
+             * @return columns.clone
              */
             public Column[] columns() {
                 return columns.clone();
