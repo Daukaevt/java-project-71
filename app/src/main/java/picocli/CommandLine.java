@@ -31048,6 +31048,8 @@ InitialValueState.CACHED;*/
                 /**
                  * Creates and returns a new {@code ColorScheme}
                  * with the values configured on this builder.
+                 * @return a new {@code ColorScheme}
+                 * with the values configured on this builder.
                  */
                 public ColorScheme build() {
                     return new ColorScheme(this);
@@ -31114,7 +31116,7 @@ InitialValueState.CACHED;*/
         private PrintStream stream = System.err;
         private TraceLevel level =
                 TraceLevel.lookup(System.getProperty("picocli.trace"));
-        boolean modified;
+        private boolean modified;
 
         private Tracer() {
         }
@@ -31150,6 +31152,7 @@ InitialValueState.CACHED;*/
 
         /**
          * Returns whether the current trace level is DEBUG (the highest).
+         * @return whether the current trace level is DEBUG (the highest).
          */
         public boolean isDebug() {
             return level.isEnabled(TraceLevel.DEBUG);
@@ -31157,6 +31160,7 @@ InitialValueState.CACHED;*/
 
         /**
          * Returns whether the current trace level is INFO or higher.
+         * @return whether the current trace level is INFO or higher.
          */
         public boolean isInfo() {
             return level.isEnabled(TraceLevel.INFO);
@@ -31164,6 +31168,7 @@ InitialValueState.CACHED;*/
 
         /**
          * Returns whether the current trace level is WARN or higher.
+         * @return whether the current trace level is WARN or higher.
          */
         public boolean isWarn() {
             return level.isEnabled(TraceLevel.WARN);
@@ -31171,6 +31176,7 @@ InitialValueState.CACHED;*/
 
         /**
          * Returns whether the current trace level is OFF (the lowest).
+         * @return whether the current trace level is OFF (the lowest).
          */
         public boolean isOff() {
             return level == TraceLevel.OFF;
@@ -31224,7 +31230,9 @@ InitialValueState.CACHED;*/
          *               the extra arguments
          *               are ignored. The number of arguments
          *               is variable and may be zero.
+         *
          * @see Formatter
+         *
          */
         public void debug(String msg, Object... params) {
             TraceLevel.DEBUG.print(this, msg, params);
@@ -31379,7 +31387,7 @@ InitialValueState.CACHED;*/
 
         /**
          * Constructs a TypeConversionException.
-         *
+         * @param msg
          * @see ITypeConverter#convert(String)
          */
         public TypeConversionException(String msg) {
@@ -31552,6 +31560,10 @@ InitialValueState.CACHED;*/
                     new ArrayList<Model.ArgSpec>(missing));
         }
 
+        /**
+         * get Missing.
+         * @return missing.
+         */
         public List<Model.ArgSpec> getMissing() {
             return missing;
         }
@@ -31668,7 +31680,9 @@ InitialValueState.CACHED;*/
          * Returns {@code true} and prints suggested solutions
          * to the specified stream if such solutions
          * exist, otherwise returns {@code false}.
-         *
+         * @param ex Parameter Exception.
+         * @param out Print Stream.
+         * @return {@code true} | {@code false}.
          * @since 3.3.0
          */
         public static boolean printSuggestions(
@@ -31681,7 +31695,9 @@ InitialValueState.CACHED;*/
          * Returns {@code true} and prints suggested solutions
          * to the specified writer if such solutions
          * exist, otherwise returns {@code false}.
-         *
+         * @param writer Print Writer.
+         * @param ex Parameter Exception.
+         * @return {@code true} | {@code false}.
          * @since 4.0
          */
         public static boolean printSuggestions(
@@ -31705,16 +31721,15 @@ InitialValueState.CACHED;*/
         }
 
         static String quoteElements(List<String> list) {
-            String result = "",
-                    suffix = "";
+            String result = "";
+            String suffix = "";
             int pos;
             for (String element : list) {
                 if (result.length() > 0) {
                     result += ", ";
                 }
                 if (element != null
-                        && (pos =
-                        element.indexOf(" (while processing option:")) >= 0) {
+                        && (pos = element.indexOf(" (while processing option:")) >= 0) {
                     suffix = element.substring(pos);
                     element = element.substring(0, pos);
                 }
