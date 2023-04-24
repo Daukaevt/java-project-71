@@ -30236,7 +30236,7 @@ InitialValueState.CACHED;*/
             /**
              * toString.
              *
-             * @return
+             * @return new StringBuilder()
              */
             public String toString() {
                 return toString(new StringBuilder()).toString();
@@ -30283,7 +30283,7 @@ InitialValueState.CACHED;*/
         public static class Column {
 
             /**
-             * Column width in characters
+             * Column width in characters.
              *
              */
             private final int width;
@@ -30296,8 +30296,7 @@ InitialValueState.CACHED;*/
             private final Overflow overflow;
 
             /**
-             * Indent (number of empty spaces at the start
-             * of the column preceding the text value)
+             * Indent (number of empty spaces at the start of the column preceding the text value).
              *
              */
             private int indent;
@@ -30305,7 +30304,8 @@ InitialValueState.CACHED;*/
             /**
              * equals.
              * @param obj
-             * @return
+             *
+             * @return obj instanceof Column
              */
             public boolean equals(Object obj) {
                 return obj instanceof Column && ((Column) obj).width == width
@@ -30327,13 +30327,19 @@ InitialValueState.CACHED;*/
             }
 
             /**
-             * hashCode
+             * hashCode.
+             *
              * @return overflow.hashCode()
              */
             public int hashCode() {
                 return SEVENTHEEN * width + THIRTY_SEVEN * indent + THIRTY_SEVEN * overflow.hashCode();
             }
 
+            /**
+             * toString.
+             *
+             * @return String.format
+             */
             public String toString() {
                 return String.format("Column[width=%d, indent=%d, overflow=%s]",
                         width, indent, overflow);
@@ -30703,9 +30709,14 @@ InitialValueState.CACHED;*/
                         other.markupMap);
             }
 
+            /**
+             * hashCode.
+             *
+             * @return result
+             */
             @Override
             public int hashCode() {
-                int result = 17;
+                int result = SEVENTHEEN;
                 result = result * THIRTY_SEVEN + ansi.hashCode();
                 result = result * THIRTY_SEVEN + commandStyles.hashCode();
                 result = result * THIRTY_SEVEN + optionStyles.hashCode();
@@ -30979,7 +30990,7 @@ InitialValueState.CACHED;*/
                  *
                  * @return this color scheme builder to enable method
                  * chaining for a more fluent API
-                 * @param newValue.
+                 * @param newValue
                  * @since 4.2
                  */
                 public ColorScheme.Builder customMarkupMap(
@@ -31272,7 +31283,7 @@ InitialValueState.CACHED;*/
          *               are ignored. The number of arguments
          *               is variable and may be zero.
          *
-         * @see Formatter
+         * @see Formatter_
          */
         public void warn(String msg, Object... params) {
             TraceLevel.WARN.print(this, msg, params);
@@ -31290,7 +31301,7 @@ InitialValueState.CACHED;*/
          *               the extra arguments are ignored.
          *               The number of arguments is variable and may be zero.
          *
-         * @see Formatter
+         * @see Formatter_
          */
         public void info(String msg, Object... params) {
             TraceLevel.INFO.print(this, msg, params);
@@ -31308,7 +31319,7 @@ InitialValueState.CACHED;*/
          *               are ignored. The number of arguments
          *               is variable and may be zero.
          *
-         * @see Formatter
+         * @see Formatter_
          *
          */
         public void debug(String msg, Object... params) {
