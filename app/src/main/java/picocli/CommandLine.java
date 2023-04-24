@@ -243,6 +243,8 @@ public class CommandLine {
     public static final String VERSION = "4.7.1-SNAPSHOT";
 
     public static final int HIEST_WORD_CHAR = 255;
+
+    public static final int MIN_FOR_MOST_SIMILAR = 3;
     private static final Tracer TRACER = new Tracer();
 
     private CommandSpec commandSpec;
@@ -31724,7 +31726,7 @@ InitialValueState.CACHED;*/
 
         /**
          * Returns the unmatched command line arguments.
-         *
+         * @return the unmatched command line arguments.
          * @since 3.3.0
          */
         public List<String> getUnmatched() {
@@ -31735,7 +31737,7 @@ InitialValueState.CACHED;*/
          * Returns {@code true} if the
          * first unmatched command line arguments
          * resembles an option, {@code false} otherwise.
-         *
+         * @return {@code true} | {@code false}.
          * @since 3.3.0
          */
         public boolean isUnknownOption() {
@@ -31746,7 +31748,8 @@ InitialValueState.CACHED;*/
          * Returns {@code true} and prints suggested solutions
          * to the specified stream if such solutions
          * exist, otherwise returns {@code false}.
-         *
+         * @param out Print Stream
+         * @return  {@code true} and prints suggested solutions.
          * @since 3.3.0
          */
         public boolean printSuggestions(PrintStream out) {
@@ -31762,7 +31765,8 @@ InitialValueState.CACHED;*/
          * Returns {@code true} and prints suggested solutions
          * to the specified stream if such solutions
          * exist, otherwise returns {@code false}.
-         *
+         * @param writer Print Writer
+         * @return {@code true} and prints suggested solutions.
          * @since 4.0
          */
         public boolean printSuggestions(PrintWriter writer) {
@@ -31799,7 +31803,7 @@ InitialValueState.CACHED;*/
         /**
          * Returns suggested solutions if such solutions exist,
          * otherwise returns an empty list.
-         *
+         * @return suggested solutions.
          * @since 3.3.0
          */
         public List<String> getSuggestions() {
@@ -31823,7 +31827,7 @@ InitialValueState.CACHED;*/
                 }
                 List<String> mostSimilar =
                         CosineSimilarity.mostSimilar(arg, visibleSubs);
-                return mostSimilar.subList(0, Math.min(3, mostSimilar.size()));
+                return mostSimilar.subList(0, Math.min(MIN_FOR_MOST_SIMILAR, mostSimilar.size()));
             }
             return Collections.emptyList();
         }
@@ -31862,7 +31866,7 @@ InitialValueState.CACHED;*/
         /**
          * Returns the {@link Model.ArgSpec}
          * for the option which was being overwritten.
-         *
+         * @return overwrittenArg.
          * @since 3.8
          */
         public Model.ArgSpec getOverwritten() {
@@ -32095,6 +32099,12 @@ InitialValueState.CACHED;*/
             return loadProperties(commandSpec.parent());
         }
 
+        /**
+         * get default value.
+         * @param argSpec the option or positional parameter, never {@code null}
+         * @return default value.
+         * @throws Exception
+         */
         public String defaultValue(Model.ArgSpec argSpec) throws Exception {
             if (properties == null) {
                 properties = loadProperties(argSpec.command());
