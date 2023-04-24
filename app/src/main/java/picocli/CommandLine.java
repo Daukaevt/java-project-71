@@ -245,6 +245,11 @@ public class CommandLine {
     public static final int HIEST_WORD_CHAR = 255;
 
     public static final int MIN_FOR_MOST_SIMILAR = 3;
+
+    public static final int SEVENTHEEN = 17;
+
+    public static final int THIRTY_SEVEN = 37;
+
     private static final Tracer TRACER = new Tracer();
 
     private CommandSpec commandSpec;
@@ -30119,6 +30124,7 @@ InitialValueState.CACHED;*/
                             }
                         } while (value.length > 0);
                         return new Cell(col, row);
+                    default:
                 }
                 throw new IllegalStateException(column.overflow.toString());
             }
@@ -30167,8 +30173,8 @@ InitialValueState.CACHED;*/
             }
 
             static class Count {
-                int charCount;
-                int columnCount;
+                private int charCount;
+                private int columnCount;
             }
 
             private int copy(
@@ -30227,6 +30233,11 @@ InitialValueState.CACHED;*/
                 count.charCount += length;
             }
 
+            /**
+             * toString.
+             *
+             * @return
+             */
             public String toString() {
                 return toString(new StringBuilder()).toString();
             }
@@ -30239,12 +30250,14 @@ InitialValueState.CACHED;*/
             public static class Cell {
                 /**
                  * Table column index (zero based).
+                 *
                  */
-                public final int column;
+                private final int column;
                 /**
                  * Table row index (zero based).
+                 *
                  */
-                public final int row;
+                private final int row;
 
                 /**
                  * Constructs a new Cell
@@ -30265,25 +30278,35 @@ InitialValueState.CACHED;*/
          * leading number of spaces in a column before the value) and
          * {@linkplain Overflow Overflow} policy
          * of a column in a {@linkplain TextTable TextTable}.
+         *
          */
         public static class Column {
 
             /**
              * Column width in characters
+             *
              */
-            public final int width;
+            private final int width;
+
             /**
              * Policy that determines how to
              * handle values larger than the column width.
+             *
              */
-            public final Overflow overflow;
-            /**
-             * Indent (
-             * number of empty spaces at the start
-             * of the column preceding the text value)
-             */
-            public int indent;
+            private final Overflow overflow;
 
+            /**
+             * Indent (number of empty spaces at the start
+             * of the column preceding the text value)
+             *
+             */
+            private int indent;
+
+            /**
+             * equals.
+             * @param obj
+             * @return
+             */
             public boolean equals(Object obj) {
                 return obj instanceof Column && ((Column) obj).width == width
                         && (
@@ -30291,14 +30314,24 @@ InitialValueState.CACHED;*/
                         && ((Column) obj).overflow == overflow;
             }
 
+            /**
+             * Column.
+             * @param width
+             * @param indent
+             * @param overflow
+             */
             public Column(int width, int indent, Overflow overflow) {
                 this.width = width;
                 this.indent = indent;
                 this.overflow = Assert.notNull(overflow, "overflow");
             }
 
+            /**
+             * hashCode
+             * @return overflow.hashCode()
+             */
             public int hashCode() {
-                return 17 * width + 37 * indent + 37 * overflow.hashCode();
+                return SEVENTHEEN * width + THIRTY_SEVEN * indent + THIRTY_SEVEN * overflow.hashCode();
             }
 
             public String toString() {
@@ -30374,8 +30407,8 @@ InitialValueState.CACHED;*/
                         new ArrayList<IStyle>(builder.stackTraceStyles()));
                 markupMap = builder.markupMap == null
                         ? null
-                        : Collections.unmodifiableMap(
-                        new HashMap<String, IStyle>(builder.markupMap));
+                        : Collections.unmodifiableMap(new HashMap<String, IStyle>(
+                                builder.markupMap));
             }
 
             /**
@@ -30499,6 +30532,7 @@ InitialValueState.CACHED;*/
 
             /**
              * Returns the {@code Ansi} setting of this color scheme.
+             * @return the {@code Ansi} setting of this color scheme.
              */
             public Ansi ansi() {
                 return ansi;
@@ -30506,6 +30540,8 @@ InitialValueState.CACHED;*/
 
             /**
              * Returns the registered
+             * styles for commands in this color scheme.
+             * @return the registered
              * styles for commands in this color scheme.
              *
              * @since 4.0
@@ -30517,6 +30553,8 @@ InitialValueState.CACHED;*/
             /**
              * Returns the registered
              * styles for options in this color scheme.
+             * @return the registered
+             * styles for options in this color scheme.
              *
              * @since 4.0
              */
@@ -30526,6 +30564,8 @@ InitialValueState.CACHED;*/
 
             /**
              * Returns the registered styles
+             * for positional parameters in this color scheme.
+             * @return the registered styles
              * for positional parameters in this color scheme.
              *
              * @since 4.0
@@ -30537,6 +30577,8 @@ InitialValueState.CACHED;*/
             /**
              * Returns the registered styles
              * for option parameters in this color scheme.
+             * @return the registered styles
+             * for option parameters in this color scheme.
              *
              * @since 4.0
              */
@@ -30547,6 +30589,8 @@ InitialValueState.CACHED;*/
             /**
              * Returns the registered
              * styles for errors in this color scheme.
+             * @return the registered
+             * styles for errors in this color scheme.
              *
              * @since 4.3
              */
@@ -30556,6 +30600,8 @@ InitialValueState.CACHED;*/
 
             /**
              * Returns the registered styles
+             * for stack traces in this color scheme.
+             * @return the registered styles
              * for stack traces in this color scheme.
              *
              * @since 4.3
@@ -30572,6 +30618,7 @@ InitialValueState.CACHED;*/
              * {@link IStyle} objects in this color scheme.
              * By default this returns an empty map,
              * unless a custom map was configured.
+             * @return the custom mapping from markup names.
              *
              * @since 4.2
              */
@@ -30590,8 +30637,8 @@ InitialValueState.CACHED;*/
              *
              * @param commaSeparatedCodes
              * a string with a comma-separated list
-             *                            of markup styles (
-            for example, {@code "bold,underline,bg_red"}
+             * of markup styles (for example, {@code "bold,underline,bg_red"}
+             * @return an array of {@link IStyle} objects.
              * @since 4.2
              */
             public IStyle[] parse(String commaSeparatedCodes) {
@@ -30630,6 +30677,11 @@ InitialValueState.CACHED;*/
                         ? markupMap.get("reset") : EMPTY_STYLE;
             }
 
+            /**
+             * equals.
+             * @param obj
+             * @return ansi.equals(other.ansi)
+             */
             @Override
             public boolean equals(Object obj) {
                 if (this == obj) {
@@ -30654,18 +30706,21 @@ InitialValueState.CACHED;*/
             @Override
             public int hashCode() {
                 int result = 17;
-                result = result * 37 + ansi.hashCode();
-                result = result * 37 + commandStyles.hashCode();
-                result = result * 37 + optionStyles.hashCode();
-                result = result * 37 + parameterStyles.hashCode();
-                result = result * 37 + optionParamStyles.hashCode();
-                result = result * 37 + errorStyles.hashCode();
-                result = result * 37 + stackTraceStyles.hashCode();
-                result = result * 37 + (markupMap == null
+                result = result * THIRTY_SEVEN + ansi.hashCode();
+                result = result * THIRTY_SEVEN + commandStyles.hashCode();
+                result = result * THIRTY_SEVEN + optionStyles.hashCode();
+                result = result * THIRTY_SEVEN + parameterStyles.hashCode();
+                result = result * THIRTY_SEVEN + optionParamStyles.hashCode();
+                result = result * THIRTY_SEVEN + errorStyles.hashCode();
+                result = result * THIRTY_SEVEN + stackTraceStyles.hashCode();
+                result = result * THIRTY_SEVEN + (markupMap == null
                         ? 0 : markupMap.hashCode());
                 return result;
             }
-
+            /**
+             * toString.
+             * @return string.
+             */
             @Override
             public String toString() {
                 return "ColorScheme[ansi=" + ansi + ", commands="
@@ -30721,6 +30776,10 @@ InitialValueState.CACHED;*/
              * <p>
              * Equivalent to
              * {@code this.ansi().new Text(stringWithMarkup, this)}.
+             * @param stringWithMarkup
+             * @return a new Text object for this ColorScheme,
+             * encapsulating the specified string
+             * which may contain markup
              *
              * @see Ansi#text(String)
              * @since 4.2
@@ -30731,8 +30790,7 @@ InitialValueState.CACHED;*/
 
             /**
              * Returns a String where any markup like
-             * {@code @|bg(
-             * red),white,underline some text|@} is
+             * {@code @|bg(red),white,underline some text|@} is
              * {@linkplain ColorScheme#parse(String) converted}
              * to the styles defined in this ColorScheme
              * (
@@ -30743,6 +30801,8 @@ InitialValueState.CACHED;*/
              * Equivalent to {@code this.ansi().new
              * Text(stringWithMarkup, this).toString()}.
              *
+             * @param stringWithMarkup
+             * @return {@linkplain ColorScheme#parse(String) converted}
              * @see Ansi#string(String)
              * @since 4.2
              */
@@ -30768,7 +30828,7 @@ InitialValueState.CACHED;*/
                         new ArrayList<IStyle>();
                 private final List<IStyle> stackTraceStyles =
                         new ArrayList<IStyle>();
-                private Ansi ansi = Ansi.AUTO;
+                private Ansi ansi1 = Ansi.AUTO;
                 private Map<String, IStyle> markupMap;
 
                 /**
@@ -30780,18 +30840,20 @@ InitialValueState.CACHED;*/
                 /**
                  * Constructs an empty color scheme builder
                  * with the specified Ansi value.
+                 * @param ansi
                  */
                 public Builder(Ansi ansi) {
-                    this.ansi = Assert.notNull(ansi, "ansi");
+                    this.ansi1 = Assert.notNull(ansi, "ansi");
                 }
 
                 /**
                  * Constructs a color scheme builder with all attributes
                  * copied from the specified color scheme.
+                 * @param existing
                  */
                 public Builder(ColorScheme existing) {
                     Assert.notNull(existing, "colorScheme");
-                    this.ansi = Assert.notNull(existing.ansi(), "ansi");
+                    this.ansi1 = Assert.notNull(existing.ansi(), "ansi");
                     this.commandStyles.addAll(existing.commandStyles());
                     this.optionStyles.addAll(existing.optionStyles());
                     this.parameterStyles.addAll(existing.parameterStyles());
@@ -30807,22 +30869,28 @@ InitialValueState.CACHED;*/
                 /**
                  * Returns the {@code Ansi}
                  * setting of this color scheme builder.
+                 * @return {@code Ansi}
                  */
                 public Ansi ansi() {
-                    return ansi;
+                    return ansi1;
                 }
 
                 /**
                  * Set the {@code Ansi}
                  * setting of this color scheme builder.
+                 * @param ansi
+                 * @return {@code Ansi}.
                  */
                 public ColorScheme.Builder ansi(Ansi ansi) {
-                    this.ansi = Assert.notNull(ansi, "ansi");
+                    this.ansi1 = Assert.notNull(ansi, "ansi");
+                    //this.ansi = Assert.notNull(ansi, "ansi");
                     return this;
                 }
 
                 /**
                  * Returns the registered styles
+                 * for commands in this color scheme builder.
+                 * @return the registered styles
                  * for commands in this color scheme builder.
                  */
                 public List<IStyle> commandStyles() {
@@ -30832,6 +30900,8 @@ InitialValueState.CACHED;*/
                 /**
                  * Returns the registered styles
                  * for options in this color scheme builder.
+                 * @return the registered styles
+                 * for options in this color scheme builder.
                  */
                 public List<IStyle> optionStyles() {
                     return optionStyles;
@@ -30839,6 +30909,8 @@ InitialValueState.CACHED;*/
 
                 /**
                  * Returns the registered styles
+                 * for positional parameters in this color scheme builder.
+                 * @return the registered styles
                  * for positional parameters in this color scheme builder.
                  */
                 public List<IStyle> parameterStyles() {
@@ -30848,6 +30920,8 @@ InitialValueState.CACHED;*/
                 /**
                  * Returns the registered styles
                  * for option parameters in this color scheme builder.
+                 * @return the registered styles
+                 * for option parameters in this color scheme builder.
                  */
                 public List<IStyle> optionParamStyles() {
                     return optionParamStyles;
@@ -30856,7 +30930,8 @@ InitialValueState.CACHED;*/
                 /**
                  * Returns the registered styles
                  * for errors in this color scheme builder.
-                 *
+                 * @return the registered styles
+                 * for errors in this color scheme builder.
                  * @since 4.3
                  */
                 public List<IStyle> errorStyles() {
@@ -30866,7 +30941,8 @@ InitialValueState.CACHED;*/
                 /**
                  * Returns the registered styles
                  * for stack traces in this color scheme builder.
-                 *
+                 * @return the registered styles
+                 * for stack traces in this color scheme builder.
                  * @since 4.3
                  */
                 public List<IStyle> stackTraceStyles() {
@@ -30884,7 +30960,7 @@ InitialValueState.CACHED;*/
                  * etc) to {@link IStyle} objects in this color scheme.
                  * By default this returns
                  * {@code null}, unless a custom map was configured.
-                 *
+                 * @return the custom mapping from markup names.
                  * @since 4.2
                  */
                 public Map<String, IStyle> customMarkupMap() {
@@ -30903,6 +30979,7 @@ InitialValueState.CACHED;*/
                  *
                  * @return this color scheme builder to enable method
                  * chaining for a more fluent API
+                 * @param newValue.
                  * @since 4.2
                  */
                 public ColorScheme.Builder customMarkupMap(
