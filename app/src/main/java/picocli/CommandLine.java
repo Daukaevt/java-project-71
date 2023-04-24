@@ -29048,7 +29048,7 @@ InitialValueState.CACHED;*/
          * "",
          * param.description()[i]}}.</p>
          */
-        final public static class DefaultParameterRenderer implements IParameterRenderer {
+        public static final class DefaultParameterRenderer implements IParameterRenderer {
             private final String requiredMarker;
             private final boolean showDefaultValues;
 
@@ -29110,7 +29110,7 @@ InitialValueState.CACHED;*/
          * "...") to indicate that any number of values is allowed
          * for options or parameters with variable arity.
          */
-        final public static class DefaultParamLabelRenderer implements IParamLabelRenderer {
+        public static final class DefaultParamLabelRenderer implements IParamLabelRenderer {
             private final CommandSpec commandSpec;
 
             /**
