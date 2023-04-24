@@ -31723,7 +31723,7 @@ InitialValueState.CACHED;*/
         static String quoteElements(List<String> list) {
             String result = "";
             String suffix = "";
-            int pos;
+            int pos = 0;
             for (String element : list) {
                 if (result.length() > 0) {
                     result += ", ";
