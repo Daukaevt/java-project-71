@@ -31725,11 +31725,12 @@ InitialValueState.CACHED;*/
             String suffix = "";
             int pos = 0;
             for (String element : list) {
+                pos = element.indexOf(" (while processing option:");
                 if (result.length() > 0) {
                     result += ", ";
                 }
                 if (element != null
-                        && (pos = element.indexOf(" (while processing option:")) >= 0) {
+                        && pos >= 0) {
                     suffix = element.substring(pos);
                     element = element.substring(0, pos);
                 }
