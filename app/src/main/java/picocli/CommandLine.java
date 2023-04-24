@@ -29048,7 +29048,7 @@ InitialValueState.CACHED;*/
          * "",
          * param.description()[i]}}.</p>
          */
-        final static class DefaultParameterRenderer implements IParameterRenderer {
+        final private static class DefaultParameterRenderer implements IParameterRenderer {
             private final String requiredMarker;
             private final boolean showDefaultValues;
 
@@ -29076,11 +29076,11 @@ InitialValueState.CACHED;*/
                         .internalShowDefaultValue(showDefaultValues)};
                 List<Text[]> result = new ArrayList<Text[]>();
                 String[] description = param.description();
-                Text[] descriptionFirstLines =
-                        createDescriptionFirstLines(
-                                scheme, param, description, showDefault);
-                result.add(new Text[]{requiredParameter,
-                        empty, empty, label, descriptionFirstLines[0]});
+                Text[] descriptionFirstLines = createDescriptionFirstLines(
+                        scheme, param, description, showDefault);
+                result.add(new Text[]{
+                        requiredParameter, empty, empty, label, descriptionFirstLines[0]
+                });
                 for (int i = 1; i < descriptionFirstLines.length; i++) {
                     result.add(new Text[]{empty, empty, empty, empty,
                             descriptionFirstLines[i]});
@@ -29089,8 +29089,8 @@ InitialValueState.CACHED;*/
                     Text[] descriptionNextLines =
                             scheme.ansi(
                             ).new Text(description[i], scheme).splitLines();
-                    for (Text line : descriptionNextLines) {result.add(new Text[]{empty,
-                            empty, empty, empty, line});
+                    for (Text line : descriptionNextLines) {
+                        result.add(new Text[]{empty,empty, empty, empty, line});
                     }
                 }
                 if (showDefault[0]) {
@@ -29112,7 +29112,7 @@ InitialValueState.CACHED;*/
          * "...") to indicate that any number of values is allowed
          * for options or parameters with variable arity.
          */
-        final static class DefaultParamLabelRenderer implements IParamLabelRenderer {
+        final private static class DefaultParamLabelRenderer implements IParamLabelRenderer {
             private final CommandSpec commandSpec;
 
             /**
