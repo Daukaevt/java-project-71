@@ -244,15 +244,27 @@ public class CommandLine {
 
     public static final int HIEST_WORD_CHAR = 255;
 
-    public static final int MIN_FOR_MOST_SIMILAR = 3;
+    public static final int THREE = 3;
 
     public static final int FOUR = 4;
 
     public static final int FIVE = 5;
 
+    public static final int SIX = 6;
+
+    public static final int SIXTHEEN  = 16;
+
     public static final int SEVENTHEEN = 17;
 
-    public static final int THIRTY_SEVEN = 37;
+    public static final int TWENTHY = 20;
+
+    public static final int THIRTHY_SIX = 36;
+
+    public static final int THIRTHY_SEVEN = 37;
+
+    public static final int THIRTHY_EIGTH  = 38;
+
+    public static final int FORTHY_EIGTH = 48;
 
     private static final Tracer TRACER = new Tracer();
 
@@ -20062,7 +20074,7 @@ InitialValueState.CACHED;*/
                             sortableComponents,
                             new Help.SortByOrder<IOrdered>());
                     for (IOrdered ordered : sortableComponents) {
-                        String prefix = synopsis.length > 0 ? infix : "";
+                        String prefix = synopsis.length1 > 0 ? infix : "";
                         if (ordered instanceof OptionSpec) {
                             synopsis =
                                     concatOptionText(
@@ -20079,7 +20091,7 @@ InitialValueState.CACHED;*/
                         }
                     }
                     for (PositionalParamSpec positional : remainder) {
-                        String prefix = synopsis.length > 0 ? infix : "";
+                        String prefix = synopsis.length1 > 0 ? infix : "";
                         synopsis =
                                 concatPositionalText(
                                         prefix,
@@ -20090,7 +20102,7 @@ InitialValueState.CACHED;*/
                     }
                 } else {
                     for (ArgSpec arg : args()) {
-                        String prefix = synopsis.length > 0 ? infix : "";
+                        String prefix = synopsis.length1 > 0 ? infix : "";
                         if (arg instanceof OptionSpec) {
                             synopsis =
                                     concatOptionText(
@@ -20109,7 +20121,7 @@ InitialValueState.CACHED;*/
                         outparam_groupArgs.add(arg);
                     }
                     for (ArgGroupSpec subgroup : subgroups()) {
-                        if (synopsis.length > 0) {
+                        if (synopsis.length1 > 0) {
                             synopsis = synopsis.concat(infix);
                         }
                         synopsis =
@@ -27596,7 +27608,7 @@ InitialValueState.CACHED;*/
                                 option, parameterLabelRenderer(), aColorScheme);
                 int len =
                         cjk ? values[0][3].getCJKAdjustedLength(
-                        ) : values[0][3].length;
+                        ) : values[0][3].length1;
                 if (len < longOptionsColWidth) {
                     max = Math.max(max, len);
                 }
@@ -27623,7 +27635,7 @@ InitialValueState.CACHED;*/
                         ).renderParameterLabel(positional,
                                 aColorScheme.ansi(),
                                 aColorScheme.parameterStyles);
-                int len = cjk ? label.getCJKAdjustedLength() : label.length;
+                int len = cjk ? label.getCJKAdjustedLength() : label.length1;
                 if (len < longOptionsColWidth) {
                     max = Math.max(max, len);
                 }
@@ -28225,11 +28237,11 @@ InitialValueState.CACHED;*/
                 private final int color;
 
                 Palette256Color(boolean foreground, String color) {
-                    this.fgbg = foreground ? 38 : 48;
+                    this.fgbg = foreground ? THIRTHY_EIGTH : FORTHY_EIGTH;
                     String[] rgb = color.split(";");
-                    if (rgb.length == 3) {
-                        this.color = 16 + 36 * Integer.decode(rgb[0])
-                                + 6 * Integer.decode(rgb[1])
+                    if (rgb.length == THREE) {
+                        this.color = SIXTHEEN + THIRTHY_SIX * Integer.decode(rgb[0])
+                                + SIX * Integer.decode(rgb[1])
                                 + Integer.decode(rgb[2]);
                     } else {
                         this.color = Integer.decode(color);
@@ -28255,13 +28267,15 @@ InitialValueState.CACHED;*/
                 }
 
                 public int hashCode() {
-                    return (17 + fgbg) * 37 + color;
+                    return (SEVENTHEEN + fgbg) * THIRTHY_SEVEN + color;
                 }
             }
 
             private static class StyledSection {
-                int startIndex, length;
-                String startStyles, endStyles;
+                private int startIndex;
+                private int length;
+                private String startStyles;
+                private String endStyles;
 
                 StyledSection(int start,
                               int len,
@@ -28295,7 +28309,7 @@ InitialValueState.CACHED;*/
             public class Text implements Cloneable {
                 private final int maxLength;
                 private int from;
-                private int length;
+                private int length1;
                 private StringBuilder plain = new StringBuilder();
                 private List<StyledSection> sections =
                         new ArrayList<StyledSection>();
@@ -28327,12 +28341,13 @@ InitialValueState.CACHED;*/
                 /**
                  * Copy constructor.
                  *
+                 * @param other
                  * @since 3.9
                  */
                 public Text(Text other) {
                     this.maxLength = other.maxLength;
                     this.from = other.from;
-                    this.length = other.length;
+                    this.length1 = other.length1;
                     this.plain = new StringBuilder(other.plain);
                     this.sections =
                             new ArrayList<StyledSection>(other.sections);
@@ -28371,18 +28386,18 @@ InitialValueState.CACHED;*/
                         if (j == -1) {
                             if (i == 0) {
                                 plain.append(input);
-                                length = plain.length();
+                                length1 = plain.length();
                                 return;
                             }
                             plain.append(input.substring(i));
-                            length = plain.length();
+                            length1 = plain.length();
                             return;
                         }
                         plain.append(input, i, j);
                         int k = input.indexOf("|@", j);
                         if (k == -1) {
                             plain.append(input);
-                            length = plain.length();
+                            length1 = plain.length();
                             return;
                         }
 
@@ -28391,7 +28406,7 @@ InitialValueState.CACHED;*/
                         String[] items = spec.split(" ", 2);
                         if (items.length == 1) {
                             plain.append(input);
-                            length = plain.length();
+                            length1 = plain.length();
                             return;
                         }
 
@@ -28409,23 +28424,30 @@ InitialValueState.CACHED;*/
 
                 private void addStyledSection(
                         int start,
-                        int length,
+                        int length1,
                         String startStyle,
                         String endStyle) {
-                    sections.add(
-                            new StyledSection(start,
-                                    length,
-                                    startStyle,
-                                    endStyle));
+                    sections.add(new StyledSection(start, length1, startStyle, endStyle));
                 }
 
+                /**
+                 * clone.
+                 *
+                 * @return Text
+                 */
                 public Object clone() {
                     return new Text(this);
                 }
 
+                /**
+                 * split Lines.
+                 *
+                 * @return result.toArray
+                 */
                 public Text[] splitLines() {
                     List<Text> result = new ArrayList<Text>();
-                    int start = 0, end = 0;
+                    int start = 0;
+                    int end = 0;
                     for (int i = 0; i < plain.length(); i++, end = i) {
                         char c = plain.charAt(i);
                         boolean eol = c == '\n';
@@ -28455,7 +28477,7 @@ InitialValueState.CACHED;*/
                  * instance that is a substring of this Text
                  */
                 public Text substring(int start) {
-                    return substring(start, length);
+                    return substring(start, length1);
                 }
 
                 /**
@@ -28472,10 +28494,10 @@ InitialValueState.CACHED;*/
                 public Text substring(int start, int end) {
                     Text result = (Text) clone();
                     result.from = from + start;
-                    result.length = end - start;
+                    result.length1 = end - start;
                     result.sections.clear();
                     for (StyledSection section : this.sections) {
-                        if (section.startIndex >= result.from + result.length) {
+                        if (section.startIndex >= result.from + result.length1) {
                             continue;
                         }
                         if (section.startIndex + section.length
@@ -28488,7 +28510,10 @@ InitialValueState.CACHED;*/
                 }
 
                 /**
-                 * @deprecated use {@link #concat(String)} instead
+                 * @deprecated use {@link #concat(String)} instead.
+                 *
+                 * @param string
+                 * @return concat(string)
                  */
                 @Deprecated
                 public Text append(String string) {
@@ -28498,6 +28523,9 @@ InitialValueState.CACHED;*/
                 /**
                  * @deprecated use {@link #concat(
                  *CommandLine.Help.Ansi.Text)} instead
+                 *
+                 * @param text
+                 * @return concat(text)
                  */
                 @Deprecated
                 public Text append(Text text) {
@@ -28532,7 +28560,7 @@ InitialValueState.CACHED;*/
                     Text result = (Text) clone();
                     result.plain =
                             new StringBuilder(plain.substring(from,
-                                    from + length));
+                                    from + length1));
                     result.from = 0;
                     result.sections = new ArrayList<StyledSection>();
                     for (StyledSection section : sections) {
@@ -28542,13 +28570,13 @@ InitialValueState.CACHED;*/
                     result.plain.append(
                             other.plain.toString(),
                             other.from,
-                            other.from + other.length);
+                            other.from + other.length1);
                     for (StyledSection section : other.sections) {
                         int index =
-                                result.length + section.startIndex - other.from;
+                                result.length1 + section.startIndex - other.from;
                         result.sections.add(section.withStartIndex(index));
                     }
-                    result.length = result.plain.length();
+                    result.length1 = result.plain.length();
                     return result;
                 }
 
@@ -28556,30 +28584,30 @@ InitialValueState.CACHED;*/
                  * Copies the specified substring of this
                  * Text into the specified destination, preserving the markup.
                  *
-                 * @param from        start of the substring
+                 * @param from1        start of the substring
                  * @param length      length of the substring
                  * @param destination destination Text to modify
                  * @param offset      indentation (padding)
                  */
                 public void getStyledChars(
-                        int from, int length, Text destination, int offset) {
-                    if (destination.length < offset) {
-                        for (int i = destination.length; i < offset; i++) {
+                        int from1, int length, Text destination, int offset) {
+                    if (destination.length1 < offset) {
+                        for (int i = destination.length1; i < offset; i++) {
                             destination.plain.append(' ');
                         }
-                        destination.length = offset;
+                        destination.length1 = offset;
                     }
                     for (StyledSection section : sections) {
-                        if ((section.startIndex - from) + section.length >= 0) {
+                        if ((section.startIndex - from1) + section.length >= 0) {
                             destination.sections.add(section.withStartIndex(
                                     section.startIndex
-                                            - from + destination.length));
+                                            - from1 + destination.length1));
                         }
                     }
                     destination.plain.append(plain.toString(),
-                            from,
-                            from + length);
-                    destination.length = destination.plain.length();
+                            from1,
+                            from1 + length);
+                    destination.length1 = destination.plain.length();
                 }
 
                 /**
@@ -28588,13 +28616,24 @@ InitialValueState.CACHED;*/
                  * @return the plain text without any formatting
                  */
                 public String plainString() {
-                    return plain.substring(from, from + length);
+                    return plain.substring(from, from + length1);
                 }
 
+                /**
+                 * equals.
+                 *
+                 * @param obj
+                 * @return toString().equals obj
+                 */
                 public boolean equals(Object obj) {
                     return toString().equals(String.valueOf(obj));
                 }
 
+                /**
+                 * hashCode.
+                 *
+                 * @return toString().hashCode()
+                 */
                 public int hashCode() {
                     return toString().hashCode();
                 }
@@ -28612,16 +28651,16 @@ InitialValueState.CACHED;*/
                  */
                 public String toString() {
                     if (!Ansi.this.enabled()) {
-                        return plain.substring(from, from + length);
+                        return plain.substring(from, from + length1);
                     }
-                    if (length == 0) {
+                    if (length1 == 0) {
                         return "";
                     }
                     StringBuilder sb =
                             new StringBuilder(
-                                    plain.length() + 20 * sections.size());
+                                    plain.length() + TWENTHY * sections.size());
                     StyledSection current = null;
-                    int end = Math.min(from + length, plain.length());
+                    int end = Math.min(from + length1, plain.length());
                     for (int i = from; i < end; i++) {
                         StyledSection section = findSectionContaining(i);
                         if (section != current) {
@@ -28660,7 +28699,7 @@ InitialValueState.CACHED;*/
                  * @since 4.0
                  */
                 public int getCJKAdjustedLength() {
-                    return getCJKAdjustedLength(from, length);
+                    return getCJKAdjustedLength(from, length1);
                 }
 
                 /**
@@ -28685,7 +28724,7 @@ InitialValueState.CACHED;*/
                     while (i < lengthOf.length()) {
                         int codePoint;
                         char c1 = lengthOf.charAt(i++);
-                        if (!Character.isHighSurrogate(c1) || i >= length) {
+                        if (!Character.isHighSurrogate(c1) || i >= length1) {
                             codePoint = c1;
                         } else {
                             char c2 = lengthOf.charAt(i);
@@ -28803,15 +28842,10 @@ InitialValueState.CACHED;*/
 
         private static void addTrailingDefaultLine(
                 List<Text[]> result, Model.ArgSpec arg, ColorScheme scheme) {
-            Text EMPTY = Ansi.EMPTY_TEXT;
-            result.add(
-                    new Text[]{EMPTY,
-                            EMPTY,
-                            EMPTY,
-                            EMPTY,
-                            scheme.ansi().new Text("  Default: "
-                                    + arg.defaultValueString(true),
-                                    scheme)});
+            Text empty = Ansi.EMPTY_TEXT;
+            result.add(new Text[]{empty, empty, empty,
+                    empty, scheme.ansi().new Text("  Default: "
+                    + arg.defaultValueString(true), scheme)});
         }
 
         /**
@@ -28844,7 +28878,8 @@ InitialValueState.CACHED;*/
             private final boolean showDefaultValues;
             private String sep;
 
-            public DefaultOptionRenderer(
+            DefaultOptionRenderer(
+            //public DefaultOptionRenderer(
                     boolean showDefaultValues, String requiredMarker) {
                 this.showDefaultValues = showDefaultValues;
                 this.requiredMarker =
@@ -28907,7 +28942,7 @@ InitialValueState.CACHED;*/
 
                 // if no long option, fill in the space between
                 // the short option name and the param label value
-                if (paramLabelText.length > 0 && longOption.length() == 0) {
+                if (paramLabelText.length1 > 0 && longOption.length() == 0) {
                     sep = renderer.separator();
                     // #181 paramLabelText may be =LABEL or [=LABEL...]
                     int sepStart = paramLabelText.plainString().indexOf(sep);
@@ -28926,39 +28961,24 @@ InitialValueState.CACHED;*/
                     String requiredOption,
                     String shortOption,
                     Text longOptionText) {
-                Text EMPTY = Ansi.EMPTY_TEXT;
+                Text empty = Ansi.EMPTY_TEXT;
                 boolean[] showDefault =
                         {option.internalShowDefaultValue(showDefaultValues)};
                 List<Text[]> result = new ArrayList<Text[]>();
                 String[] description = option.description();
-                Text[] descriptionFirstLines =
-                        createDescriptionFirstLines(
-                                scheme, option, description, showDefault);
-                result.add(
-                        new Text[]{scheme.optionText(requiredOption),
-                                scheme.optionText(shortOption),
-                                scheme.ansi().new Text(sep,
-                                        scheme),
-                                longOptionText,
-                                descriptionFirstLines[0]});
+                Text[] descriptionFirstLines = createDescriptionFirstLines(
+                        scheme, option, description, showDefault);
+                result.add(new Text[]{scheme.optionText(requiredOption),
+                        scheme.optionText(shortOption), scheme.ansi().new Text(sep, scheme),
+                        longOptionText, descriptionFirstLines[0]});
                 for (int i = 1; i < descriptionFirstLines.length; i++) {
-                    result.add(
-                            new Text[]{EMPTY,
-                                    EMPTY,
-                                    EMPTY,
-                                    EMPTY,
-                                    descriptionFirstLines[i]});
+                    result.add(new Text[]{empty, empty, empty, empty, descriptionFirstLines[i]});
                 }
                 for (int i = 1; i < description.length; i++) {
-                    Text[] descriptionNextLines =
-                            scheme.ansi(
-                            ).new Text(description[i], scheme).splitLines();
+                    Text[] descriptionNextLines = scheme.ansi().new Text(description[i],
+                            scheme).splitLines();
                     for (Text line : descriptionNextLines) {
-                        result.add(new Text[]{EMPTY,
-                                EMPTY,
-                                EMPTY,
-                                EMPTY,
-                                line});
+                        result.add(new Text[]{empty, empty, empty, empty, line});
                     }
                 }
                 if (showDefault[0]) {
@@ -30116,13 +30136,13 @@ InitialValueState.CACHED;*/
                                             indent);
                             value = value.substring(charsWritten);
                             indent = 0;
-                            if (value.length > 0) { // value did not
+                            if (value.length1 > 0) { // value did not
                                 // fit in column
                                 ++col;                // write remainder
                                 // of value in next column
                             }
                             if (
-                                    value.length > 0 && col
+                                    value.length1 > 0 && col
                                             >= columns.length) { // we filled up
                                 // all columns on this row
                                 addEmptyRow();
@@ -30130,7 +30150,7 @@ InitialValueState.CACHED;*/
                                 col = startColumn;
                                 indent = column.indent + indentWrappedLines;
                             }
-                        } while (value.length > 0);
+                        } while (value.length1 > 0);
                         return new Cell(col, row);
                     case WRAP:
                         BreakIterator lineBreakIterator =
@@ -30145,13 +30165,13 @@ InitialValueState.CACHED;*/
                                             indent);
                             value = value.substring(charsWritten);
                             indent = column.indent + indentWrappedLines;
-                            if (value.length > 0) {  // value did not
+                            if (value.length1 > 0) {  // value did not
                                 // fit in column
                                 ++row;                 // write remainder
                                 // of value in next row
                                 addEmptyRow();
                             }
-                        } while (value.length > 0);
+                        } while (value.length1 > 0);
                         return new Cell(col, row);
                     default:
                 }
@@ -30185,7 +30205,7 @@ InitialValueState.CACHED;*/
                     row.append(column.toString());
                     row.append(
                             new String(spaces(
-                                    columns[i % columnCount].width - column.length)));
+                                    columns[i % columnCount].width - column.length1)));
                     if (i % columnCount == columnCount - 1) {
                         int lastChar = row.length() - 1;
                         while (lastChar >= 0 && row.charAt(lastChar) == ' ') {
@@ -30256,7 +30276,7 @@ InitialValueState.CACHED;*/
             private void copy(
                     Text value, Text destination, int offset, Count count) {
                 int length =
-                        Math.min(value.length, destination.maxLength - offset);
+                        Math.min(value.length1, destination.maxLength - offset);
                 value.getStyledChars(value.from, length, destination, offset);
                 count.columnCount += length(value, value.from, length);
                 count.charCount += length;
@@ -30361,7 +30381,7 @@ InitialValueState.CACHED;*/
              * @return overflow.hashCode()
              */
             public int hashCode() {
-                return SEVENTHEEN * width + THIRTY_SEVEN * indent + THIRTY_SEVEN * overflow.hashCode();
+                return SEVENTHEEN * width + THIRTHY_SEVEN * indent + THIRTHY_SEVEN * overflow.hashCode();
             }
 
             /**
@@ -30746,14 +30766,14 @@ InitialValueState.CACHED;*/
             @Override
             public int hashCode() {
                 int result = SEVENTHEEN;
-                result = result * THIRTY_SEVEN + ansi.hashCode();
-                result = result * THIRTY_SEVEN + commandStyles.hashCode();
-                result = result * THIRTY_SEVEN + optionStyles.hashCode();
-                result = result * THIRTY_SEVEN + parameterStyles.hashCode();
-                result = result * THIRTY_SEVEN + optionParamStyles.hashCode();
-                result = result * THIRTY_SEVEN + errorStyles.hashCode();
-                result = result * THIRTY_SEVEN + stackTraceStyles.hashCode();
-                result = result * THIRTY_SEVEN + (markupMap == null
+                result = result * THIRTHY_SEVEN + ansi.hashCode();
+                result = result * THIRTHY_SEVEN + commandStyles.hashCode();
+                result = result * THIRTHY_SEVEN + optionStyles.hashCode();
+                result = result * THIRTHY_SEVEN + parameterStyles.hashCode();
+                result = result * THIRTHY_SEVEN + optionParamStyles.hashCode();
+                result = result * THIRTHY_SEVEN + errorStyles.hashCode();
+                result = result * THIRTHY_SEVEN + stackTraceStyles.hashCode();
+                result = result * THIRTHY_SEVEN + (markupMap == null
                         ? 0 : markupMap.hashCode());
                 return result;
             }
@@ -30797,7 +30817,7 @@ InitialValueState.CACHED;*/
                                 Style.off(reverseArray(all))
                                         + resetStyle().off()));
                 result.plain.append(plainText);
-                result.length = result.plain.length();
+                result.length1 = result.plain.length();
                 return result;
             }
 
@@ -31960,7 +31980,7 @@ InitialValueState.CACHED;*/
                 }
                 List<String> mostSimilar =
                         CosineSimilarity.mostSimilar(arg, visibleSubs);
-                return mostSimilar.subList(0, Math.min(MIN_FOR_MOST_SIMILAR, mostSimilar.size()));
+                return mostSimilar.subList(0, Math.min(THREE, mostSimilar.size()));
             }
             return Collections.emptyList();
         }
