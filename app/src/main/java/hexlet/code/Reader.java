@@ -3,23 +3,15 @@ package hexlet.code;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class Reader {
     public static String readFile(final String filePath) {
-        String content;
-        try {
-            content = read(filePath);
-        } catch (Exception e) {
-            System.out.println("File '" + filePath + "' does not exist.");
-            throw new RuntimeException(e);
-        }
-        return content;
-    }
-    public static String read(final String filePath1) throws Exception {
-        Path path = Paths.get(filePath1).toAbsolutePath().normalize();
+        String content = null;
+        Path path = Paths.get(filePath).toAbsolutePath().normalize();
         if (!Files.exists(path)) {
             try {
                 throw new Exception("File '" + path + "' does not exist");
@@ -27,9 +19,8 @@ public class Reader {
                 throw new RuntimeException(e);
             }
         }
-        String content = null;
         try (BufferedReader br =
-                     new BufferedReader(new FileReader(filePath1))) {
+                     new BufferedReader(new FileReader(String.valueOf(path)))) {
             StringBuilder sb = new StringBuilder();
             String line = br.readLine();
             while (line != null) {
@@ -38,6 +29,8 @@ public class Reader {
                 line = br.readLine();
                 content = sb.toString();
             }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
         return content;
     }
