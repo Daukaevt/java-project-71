@@ -32,6 +32,8 @@ public class Reader {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return content.replaceAll("\n$", "");
+        return !(content == null)
+                ? content.replaceAll("\n$", "")
+                : "";
     }
 }
