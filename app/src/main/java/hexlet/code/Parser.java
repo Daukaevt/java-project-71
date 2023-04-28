@@ -21,25 +21,25 @@ import java.util.stream.Stream;
 
 public class Parser {
     public static Map parse(final String content) {
-        String notNullContent = content;
-        if (notNullContent == null) {
-            notNullContent = "";
+        if (content.isEmpty()) {
+            return new HashMap<String, String>();
         }
-        boolean validJSON = isJSONValid(notNullContent);
+        boolean validJSON = isJSONValid(content);
         Map parseJsonToMap = null;
         if (validJSON) {
-            parseJsonToMap = getJsonData(notNullContent);
+            parseJsonToMap = getJson(content);
         } else {
-            String jsonContent = convertYamlToJsonData(notNullContent);
+            String jsonContent = convertYamlToJsonData(content);
             try {
-                parseJsonToMap = getJsonData(jsonContent);
+                parseJsonToMap = getJson(jsonContent);
             } catch (Exception e) {
                 System.out.println("Wrong file format");
                 System.exit(0);
             }
         }
-        return replace(parseJsonToMap);
+        return replaceNull(parseJsonToMap);
     }
+
     public static boolean isJSONValid(final String jsonInString) {
         try {
             final ObjectMapper mapper = new ObjectMapper();
@@ -49,18 +49,23 @@ public class Parser {
             return false;
         }
     }
-    public static Map getJsonData(final String contentFile1) {
-        if (contentFile1.startsWith("[")) {
-            JSONArray jsonArray;
-            JSONParser jsonParser = new JSONParser();
-            try {
-                jsonArray = (JSONArray) jsonParser.parse(contentFile1);
-                HashMap hashMap = new HashMap();
-                for (Object o : jsonArray) {
-                    ObjectMapper mapper = new ObjectMapper();
-                    try {
-                        Map<String, String> map = mapper
-                                .readValue(String.valueOf(o), Map.class);
+    private static Map getJson(String content) {
+        return content.startsWith("[")
+                ? getJsonArray(content)
+                : getJsonObject(content);
+    }
+
+    public static Map getJsonArray(final String contentFile1) {
+        JSONArray jsonArray;
+        JSONParser jsonParser = new JSONParser();
+        try {
+            jsonArray = (JSONArray) jsonParser.parse(contentFile1);
+            HashMap hashMap = new HashMap();
+            for (Object o : jsonArray) {
+                ObjectMapper mapper = new ObjectMapper();
+                try {
+                    Map<String, String> map = mapper
+                            .readValue(String.valueOf(o), Map.class);
                         for (Object key : map.keySet()) {
                             hashMap.put(key, map.get(key));
                         }
@@ -72,13 +77,8 @@ public class Parser {
             } catch (ParseException e) {
                 throw new RuntimeException(e);
             }
-        } else if (contentFile1.isEmpty()) {
-            return new HashMap<String, String>();
-        } else {
-            return getJsonObject(contentFile1);
-        }
     }
-    private static Map getJsonObject(final String contentFile1) {
+    public static Map getJsonObject(final String contentFile1) {
         JSONObject jsonObject;
         JSONParser jsonParser = new JSONParser();
         try {
@@ -103,12 +103,12 @@ public class Parser {
             throw new RuntimeException(e);
         }
     }
-    public static Map<String, String> replace(
+    public static Map<String, String> replaceNull(
             final Map parseFileContent) {
         HashMap hashMap = new HashMap();
         Pattern braces = Pattern.compile("\\{.*}");
         Pattern squareBrackets = Pattern.compile("\\[.*]");
-        for (Object key: parseFileContent.keySet()) {
+        for (Object key : parseFileContent.keySet()) {
             String value;
             parseFileContent.putIfAbsent(key, "null");
             value = parseFileContent.get(key).toString();
