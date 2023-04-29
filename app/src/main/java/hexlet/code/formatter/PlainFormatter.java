@@ -8,34 +8,28 @@ import java.util.TreeMap;
 import static java.lang.Integer.parseInt;
 
 public class PlainFormatter {
-    public static String plainFormate(final TreeMap<String, Wrapper> unitMap) {
+    public static String plainFormat(final TreeMap<String, Wrapper> unitMap) {
         StringBuilder stringBuilder = new StringBuilder();
         unitMap.keySet().forEach(key -> {
             Wrapper values = unitMap.get(key);
             String value1 = values.getValue1();
             String value2 = values.getValue2();
             if (value1.equals("-absent-")) {
-                stringBuilder.append("Property '")
-                        .append(key)
+                stringBuilder.append("Property '").append(key)
                         .append("' was added with value: ")
                         .append(getSingleQuotes3(value2)).append("\n");
                 return;
             }
             if (value2.equals("-absent-")) {
-                stringBuilder.append("Property '")
-                        .append(key)
-                        .append("' was removed")
-                        .append("\n");
+                stringBuilder.append("Property '").append(key)
+                        .append("' was removed").append("\n");
                 return;
             }
             if (!value1.equals(value2)) {
-                stringBuilder.append("Property '")
-                        .append(key)
+                stringBuilder.append("Property '").append(key)
                         .append("' was updated. From ")
-                        .append(getSingleQuotes3(value1))
-                        .append(" to ")
-                        .append(getSingleQuotes3(value2))
-                        .append("\n");
+                        .append(getSingleQuotes3(value1)).append(" to ")
+                        .append(getSingleQuotes3(value2)).append("\n");
             }
         });
         return stringBuilder.toString().replaceAll("\n$", "");
