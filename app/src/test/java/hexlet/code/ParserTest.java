@@ -21,7 +21,6 @@ class ParserTest {
         expectedData.put("profile", "{name=typicode}");
         expectedData.put("posts", "[{id:1, title:hello}]");
         expectedData.put("field", "null");
-
     }
 
     @Test
