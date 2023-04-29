@@ -10,27 +10,34 @@ import static java.lang.Integer.parseInt;
 public class PlainFormatter {
     public static String plainFormate(final TreeMap<String, Wrapper> unitMap) {
         StringBuilder stringBuilder = new StringBuilder();
-        for (Object key: unitMap.keySet()) {
+        unitMap.keySet().forEach(key -> {
             Wrapper values = unitMap.get(key);
             String value1 = values.getValue1();
             String value2 = values.getValue2();
             if (value1.equals("-absent-")) {
-                stringBuilder.append("Property '" + key
-                        + "' was added with value: "
-                        + getSingleQuotes3(value2) + "\n");
-                continue;
+                stringBuilder.append("Property '")
+                        .append(key)
+                        .append("' was added with value: ")
+                        .append(getSingleQuotes3(value2)).append("\n");
+                return;
             }
             if (value2.equals("-absent-")) {
-                stringBuilder.append("Property '"
-                        + key + "' was removed" + "\n");
-                continue;
+                stringBuilder.append("Property '")
+                        .append(key)
+                        .append("' was removed")
+                        .append("\n");
+                return;
             }
             if (!value1.equals(value2)) {
-                stringBuilder.append("Property '" + key
-                        + "' was updated. From " + getSingleQuotes3(value1)
-                        + " to " + getSingleQuotes3(value2) + "\n");
+                stringBuilder.append("Property '")
+                        .append(key)
+                        .append("' was updated. From ")
+                        .append(getSingleQuotes3(value1))
+                        .append(" to ")
+                        .append(getSingleQuotes3(value2))
+                        .append("\n");
             }
-        }
+        });
         return stringBuilder.toString().replaceAll("\n$", "");
     }
     public static String getSingleQuotes3(final String value) {
