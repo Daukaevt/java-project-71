@@ -23,7 +23,7 @@ class PlainFormatterTest {
 
     @Test
     void plainFormate() {
-        assertEquals(expected, PlainFormatter.plainFormate(testMap));
+        assertEquals(expected, PlainFormatter.plainFormat(testMap));
     }
 
     @Test
