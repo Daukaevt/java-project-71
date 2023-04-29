@@ -27,6 +27,6 @@ public class Differ {
         Map<String, Object> parseJson2 =
                 Parser.parse(Reader.readFile(path2.toAbsolutePath().toString()));
         TreeMap<String, Wrapper> unitMap = Uniter.unite(parseJson1, parseJson2);
-        return ContentFormatter.makeStyle1(unitMap, format);
+        return ContentFormatter.makeFormat(unitMap, format);
     }
 }
