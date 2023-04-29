@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ContentFormatterTest {
 
-    TreeMap testMap = new TreeMap<String, Wrapper>();
+    TreeMap<String, Wrapper> testMap = new TreeMap<>();
     String expected;
     @BeforeEach
     void setUp() {
@@ -27,19 +27,22 @@ class ContentFormatterTest {
 
     @Test
     void makeJson() {
-        expected = "{\n"
-                + "  \"- testKey\": \"value2\",\n"
-                + "  \"+ testKey\": \"value1\"\n"
-                + "}\n";
+        expected = """
+                {
+                  "- testKey": "value2",
+                  "+ testKey": "value1"
+                }
+                """;
         assertEquals(expected, ContentFormatter.makeFormat(testMap, "json"));
     }
 
     @Test
     void makeStylish() {
-        expected = "{\n"
-                + "  - testKey: value1\n"
-                + "  + testKey: value2\n"
-                + "}";
+        expected = """
+                {
+                  - testKey: value1
+                  + testKey: value2
+                }""";
         assertEquals(expected, ContentFormatter.makeFormat(testMap, "stylish"));
     }
 }
