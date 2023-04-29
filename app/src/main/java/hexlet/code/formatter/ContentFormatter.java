@@ -13,7 +13,7 @@ public class ContentFormatter {
     ) {
         switch (format) {
             case ("plain") -> {
-                return PlainFormatter.plainFormate(unitMap);
+                return PlainFormatter.plainFormat(unitMap);
             }
             case ("json") -> {
                 return JsonFormatter.jsonFormat(unitMap);
