@@ -7,7 +7,7 @@ import java.util.TreeMap;
 
 
 public class ContentFormatter {
-    public static String makeStyle1(
+    public static String makeFormat(
             final TreeMap<String, Wrapper> unitMap,
             final String format
     ) {
