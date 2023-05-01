@@ -3,6 +3,7 @@ package hexlet.code;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 class ReaderTest {
@@ -10,7 +11,11 @@ class ReaderTest {
     final private String testFilePath1
             = "/home/timur/IdeaProjects/java-project-71/app/src/test/resources/nestedFile1.json";
     String fileContent = Reader.readFile(testFilePath1);
-    String testContent = """
+    String expected;
+
+    @Test
+    void readFile() {
+        expected = """
             {
               "posts": [
                 {
@@ -20,10 +25,16 @@ class ReaderTest {
               ],
               "profile": {
                 "name": "typicode"
-              }
+              },
+              "field": null
             }""";
+        assertEquals(expected, fileContent);
+    }
+
     @Test
-    void readFile() {
-        assertEquals(testContent, fileContent);
+    void readFileThrowException() {
+        assertThrows(RuntimeException.class, () -> {
+            Reader.readFile("wrongPath");
+        });
     }
 }
