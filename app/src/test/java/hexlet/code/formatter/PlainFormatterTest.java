@@ -11,8 +11,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 class PlainFormatterTest {
-    TreeMap<String, Wrapper> testMap;
-    String expected;
+    private TreeMap<String, Wrapper> testMap;
+    private String expected;
 
     @BeforeEach
     void setUp() {
