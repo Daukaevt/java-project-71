@@ -12,6 +12,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class DifferTest {
+    private final String expected = """
+                {
+                  - host: jd.com
+                  + host: tencentcloud.com
+                }""";
     private final String testFilePath1 = "testFile1.txt";
     private final String testFilePath2 = "testFile2.txt";
     private final String testFilePathEmpty = "testFileEmpty.txt";
@@ -50,18 +55,15 @@ class DifferTest {
     }
 
     @Test
-    void generate() {
+    void generateTwoParams() throws Exception {
+        assertEquals(expected, Differ.generate(testFilePath1, testFilePath2));
+    }
+
+    @Test
+    void generate() throws Exception {
         String testStr;
-        try {
-            testStr = Differ.generate(testFilePath1, testFilePath2, "styish");
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        assertEquals("""
-                {
-                  - host: jd.com
-                  + host: tencentcloud.com
-                }""", testStr);
+        testStr = Differ.generate(testFilePath1, testFilePath2, "styish");
+        assertEquals(expected, testStr);
     }
     @Test
     void generateFileNullContent() {
@@ -86,6 +88,13 @@ class DifferTest {
                   - host: jd.com
                 }""", testStrNull);
 
+    }
+
+    @Test
+    void isNotExist() throws Exception {
+        assertEquals("File does not exist", Differ.generate(
+                "/home/timur/IdeaProjects/java-project-71/app/src/test/resources/file1.json",
+                "not exist file"));
     }
 
     @AfterEach
