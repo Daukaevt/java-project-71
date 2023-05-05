@@ -11,8 +11,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ContentFormatterTest {
 
-    TreeMap<String, Wrapper> testMap = new TreeMap<>();
-    String expected;
+    private TreeMap<String, Wrapper> testMap = new TreeMap<>();
+    private String expected;
     @BeforeEach
     void setUp() {
         testMap.put("testKey", new Wrapper("value1", "value2"));
