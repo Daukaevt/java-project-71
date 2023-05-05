@@ -118,8 +118,8 @@ class ParserTest {
     void convertYamlToJsonData() throws JsonProcessingException {
         String expectedYamlToJson = "{\"martin\":{\"name\":\"Martin D'vloper\","
                 + "\"job\":\"Developer\",\"skill\":\"Elite\"}}";
-        assertEquals(expectedYamlToJson, Parser.convertYamlToJsonData("---\n" +
-                "martin: {name: Martin D'vloper, job: Developer, skill: Elite}"));
+        assertEquals(expectedYamlToJson, Parser.convertYamlToJsonData("---\n"
+                + "martin: {name: Martin D'vloper, job: Developer, skill: Elite}"));
     }
 
     @Test
