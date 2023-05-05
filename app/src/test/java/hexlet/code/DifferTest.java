@@ -12,10 +12,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class DifferTest {
-    final private Differ differ = new Differ();
-    final private String testFilePath1 = "testFile1.txt";
-    final private String testFilePath2 = "testFile2.txt";
-    final private String testFilePathEmpty = "testFileEmpty.txt";
+    private final String testFilePath1 = "testFile1.txt";
+    private final String testFilePath2 = "testFile2.txt";
+    private final String testFilePathEmpty = "testFileEmpty.txt";
 
 
     @BeforeEach
