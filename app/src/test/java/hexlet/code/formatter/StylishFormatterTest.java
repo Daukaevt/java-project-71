@@ -19,7 +19,7 @@ class StylishFormatterTest {
     @Test
     void stylishFormat() {
         testMap.put("testKey", new Wrapper("value1", "value2"));
-         expected = """
+        expected = """
                 {
                   - testKey: value1
                   + testKey: value2
