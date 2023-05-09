@@ -242,33 +242,23 @@ public class CommandLine {
      */
     public static final String VERSION = "4.7.1-SNAPSHOT";
 
-    public static final int HIEST_WORD_CHAR = 255;
 
     public static final int TWO = 2;
-
     public static final int THREE = 3;
-
     public static final int FOUR = 4;
-
     public static final int FIVE = 5;
-
     public static final int SIX = 6;
-
+    public static final int EIGHT = 8;
     public static final int TEN = 10;
-
+    public static final int TWELVE = 12;
     public static final int SIXTHEEN  = 16;
-
     public static final int SEVENTHEEN = 17;
-
     public static final int TWENTHY = 20;
-
     public static final int THIRTHY_SIX = 36;
-
     public static final int THIRTHY_SEVEN = 37;
-
     public static final int THIRTHY_EIGTH  = 38;
-
     public static final int FORTHY_EIGTH = 48;
+    public static final int HIEST_WORD_CHAR = 255;
 
     private static final Tracer TRACER = new Tracer();
 
@@ -25124,15 +25114,15 @@ InitialValueState.CACHED;*/
 
             public Object convert(String value) {
                 try {
-                    if (value.length() <= 5) {
+                    if (value.length() <= FIVE) {
                         return createTime(
                                 new SimpleDateFormat("HH:mm")
                                         .parse(value).getTime());
-                    } else if (value.length() <= 8) {
+                    } else if (value.length() <= EIGHT) {
                         return createTime(
                                 new SimpleDateFormat("HH:mm:ss")
                                         .parse(value).getTime());
-                    } else if (value.length() <= 12) {
+                    } else if (value.length() <= TWELVE) {
                         try {
                             return createTime(
                                     new SimpleDateFormat("HH:mm:ss.SSS")
@@ -25263,13 +25253,13 @@ InitialValueState.CACHED;*/
             return false;
         }
 
-        static Set<String> traced = new HashSet<String>();
+        private static Set<String> traced = new HashSet<String>();
 
         static class ReflectionConverter implements ITypeConverter<Object> {
             private final Method method;
             private final Class<?>[] paramTypes;
 
-            public ReflectionConverter(Method method, Class<?>... paramTypes) {
+            private ReflectionConverter(Method method, Class<?>... paramTypes) {
                 this.method = Assert.notNull(method, "method");
                 this.paramTypes = Assert.notNull(paramTypes, "paramTypes");
             }
@@ -25317,18 +25307,16 @@ InitialValueState.CACHED;*/
     static class AutoHelpMixin {
         private static final String KEY = "mixinStandardHelpOptions";
 
-        @Option(names =
-                {"${picocli.help.name.0:--h}",
-                        "${picocli.help.name.1:---help}"},
+        @Option(names = {"${picocli.help.name.0:--h}",
+                "${picocli.help.name.1:---help}"},
                 usageHelp =
                         true, descriptionKey =
                 "mixinStandardHelpOptions.help", description =
                 "Show this help message and exit.")
         private boolean helpRequested;
 
-        @Option(names =
-                {"${picocli.version.name.0:--V}",
-                        "${picocli.version.name.1:---version}"},
+        @Option(names = {"${picocli.version.name.0:--V}",
+                "${picocli.version.name.1:---version}"},
                 versionHelp =
                         true, descriptionKey =
                 "mixinStandardHelpOptions.version", description =
@@ -25367,16 +25355,13 @@ InitialValueState.CACHED;*/
             synopsisHeading =
                     "%nUsage: ", helpCommand =
             true, description =
-            {"%nWhen no COMMAND is given, the usage help "
-                    + "for the main command is displayed.",
-                    "If a COMMAND is specified, "
-                            + "the help for that command is shown.%n"})
+            {"%nWhen no COMMAND is given, the usage help for the main command is displayed.",
+                    "If a COMMAND is specified, the help for that command is shown.%n"})
     public static final class HelpCommand implements IHelpCommandInitializable,
             IHelpCommandInitializable2,
             Runnable {
 
-        @Option(names =
-                {"-h", "--help"}, usageHelp =
+        @Option(names = {"-h", "--help"}, usageHelp =
                 true, descriptionKey =
                 "helpCommand.help", description =
                 "Show usage help for the help command and exit.")
@@ -25456,13 +25441,13 @@ InitialValueState.CACHED;*/
         @Deprecated
         public void init(
                 CommandLine helpCommandLine,
-                Help.Ansi ansi,
-                PrintStream out,
-                PrintStream err) {
+                Help.Ansi ansi1,
+                PrintStream printStreamOut,
+                PrintStream printStreamErr) {
             this.self = Assert.notNull(helpCommandLine, "helpCommandLine");
-            this.ansi = Assert.notNull(ansi, "ansi");
-            this.out = Assert.notNull(out, "out");
-            this.err = Assert.notNull(err, "err");
+            this.ansi = Assert.notNull(ansi1, "ansi");
+            this.out = Assert.notNull(printStreamOut, "out");
+            this.err = Assert.notNull(printStreamErr, "err");
         }
 
         /**
@@ -25470,13 +25455,13 @@ InitialValueState.CACHED;*/
          */
         public void init(
                 CommandLine helpCommandLine,
-                Help.ColorScheme colorScheme,
-                PrintWriter out,
-                PrintWriter err) {
+                Help.ColorScheme colorScheme1,
+                PrintWriter outWriter,
+                PrintWriter errWriter) {
             this.self = Assert.notNull(helpCommandLine, "helpCommandLine");
-            this.colorScheme = Assert.notNull(colorScheme, "colorScheme");
-            this.outWriter = Assert.notNull(out, "outWriter");
-            this.errWriter = Assert.notNull(err, "errWriter");
+            this.colorScheme = Assert.notNull(colorScheme1, "colorScheme");
+            this.outWriter = Assert.notNull(outWriter, "outWriter");
+            this.errWriter = Assert.notNull(errWriter, "errWriter");
         }
     }
 
@@ -25555,14 +25540,14 @@ InitialValueState.CACHED;*/
         protected static final String DEFAULT_SEPARATOR =
                 Model.ParserSpec.DEFAULT_SEPARATOR;
 
-        public final Model.PositionalParamSpec AT_FILE_POSITIONAL_PARAM =
+        private final Model.PositionalParamSpec atFilePositionalParam =
                 Model.PositionalParamSpec.builder(
                         ).paramLabel("${picocli.atfile.label:-@<filename>}")
                         .description("${picocli.atfile.description:"
                                 + "-One or more argument files containing options.}")
                         .arity("0..*").descriptionKey("picocli.atfile").build();
 
-        public final Model.OptionSpec END_OF_OPTIONS_OPTION =
+        private final Model.OptionSpec endOfOptionsOption =
                 createEndOfOptionsOption(
                         Model.ParserSpec.DEFAULT_END_OF_OPTIONS_DELIMITER);
 
@@ -25638,12 +25623,11 @@ InitialValueState.CACHED;*/
                             commandSpec); // uses help separator
 
             this.registerSubcommands(commandSpec.subcommands());
-            AT_FILE_POSITIONAL_PARAM.commandSpec =
+            atFilePositionalParam.commandSpec =
                     commandSpec; // for interpolation
         }
 
-        private static Comparator<Model.OptionSpec>
-        createOrderComparatorIfNecessary(
+        private static Comparator<Model.OptionSpec> createOrderComparatorIfNecessary(
                 List<Model.OptionSpec> options) {
             for (Model.OptionSpec option : options) {
                 if (option.order() != Model.OptionSpec.DEFAULT_ORDER) {
@@ -25710,20 +25694,18 @@ InitialValueState.CACHED;*/
 
         /**
          * @deprecated Use {@link #join(
-                Ansi,
-                        int,
-                        boolean,
-                        String[],
-                        StringBuilder,
-                        Object...)}  instead
+                Ansi,int, boolean, String[], StringBuilder, Object...)}  instead
+         @param ansi,
+         @param params,
+         @param values,
+         @param sb,
+         @param usageHelpWidth
+         @return join(ansi, usageHelpWidth,
+                 Model.UsageMessageSpec.DEFAULT_ADJUST_CJK, values, sb, params)
          */
         @Deprecated
-        public static StringBuilder join(
-                Ansi ansi,
-                int usageHelpWidth,
-                String[] values,
-                StringBuilder sb,
-                Object... params) {
+        public static StringBuilder join(Ansi ansi, int usageHelpWidth,
+                String[] values, StringBuilder sb, Object... params) {
             return join(
                     ansi,
                     usageHelpWidth,
@@ -25851,8 +25833,7 @@ InitialValueState.CACHED;*/
          * @return a comparator that sorts OptionSpecs
          * by their option name in case-insensitive alphabetic order
          */
-        public static Comparator<Model.OptionSpec>
-        createShortOptionNameComparator(
+        public static Comparator<Model.OptionSpec> createShortOptionNameComparator(
         ) {
             return new SortByShortestOptionNameAlphabetically();
         }
@@ -25867,8 +25848,7 @@ InitialValueState.CACHED;*/
          * @return a comparator that sorts OptionSpecs
          * by arity first, then their option name
          */
-        public static Comparator<Model.OptionSpec>
-        createShortOptionArityAndNameComparator(
+        public static Comparator<Model.OptionSpec> createShortOptionArityAndNameComparator(
         ) {
             return new SortByOptionArityAndNameAlphabetically();
         }
@@ -25945,6 +25925,11 @@ InitialValueState.CACHED;*/
                     .arity("0").descriptionKey("picocli.endofoptions").build();
         }
 
+        /**
+         * withCommandNames.
+         * @param aliases
+         * @return aliases.
+         */
         Help withCommandNames(List<String> aliases) {
             this.aliases = aliases;
             return this;
@@ -26625,8 +26610,8 @@ InitialValueState.CACHED;*/
                             commandSpec.positionalParameters()
                     ); // iterate in declaration order
             if (hasAtFileParameter()) {
-                positionals.add(0, AT_FILE_POSITIONAL_PARAM);
-                AT_FILE_POSITIONAL_PARAM.messages(
+                positionals.add(0, atFilePositionalParam);
+                atFilePositionalParam.messages(
                         commandSpec.usageMessage().messages());
             }
             positionals.removeAll(done);
@@ -27107,11 +27092,11 @@ InitialValueState.CACHED;*/
          */
         public String atFileParameterList() {
             if (hasAtFileParameter()) {
-                AT_FILE_POSITIONAL_PARAM.messages(
+                atFilePositionalParam.messages(
                         commandSpec.usageMessage().messages());
                 Layout layout = createDefaultLayout();
                 layout.addPositionalParameter(
-                        AT_FILE_POSITIONAL_PARAM, parameterLabelRenderer());
+                        atFilePositionalParam, parameterLabelRenderer());
                 return layout.toString();
             }
             return "";
@@ -27133,7 +27118,7 @@ InitialValueState.CACHED;*/
             Model.OptionSpec endOfOptionsOption =
                     Model.ParserSpec.DEFAULT_END_OF_OPTIONS_DELIMITER.equals(
                             commandSpec.parser().endOfOptionsDelimiter())
-                            ? END_OF_OPTIONS_OPTION
+                            ? this.endOfOptionsOption
                             : createEndOfOptionsOption(
                             commandSpec.parser().endOfOptionsDelimiter());
             endOfOptionsOption.commandSpec =
@@ -27649,8 +27634,8 @@ InitialValueState.CACHED;*/
                     new ArrayList<Model.PositionalParamSpec>(
                             positionals); // iterate in declaration order
             if (hasAtFileParameter()) {
-                positionalsWithAtFile.add(0, AT_FILE_POSITIONAL_PARAM);
-                AT_FILE_POSITIONAL_PARAM.messages(
+                positionalsWithAtFile.add(0, atFilePositionalParam);
+                atFilePositionalParam.messages(
                         commandSpec.usageMessage().messages());
             }
             //IParameterRenderer paramRenderer=
