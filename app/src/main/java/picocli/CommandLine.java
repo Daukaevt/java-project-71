@@ -26064,7 +26064,7 @@ InitialValueState.CACHED;*/
          * @param colorScheme
          * @param positionalParam
          * @param parameterLabelRenderer
-         * @return
+         * @return text
          */
         static Text concatPositionalText(
                 String prefix,
@@ -26135,9 +26135,9 @@ InitialValueState.CACHED;*/
             // (if it isn't already in the list)
             for (Map.Entry<String,
                     CommandLine> entry : subcommands.entrySet()) {
-                List<String> aliases_ = done.get(entry.getValue());
-                if (!aliases_.contains(entry.getKey())) {
-                    aliases_.add(0, entry.getKey());
+                List<String> aliases11 = done.get(entry.getValue());
+                if (!aliases11.contains(entry.getKey())) {
+                    aliases11.add(0, entry.getKey());
                 }
             }
             // The aliases list for each command now has at least one entry,
@@ -26204,14 +26204,18 @@ InitialValueState.CACHED;*/
         }
 
         /**
+         * positionalParameters.
          *
-         * @return positionalParameters.
          * @return positionalParameters().
          */
         List<Model.PositionalParamSpec> positionalParameters() {
             return commandSpec.positionalParameters();
         }
 
+        /**
+         * commandName.
+         * @return commandSpec.name()
+         */
         String commandName() {
             return commandSpec.name();
         }
@@ -26712,12 +26716,12 @@ InitialValueState.CACHED;*/
             textTable.indentWrappedLines = indent;
 
             // right-adjust the command name by length of synopsis heading
-            Text padding_ = Ansi.OFF.new Text(
+            Text padding1 = Ansi.OFF.new Text(
                     stringOf('X', synopsisHeadingLength),
                     optionsAndPositionalsAndCommandsDetails.colorScheme
             );
             textTable.addRowValues(
-                    padding_.concat(colorScheme.commandText(commandName))
+                    padding1.concat(colorScheme.commandText(commandName))
                             .concat(optionsAndPositionalsAndCommandsDetails));
             return textTable.toString(
             ).substring(synopsisHeadingLength); // cut off
@@ -28891,10 +28895,9 @@ InitialValueState.CACHED;*/
                 List<Text[]> result, Model.ArgSpec arg, ColorScheme scheme
         ) {
             Text empty = Ansi.emptyText;
-            result.add(new Text[]{
-                    empty, empty, empty, empty,
-                    scheme.ansi().new Text("  Default: " + arg.defaultValueString(
-                            true), scheme)});
+            result.add(new Text[]{empty, empty, empty, empty,
+                    scheme.ansi().new Text("  Default: "
+                            + arg.defaultValueString(true), scheme)});
         }
 
         /**
@@ -29009,14 +29012,15 @@ InitialValueState.CACHED;*/
                     ColorScheme scheme,
                     String requiredOption,
                     String shortOption,
-                    Text longOptionText) {
+                    Text longOptionText
+            ) {
                 Text empty = Ansi.emptyText;
-                boolean[] showDefault =
-                        {option.internalShowDefaultValue(showDefaultValues)};
+                boolean[] showDefault = {option
+                        .internalShowDefaultValue(showDefaultValues)};
                 List<Text[]> result = new ArrayList<Text[]>();
                 String[] description = option.description();
-                Text[] descriptionFirstLines = createDescriptionFirstLines(
-                        scheme, option, description, showDefault);
+                Text[] descriptionFirstLines =
+                        createDescriptionFirstLines(scheme, option, description, showDefault);
                 result.add(new Text[]{scheme.optionText(requiredOption),
                         scheme.optionText(shortOption), scheme.ansi().new Text(sep, scheme),
                         longOptionText, descriptionFirstLines[0]});
