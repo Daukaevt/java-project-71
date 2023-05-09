@@ -244,6 +244,8 @@ public class CommandLine {
 
     public static final int HIEST_WORD_CHAR = 255;
 
+    public static final int TWO = 2;
+
     public static final int THREE = 3;
 
     public static final int FOUR = 4;
@@ -251,6 +253,8 @@ public class CommandLine {
     public static final int FIVE = 5;
 
     public static final int SIX = 6;
+
+    public static final int TEN = 10;
 
     public static final int SIXTHEEN  = 16;
 
@@ -25907,7 +25911,7 @@ InitialValueState.CACHED;*/
                     showDefault[0] =
                             false; // don't show the default value twice
                 } else {
-                    result = new Text[]{Ansi.EMPTY_TEXT};
+                    result = new Text[]{Ansi.emptyText};
                 }
             }
             return result;
@@ -26036,7 +26040,7 @@ InitialValueState.CACHED;*/
         /**
          * Returns the map of all subcommand {@code Help} instances (
          * including hidden commands) for this command Help.
-         *
+         * @return unmodifiableMap(allCommands)
          * @see #subcommands()
          * @since 4.4
          */
@@ -26046,13 +26050,22 @@ InitialValueState.CACHED;*/
 
         /**
          * Returns the list of aliases for the command in this Help.
-         *
+         * @return unmodifiableList(aliases)
          * @since 3.9
          */
         protected List<String> aliases() {
             return Collections.unmodifiableList(aliases);
         }
 
+        /**
+         * concatPositionalText.
+         * @param prefix
+         * @param text
+         * @param colorScheme
+         * @param positionalParam
+         * @param parameterLabelRenderer
+         * @return
+         */
         static Text concatPositionalText(
                 String prefix,
                 Text text,
@@ -26084,6 +26097,7 @@ InitialValueState.CACHED;*/
          * may need to re-initialize this field
          * by calling {@link #createDefaultParamLabelRenderer(
          *)} again.
+         * @return parameterLabelRenderer
          */
         public IParamLabelRenderer parameterLabelRenderer() {
             return parameterLabelRenderer;
@@ -26121,9 +26135,9 @@ InitialValueState.CACHED;*/
             // (if it isn't already in the list)
             for (Map.Entry<String,
                     CommandLine> entry : subcommands.entrySet()) {
-                List<String> aliases = done.get(entry.getValue());
-                if (!aliases.contains(entry.getKey())) {
-                    aliases.add(0, entry.getKey());
+                List<String> aliases_ = done.get(entry.getValue());
+                if (!aliases_.contains(entry.getKey())) {
+                    aliases_.add(0, entry.getKey());
                 }
             }
             // The aliases list for each command now has at least one entry,
@@ -26181,10 +26195,19 @@ InitialValueState.CACHED;*/
             return this;
         }
 
+        /**
+         * options.
+         * @return commandSpec.options()
+         */
         List<Model.OptionSpec> options() {
             return commandSpec.options();
         }
 
+        /**
+         *
+         * @return positionalParameters.
+         * @return positionalParameters().
+         */
         List<Model.PositionalParamSpec> positionalParameters() {
             return commandSpec.positionalParameters();
         }
@@ -26198,7 +26221,7 @@ InitialValueState.CACHED;*/
          * of this command. This is equivalent to:
          * {@code this.synopsisHeading(
          * ) + this.synopsis(this.synopsisHeadingLength())}
-         *
+         * @return synopsisHeading
          * @since 4.1
          */
         public String fullSynopsis() {
@@ -26402,7 +26425,7 @@ InitialValueState.CACHED;*/
          *) validating} {@linkplain ArgGroup groups},
          * starting with a {@code " "} space.
          *
-         * @param outparam_groupArgs all options and positional
+         * @param outparamGroupArgs all options and positional
          * parameters in the groups this method generates a synopsis for;
          * these options and positional parameters
          * should be excluded from appearing elsewhere in the synopsis
@@ -26412,14 +26435,14 @@ InitialValueState.CACHED;*/
          * @since 4.0
          */
         protected Text createDetailedSynopsisGroupsText(
-                Set<Model.ArgSpec> outparam_groupArgs) {
+                Set<Model.ArgSpec> outparamGroupArgs) {
             Text groupText = ansi().new Text(0);
             for (Model.ArgGroupSpec group : commandSpec().argGroups()) {
                 if (group.validate()) { // non-validating
                     // groups are not shown in the synopsis
                     groupText = groupText.concat(" ").concat(
                             group.synopsisText(colorScheme(),
-                                    outparam_groupArgs));
+                                    outparamGroupArgs));
                 }
             }
             return groupText;
@@ -26689,12 +26712,12 @@ InitialValueState.CACHED;*/
             textTable.indentWrappedLines = indent;
 
             // right-adjust the command name by length of synopsis heading
-            Text PADDING = Ansi.OFF.new Text(
+            Text padding_ = Ansi.OFF.new Text(
                     stringOf('X', synopsisHeadingLength),
                     optionsAndPositionalsAndCommandsDetails.colorScheme
             );
             textTable.addRowValues(
-                    PADDING.concat(colorScheme.commandText(commandName))
+                    padding_.concat(colorScheme.commandText(commandName))
                             .concat(optionsAndPositionalsAndCommandsDetails));
             return textTable.toString(
             ).substring(synopsisHeadingLength); // cut off
@@ -26847,6 +26870,7 @@ InitialValueState.CACHED;*/
          * @see #optionListExcludingGroups(
                 List, Layout, Comparator, IParamLabelRenderer)
          * @see #optionListGroupSections()
+         * @param optionSort
          * @since 3.0
          */
         public String optionList(
@@ -26884,6 +26908,7 @@ InitialValueState.CACHED;*/
          * the option list for the specified options only (
          * argument groups are not included)
          * @since 4.4
+         * @param optionSort
          */
         public String optionListExcludingGroups(
                 List<Model.OptionSpec> optionList,
@@ -26970,7 +26995,7 @@ InitialValueState.CACHED;*/
          * Returns the list of {@code ArgGroupSpec} instances in this command
          * that have a non-{@code null} heading,
          * most deeply nested argument groups first.
-         *
+         * @return optionSectionGroups
          * @see #optionListGroupSections()
          * @since 4.4
          */
@@ -27060,7 +27085,7 @@ InitialValueState.CACHED;*/
         /**
          * Returns true if the usage help should show the
          * at file parameter in the parameter list, otherwise false.
-         *
+         * @return expandAtFiles() && commandSpec.usageMessage.showAtFileInUsageHelp()
          * @since 4.3
          */
         public boolean hasAtFileParameter() {
@@ -27438,10 +27463,10 @@ InitialValueState.CACHED;*/
          */
         public TextTable createTextTable(Map<?, ?> map) {
             if (map == null || map.isEmpty()) {
-                return TextTable.forColumnWidths(colorScheme, 10, width() - 10);
+                return TextTable.forColumnWidths(colorScheme, TEN, width() - TEN);
             }
-            int spacing = 3;
-            int indent = 2;
+            int spacing = THREE;
+            int indent = TWO;
             int keyLength =
                     Math.min(width() - spacing - 1, maxLength(map.keySet()));
             Help.TextTable textTable =
@@ -27481,6 +27506,7 @@ InitialValueState.CACHED;*/
          * names and first line of their header or (
          * if absent) description of the specified command map.
          *
+         * @param subcommands
          * @return a usage help section describing the added commands
          * @see #subcommands()
          * @see #allSubcommands()
@@ -27516,7 +27542,7 @@ InitialValueState.CACHED;*/
                     textTable.addRowValues(
                             i == 0
                                     ? help.commandNamesText(", ")
-                                    : Ansi.EMPTY_TEXT,
+                                    : Ansi.emptyText,
                             lines[i]);
                 }
             }
@@ -27530,6 +27556,8 @@ InitialValueState.CACHED;*/
          *String) command style} for the color scheme of this Help.
          *
          * @since 3.9
+         * @param separator
+         * @return result
          */
         public Text commandNamesText(String separator) {
             Text result = colorScheme().commandText(aliases().get(0));
@@ -27607,8 +27635,8 @@ InitialValueState.CACHED;*/
                         optionRenderer.render(
                                 option, parameterLabelRenderer(), aColorScheme);
                 int len =
-                        cjk ? values[0][3].getCJKAdjustedLength(
-                        ) : values[0][3].length1;
+                        cjk ? values[0][THREE].getCJKAdjustedLength(
+                        ) : values[0][THREE].length1;
                 if (len < longOptionsColWidth) {
                     max = Math.max(max, len);
                 }
@@ -27641,7 +27669,7 @@ InitialValueState.CACHED;*/
                 }
             }
 
-            return max + 3;
+            return max + THREE;
         }
 
         /**
@@ -27742,7 +27770,7 @@ InitialValueState.CACHED;*/
          * Controls the visibility of certain
          * aspects of the usage help message.
          */
-        public enum Visibility {ALWAYS, NEVER, ON_DEMAND}
+        public enum Visibility { ALWAYS, NEVER, ON_DEMAND }
 
         /**
          * Provides methods and inner classes to support
@@ -27766,9 +27794,12 @@ InitialValueState.CACHED;*/
              * escape code regardless of the platform.
              */
             OFF;
-            static Text EMPTY_TEXT = OFF.new Text(0);
+            private static Text emptyText = OFF.new Text(0);
 
-            static Boolean tty;
+            /**
+             * Boolean tty.
+             */
+            private static Boolean tty;
 
             static boolean isTTY() {
                 if (tty == null) {
@@ -27777,71 +27808,78 @@ InitialValueState.CACHED;*/
                 return tty;
             }
 
-            static final boolean isWindows() {
+            static boolean isWindows() {
                 return System.getProperty("os.name")
                         .toLowerCase().contains("win");
             }
 
-            static final boolean isMac() {
+            static boolean isMac() {
                 return System.getProperty("os.name")
                         .toLowerCase().contains("mac");
             }
 
-            static final boolean isXterm() {
+            static boolean isXterm() {
                 return System.getenv("TERM") != null
                         && System.getenv("TERM").startsWith("xterm");
             }
 
-            static final boolean isCygwin() {
+            static boolean isCygwin() {
                 return System.getenv("TERM") != null
                         && System.getenv("TERM")
                         .toLowerCase(ENGLISH).contains("cygwin");
             }
 
             // null on Windows unless on Cygwin or MSYS
-            static final boolean hasOsType() {
+            static boolean hasOsType() {
                 return System.getenv("OSTYPE") != null;
             }
 
             // see Jan Niklas Hasse's https://bixense.com/clicolors/ proposal
             // https://conemu.github.io/en
             // /AnsiEscapeCodes.html#Environment_variable
-            static final boolean hintDisabled() {
+            static boolean hintDisabled() {
                 return "0".equals(System.getenv("CLICOLOR"))
                         || "OFF".equals(System.getenv("ConEmuANSI"));
             }
 
             /**
+             * http adress.
              * https://github.com/adoxa/ansicon/blob/master/readme.txt,
              * Jan Niklas Hasse's https://bixense.com/clicolors/ proposal,
              * https://conemu.github.io/en/AnsiEscapeCodes
              * .html#Environment_variable
+             * @return ANSICON
              */
-            static final boolean hintEnabled() {
+            static boolean hintEnabled() {
                 return System.getenv("ANSICON")
                         != null || "1".equals(System.getenv("CLICOLOR"))
                         || "ON".equals(System.getenv("ConEmuANSI"));
             }
 
             /**
+             * http adress.
              * https://no-color.org/
+             * @return NO_COLOR
              */
-            static final boolean forceDisabled() {
+            static boolean forceDisabled() {
                 return System.getenv("NO_COLOR") != null;
             }
 
             /**
-             * Jan Niklas Hasse's https://bixense.com/clicolors/ proposal
+             * Jan Niklas Hasse's https://bixense.com/clicolors/ proposal.
+             * @return CLICOLOR_FORCE
              */
-            static final boolean forceEnabled() {
+            static boolean forceEnabled() {
                 return System.getenv("CLICOLOR_FORCE")
                         != null && !"0".equals(System.getenv("CLICOLOR_FORCE"));
             }
 
             /**
+             * http adress.
              * http://stackoverflow.com/questions/1403772
              * /how-can-i-check-if-a-java-programs
              * -input-output-streams-are-connected-to-a-term
+             * @return getDeclaredMethod("console")
              */
             static boolean calcTTY() {
                 try {
@@ -27854,6 +27892,7 @@ InitialValueState.CACHED;*/
 
             /**
              * Cygwin and MSYS use pseudo-tty and console is always null...
+             * @return isWindows() && (isXterm() || isCygwin() || hasOsType())
              */
             static boolean isPseudoTTY() {
                 return isWindows() && (isXterm() || isCygwin() || hasOsType());
@@ -27914,6 +27953,8 @@ InitialValueState.CACHED;*/
              * {@code enabled} flag is true, Ansi.OFF otherwise.
              *
              * @since 3.4
+             * @param enabled
+             * @return enabled ON/OFF
              */
             public static Ansi valueOf(boolean enabled) {
                 return enabled ? ON : OFF;
@@ -27948,11 +27989,11 @@ InitialValueState.CACHED;*/
                 }
                 String ansi = System.getProperty("picocli.ansi");
                 boolean auto = ansi == null || "AUTO".equalsIgnoreCase(ansi);
-                boolean tty =
+                boolean tty1 =
                         "TTY".equalsIgnoreCase(ansi)
                                 && (isTTY() || isPseudoTTY());
                 return auto ? ansiPossible(
-                ) : tty || Boolean.getBoolean("picocli.ansi");
+                ) : tty1 || Boolean.getBoolean("picocli.ansi");
             }
 
             /**
@@ -27971,6 +28012,8 @@ InitialValueState.CACHED;*/
              *
              * @see ColorScheme#text(String)
              * @since 3.4
+             * @param stringWithMarkup
+             * @return Text(stringWithMarkup)
              */
             public Text text(String stringWithMarkup) {
                 return this.new Text(stringWithMarkup);
@@ -27988,6 +28031,8 @@ InitialValueState.CACHED;*/
              *
              * @see ColorScheme#string(String)
              * @since 3.4
+             * @param stringWithMarkup
+             * @return ext(stringWithMarkup)
              */
             public String string(String stringWithMarkup) {
                 return this.new Text(stringWithMarkup).toString();
@@ -27996,6 +28041,9 @@ InitialValueState.CACHED;*/
             /**
              * @deprecated use {@link
              * ColorScheme#apply(String, List)} instead
+             * @param styles
+             * @param plainText
+             * @return Help.defaultColorScheme(this).apply(plainText, styles)
              */
             @Deprecated
             public Text apply(String plainText, List<IStyle> styles) {
@@ -28057,8 +28105,7 @@ InitialValueState.CACHED;*/
                 bg_cyan(46,
                         49),
                 bg_white(47,
-                        49),
-                ;
+                        49),;
                 private final int startCode;
                 private final int endCode;
 
@@ -28175,14 +28222,14 @@ InitialValueState.CACHED;*/
                     for (int i = 0; i < codes.length; ++i) {
                         if (codes[i].toLowerCase(ENGLISH).startsWith("fg(")) {
                             int end = codes[i].indexOf(')');
-                            styles[i] = Style.fg(codes[i].substring(3, end < 0
+                            styles[i] = Style.fg(codes[i].substring(THREE, end < 0
                                     ? codes[i].length()
                                     : end));
                         } else if (
                                 codes[i].toLowerCase(ENGLISH)
                                         .startsWith("bg(")) {
                             int end = codes[i].indexOf(')');
-                            styles[i] = Style.bg(codes[i].substring(3, end < 0
+                            styles[i] = Style.bg(codes[i].substring(THREE, end < 0
                                     ? codes[i].length()
                                     : end));
                         } else {
@@ -28424,10 +28471,10 @@ InitialValueState.CACHED;*/
 
                 private void addStyledSection(
                         int start,
-                        int length1,
+                        int length11,
                         String startStyle,
                         String endStyle) {
-                    sections.add(new StyledSection(start, length1, startStyle, endStyle));
+                    sections.add(new StyledSection(start, length11, startStyle, endStyle));
                 }
 
                 /**
@@ -28841,11 +28888,13 @@ InitialValueState.CACHED;*/
         }
 
         private static void addTrailingDefaultLine(
-                List<Text[]> result, Model.ArgSpec arg, ColorScheme scheme) {
-            Text empty = Ansi.EMPTY_TEXT;
-            result.add(new Text[]{empty, empty, empty,
-                    empty, scheme.ansi().new Text("  Default: "
-                    + arg.defaultValueString(true), scheme)});
+                List<Text[]> result, Model.ArgSpec arg, ColorScheme scheme
+        ) {
+            Text empty = Ansi.emptyText;
+            result.add(new Text[]{
+                    empty, empty, empty, empty,
+                    scheme.ansi().new Text("  Default: " + arg.defaultValueString(
+                            true), scheme)});
         }
 
         /**
@@ -28961,7 +29010,7 @@ InitialValueState.CACHED;*/
                     String requiredOption,
                     String shortOption,
                     Text longOptionText) {
-                Text empty = Ansi.EMPTY_TEXT;
+                Text empty = Ansi.emptyText;
                 boolean[] showDefault =
                         {option.internalShowDefaultValue(showDefaultValues)};
                 List<Text[]> result = new ArrayList<Text[]>();
@@ -29091,7 +29140,7 @@ InitialValueState.CACHED;*/
                         scheme.parameterText(param.arity().min
                                 > 0 ? requiredMarker : "");
 
-                Text empty = Ansi.EMPTY_TEXT;
+                Text empty = Ansi.emptyText;
                 boolean[] showDefault = {param
                         .internalShowDefaultValue(showDefaultValues)};
                 List<Text[]> result = new ArrayList<Text[]>();
@@ -30006,14 +30055,14 @@ InitialValueState.CACHED;*/
                 for (int col = 0; col < numColumns; col++) {
                     cells[col] =
                             values[col] == null
-                                    ? new Text[]{Ansi.EMPTY_TEXT}
+                                    ? new Text[]{Ansi.emptyText}
                                     : colorScheme.text(
                                     values[col]).splitLines();
                     maxRows = Math.max(maxRows, cells[col].length);
                 }
                 Text[] rowValues = new Text[numColumns];
                 for (int row = 0; row < maxRows; row++) {
-                    Arrays.fill(rowValues, Ansi.EMPTY_TEXT);
+                    Arrays.fill(rowValues, Ansi.emptyText);
                     for (int col = 0; col < numColumns; col++) {
                         if (row < cells[col].length) {
                             rowValues[col] = cells[col][row];
