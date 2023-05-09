@@ -29006,9 +29006,7 @@ InitialValueState.CACHED;*/
                 longOptionText = longOptionText.concat(paramLabelText);
                 return longOptionText;
             }
-
-            private Text[][] renderDescriptionLines(
-                    Model.OptionSpec option, ColorScheme scheme,
+            private Text[][] renderDescriptionLines(Model.OptionSpec option, ColorScheme scheme,
                     String requiredOption, String shortOption, Text longOptionText
             ) {
                 Text empty = Ansi.emptyText;
@@ -29017,12 +29015,8 @@ InitialValueState.CACHED;*/
                 String[] description = option.description();
                 Text[] descriptionFirstLines = createDescriptionFirstLines(
                         scheme, option, description, showDefault);
-                result.add(new Text[]{
-                        scheme.optionText(requiredOption),
-                        scheme.optionText(shortOption),
-                        scheme.ansi().new Text(sep, scheme),
-                        longOptionText,
-                        descriptionFirstLines[0]
+                result.add(new Text[]{scheme.optionText(requiredOption), scheme.optionText(shortOption),
+                        scheme.ansi().new Text(sep, scheme), longOptionText, descriptionFirstLines[0]
                 });
                 for (int i = 1; i < descriptionFirstLines.length; i++) {
                     result.add(new Text[]{empty, empty, empty, empty, descriptionFirstLines[i]});
