@@ -25691,17 +25691,17 @@ InitialValueState.CACHED;*/
             return trailingSpaces;
         }
 
+
         /**
          * @deprecated Use {@link #join(
-                Ansi,int, boolean, String[], StringBuilder, Object...)}  instead
-         * @param ansi,
-         * @param params,
-         * @param values,
-         * @param sb,
+         * Ansi, int, boolean, String[], StringBuilder, Object...)}  instead
+         * @param ansi
          * @param usageHelpWidth
-         * @return join(ansi, usageHelpWidth,
-                 Model.UsageMessageSpec.DEFAULT_ADJUST_CJK, values, sb, params)
-         *
+         * @param values
+         * @param sb
+         * @param params
+         * @return join(ansi,usageHelpWidth,Model.UsageMessageSpec.DEFAULT_ADJUST_CJK,
+         * values,sb,params)
          */
         @Deprecated
         public static StringBuilder join(Ansi ansi, int usageHelpWidth,
@@ -27117,22 +27117,22 @@ InitialValueState.CACHED;*/
                     .showEndOfOptionsDelimiterInUsageHelp()) {
                 return "";
             }
-            Model.OptionSpec endOfOptionsOption =
+            Model.OptionSpec endOfOptionsOption1 =
                     Model.ParserSpec.DEFAULT_END_OF_OPTIONS_DELIMITER.equals(
                             commandSpec.parser().endOfOptionsDelimiter())
                             ? this.endOfOptionsOption
                             : createEndOfOptionsOption(
                             commandSpec.parser().endOfOptionsDelimiter());
-            endOfOptionsOption.commandSpec =
+            endOfOptionsOption1.commandSpec =
                     this.commandSpec; // needed for interpolation
             try {
-                endOfOptionsOption.messages(
+                endOfOptionsOption1.messages(
                         commandSpec.usageMessage().messages());
                 Layout layout = createDefaultLayout();
-                layout.addOption(endOfOptionsOption, parameterLabelRenderer());
+                layout.addOption(endOfOptionsOption1, parameterLabelRenderer());
                 return layout.toString();
             } finally {
-                endOfOptionsOption.commandSpec = null;
+                endOfOptionsOption1.commandSpec = null;
             }
         }
 
