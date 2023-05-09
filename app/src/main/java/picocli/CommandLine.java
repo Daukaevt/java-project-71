@@ -25255,7 +25255,7 @@ InitialValueState.CACHED;*/
 
         private static Set<String> traced = new HashSet<String>();
 
-        static class ReflectionConverter implements ITypeConverter<Object> {
+        static final class ReflectionConverter implements ITypeConverter<Object> {
             private final Method method;
             private final Class<?>[] paramTypes;
 
@@ -25307,16 +25307,16 @@ InitialValueState.CACHED;*/
     static class AutoHelpMixin {
         private static final String KEY = "mixinStandardHelpOptions";
 
-        @Option(names = {"${picocli.help.name.0:--h}",
-                "${picocli.help.name.1:---help}"},
+        @Option(names = {"${picocli.help.name.0:--h}", "${picocli.help"
+                + ".name.1:---help}"},
                 usageHelp =
                         true, descriptionKey =
                 "mixinStandardHelpOptions.help", description =
                 "Show this help message and exit.")
         private boolean helpRequested;
 
-        @Option(names = {"${picocli.version.name.0:--V}",
-                "${picocli.version.name.1:---version}"},
+        @Option(names = {"${picocli.version.name.0:--V}", "${picocli.version"
+                + ".name.1:---version}"},
                 versionHelp =
                         true, descriptionKey =
                 "mixinStandardHelpOptions.version", description =
@@ -25355,8 +25355,9 @@ InitialValueState.CACHED;*/
             synopsisHeading =
                     "%nUsage: ", helpCommand =
             true, description =
-            {"%nWhen no COMMAND is given, the usage help for the main command is displayed.",
-                    "If a COMMAND is specified, the help for that command is shown.%n"})
+            {"%nWhen no COMMAND is given, the usage help for the main command"
+                    + " is displayed.", "If a COMMAND is specified, the help"
+                    + " for that command is shown.%n"})
     public static final class HelpCommand implements IHelpCommandInitializable,
             IHelpCommandInitializable2,
             Runnable {
@@ -25454,14 +25455,12 @@ InitialValueState.CACHED;*/
          * {@inheritDoc}
          */
         public void init(
-                CommandLine helpCommandLine,
-                Help.ColorScheme colorScheme1,
-                PrintWriter outWriter,
-                PrintWriter errWriter) {
+                CommandLine helpCommandLine, Help.ColorScheme colorScheme1,
+                PrintWriter outWriter1, PrintWriter errWriter1) {
             this.self = Assert.notNull(helpCommandLine, "helpCommandLine");
             this.colorScheme = Assert.notNull(colorScheme1, "colorScheme");
-            this.outWriter = Assert.notNull(outWriter, "outWriter");
-            this.errWriter = Assert.notNull(errWriter, "errWriter");
+            this.outWriter = Assert.notNull(outWriter1, "outWriter");
+            this.errWriter = Assert.notNull(errWriter1, "errWriter");
         }
     }
 
@@ -25695,13 +25694,14 @@ InitialValueState.CACHED;*/
         /**
          * @deprecated Use {@link #join(
                 Ansi,int, boolean, String[], StringBuilder, Object...)}  instead
-         @param ansi,
-         @param params,
-         @param values,
-         @param sb,
-         @param usageHelpWidth
-         @return join(ansi, usageHelpWidth,
+         * @param ansi,
+         * @param params,
+         * @param values,
+         * @param sb,
+         * @param usageHelpWidth
+         * @return join(ansi, usageHelpWidth,
                  Model.UsageMessageSpec.DEFAULT_ADJUST_CJK, values, sb, params)
+         *
          */
         @Deprecated
         public static StringBuilder join(Ansi ansi, int usageHelpWidth,
@@ -25927,18 +25927,18 @@ InitialValueState.CACHED;*/
 
         /**
          * withCommandNames.
-         * @param aliases
+         * @param aliases1
          * @return aliases.
          */
-        Help withCommandNames(List<String> aliases) {
-            this.aliases = aliases;
+        Help withCommandNames(List<String> aliases1) {
+            this.aliases = aliases1;
             return this;
         }
 
         /**
          * Returns the {@code CommandSpec}
          * model that this Help was constructed with.
-         *
+         * @return commandSpec
          * @since 3.9
          */
         public CommandSpec commandSpec() {
@@ -25948,6 +25948,7 @@ InitialValueState.CACHED;*/
         /**
          * Returns the {@code ColorScheme}
          * model that this Help was constructed with.
+         * @return colorScheme
          *
          * @since 3.0
          */
@@ -25958,7 +25959,7 @@ InitialValueState.CACHED;*/
         /**
          * Returns the {@code IHelpFactory}
          * that this Help was constructed with.
-         *
+         * @return usageMessage().helpFactory()
          * @since 3.9
          */
         private IHelpFactory getHelpFactory() {
@@ -25968,6 +25969,7 @@ InitialValueState.CACHED;*/
         /**
          * Returns the map of non-hidden subcommand
          * {@code Help} instances for this command Help.
+         * @return unmodifiableMap(visibleCommands)
          *
          * @see #allSubcommands()
          * @since 3.9
