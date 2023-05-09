@@ -29008,19 +29008,15 @@ InitialValueState.CACHED;*/
             }
 
             private Text[][] renderDescriptionLines(
-                    Model.OptionSpec option,
-                    ColorScheme scheme,
-                    String requiredOption,
-                    String shortOption,
-                    Text longOptionText
+                    Model.OptionSpec option, ColorScheme scheme,
+                    String requiredOption, String shortOption, Text longOptionText
             ) {
                 Text empty = Ansi.emptyText;
-                boolean[] showDefault = {option
-                        .internalShowDefaultValue(showDefaultValues)};
+                boolean[] showDefault = {option.internalShowDefaultValue(showDefaultValues)};
                 List<Text[]> result = new ArrayList<>();
                 String[] description = option.description();
-                Text[] descriptionFirstLines =
-                        createDescriptionFirstLines(scheme, option, description, showDefault);
+                Text[] descriptionFirstLines = createDescriptionFirstLines(
+                        scheme, option, description, showDefault);
                 result.add(new Text[]{
                         scheme.optionText(requiredOption),
                         scheme.optionText(shortOption),
