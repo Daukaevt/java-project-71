@@ -20187,6 +20187,11 @@ InitialValueState.CACHED;*/
                         other.args);
             }
 
+            /**
+             * hashCode.
+             *
+             * @return result
+             */
             @Override
             public int hashCode() {
                 int result = SEVENTHEEN;
@@ -20319,8 +20324,8 @@ InitialValueState.CACHED;*/
                 if (typeInfo().isCollection()) {
                     Collection<Object> c = getter().get();
                     if (c == null) {
-                        @SuppressWarnings("unchecked") Collection<Object> c2 = (Collection<Object>) DefaultFactory.create(factory,
-                                typeInfo.getType());
+                        @SuppressWarnings("unchecked") Collection<Object> c2 = (Collection<Object>) DefaultFactory
+                                .create(factory, typeInfo.getType());
                         setter().set(c == c2);
                     }
                     (c).add(userObject);
@@ -21066,10 +21071,10 @@ InitialValueState.CACHED;*/
                 return method.getParameterAnnotations()[paramIndex];
             }
 
-            @SuppressWarnings("deprecation")
             /**
              * isAccessible.
              */
+            @SuppressWarnings("deprecation")
             @Override
             public boolean isAccessible() throws SecurityException {
                 return method.isAccessible();
@@ -21950,7 +21955,7 @@ InitialValueState.CACHED;*/
                 for (Enumeration<String> k = rb.getKeys();
                      k.hasMoreElements();
                      keys.add(k.nextElement())) {
-                    System.out.print("");//Do nothing.
+                    System.out.print(""); //Do nothing.
                 }
                 return keys;
             }
