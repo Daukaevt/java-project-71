@@ -21053,8 +21053,7 @@ InitialValueState.CACHED;*/
                             Map.class.isAssignableFrom(type)) { // type
                         // is a map but element type is unspecified
                         auxiliaryTypes =
-                                new Class<?>[]{String.class,
-                                        String.class}; // use
+                                new Class<?>[]{String.class, String.class}; // use
                         // String keys and String values
                     } else {
                         auxiliaryTypes = new Class<?>[]{type};
@@ -21097,8 +21096,7 @@ InitialValueState.CACHED;*/
                         return extractTypeParameters(
                                 (ParameterizedType) genericType);
                     }
-                    return new Class<?>[]{String.class,
-                            String.class}; // field
+                    return new Class<?>[]{String.class, String.class}; // field
                     // is multi-value but not ParameterizedType
                 }
                 return new Class<?>[]{propertyType}; // not a multi-value field
@@ -21253,7 +21251,7 @@ InitialValueState.CACHED;*/
             }
 
             public int hashCode() {
-                return Arrays.hashCode(auxiliaryTypes) + 37 * Assert.hashCode(type);
+                return Arrays.hashCode(auxiliaryTypes) + THIRTHY_SEVEN * Assert.hashCode(type);
             }
 
             public String toString() {
@@ -21268,9 +21266,9 @@ InitialValueState.CACHED;*/
         }
 
         static class TypedMember implements IAnnotatedElement, IExtensible {
-            final AccessibleObject accessible;
-            final String name;
-            final ITypeInfo typeInfo;
+            private final AccessibleObject accessible;
+            private final String name;
+            private final ITypeInfo typeInfo;
             private final InitialValueState initialValueState;
             private IScope scope;
             private IGetter getter;
@@ -21401,10 +21399,10 @@ InitialValueState.CACHED;*/
 
             static String propertyName(String methodName) {
                 if (
-                        methodName.length() > 3
+                        methodName.length() > THREE
                                 && (methodName.startsWith("get")
                                 || methodName.startsWith("set"))) {
-                    return decapitalize(methodName.substring(3));
+                    return decapitalize(methodName.substring(THREE));
                 }
                 return decapitalize(methodName);
             }
@@ -21766,6 +21764,11 @@ InitialValueState.CACHED;*/
                 }
             }
 
+            /**
+             * Messages parent.
+             *
+             * @return parent
+             */
             public Messages parent() {
                 CommandSpec parentSpec = this.spec.parent();
                 if (parent == null || parent.spec != parentSpec) {
@@ -21796,7 +21799,7 @@ InitialValueState.CACHED;*/
                 Set<String> keys = new LinkedHashSet<String>();
                 for (Enumeration<String> k = rb.getKeys();
                      k.hasMoreElements();
-                     keys.add(k.nextElement()));
+                     keys.add(k.nextElement())) {}
                 return keys;
             }
 
@@ -21836,6 +21839,9 @@ InitialValueState.CACHED;*/
              * Returns {@code true} if the specified {@code Messages} is {@code
              * null}, has a {@code null ResourceBundle},
              * or has a {@code null parent Messages}.
+             *
+             * @param messages
+             * @return messages.isEmpty()
              */
             public static boolean empty(Messages messages) {
                 return messages == null || messages.isEmpty();
@@ -21864,6 +21870,8 @@ InitialValueState.CACHED;*/
              * or {@code null} if the specified Messages object is {@code null}.
              *
              * @since 4.0
+             * @param messages
+             * @return messages.resourceBundleBaseName()
              */
             public static String resourceBundleBaseName(Messages messages) {
                 return messages == null
@@ -21874,6 +21882,9 @@ InitialValueState.CACHED;*/
             /**
              * Returns the ResourceBundle of the specified Messages object
              * or {@code null} if the specified Messages object is {@code null}.
+             *
+             * @param messages
+             * @return messages.resourceBundle()
              */
             public static ResourceBundle resourceBundle(Messages messages) {
                 return messages == null ? null : messages.resourceBundle();
@@ -21919,6 +21930,11 @@ InitialValueState.CACHED;*/
                 }
             }
 
+            /**
+             * isEmpty.
+             *
+             * @return rb == null || keys.isEmpty() && (parent() == null || parent().isEmpty())
+             */
             boolean isEmpty() {
                 return (
                         rb == null || keys.isEmpty())
@@ -21973,6 +21989,7 @@ InitialValueState.CACHED;*/
              * ResourceBundle of this object or {@code null}.
              *
              * @since 4.0
+             * @return resourceBundleBaseName
              */
             public String resourceBundleBaseName() {
                 return bundleBaseName;
@@ -21980,6 +21997,8 @@ InitialValueState.CACHED;*/
 
             /**
              * Returns the ResourceBundle of this object or {@code null}.
+             *
+             * @return ResourceBundle
              */
             public ResourceBundle resourceBundle() {
                 return rb;
@@ -21987,6 +22006,8 @@ InitialValueState.CACHED;*/
 
             /**
              * Returns the CommandSpec of this object, never {@code null}.
+             *
+             * @return spec
              */
             public CommandSpec commandSpec() {
                 return spec;
