@@ -21800,7 +21800,7 @@ InitialValueState.CACHED;*/
                 for (Enumeration<String> k = rb.getKeys();
                      k.hasMoreElements();
                      keys.add(k.nextElement())) {
-                    ;
+                    System.out.println("");
                 }
                 return keys;
             }
