@@ -20033,6 +20033,12 @@ InitialValueState.CACHED;*/
                         createLabelRenderer(positionalParam.commandSpec));
             }
 
+            /**
+             * createLabelRenderer.
+             *
+             * @param commandSpec
+             * @return Help.DefaultParamLabelRenderer
+             */
             public Help.IParamLabelRenderer createLabelRenderer(
                     CommandSpec commandSpec) {
                 return new Help.DefaultParamLabelRenderer(
@@ -20041,7 +20047,7 @@ InitialValueState.CACHED;*/
 
             private Text rawSynopsisUnitText(
                     Help.ColorScheme colorScheme,
-                    Set<ArgSpec> outparam_groupArgs) {
+                    Set<ArgSpec> outparamGroupArgs) {
                 String infix = exclusive() ? " | " : " ";
                 Text synopsis = colorScheme.ansi().new Text(0);
 
@@ -20076,12 +20082,12 @@ InitialValueState.CACHED;*/
                                             synopsis,
                                             colorScheme,
                                             (OptionSpec) ordered);
-                            outparam_groupArgs.add((OptionSpec) ordered);
+                            outparamGroupArgs.add((OptionSpec) ordered);
                         } else {
                             synopsis =
                                     synopsis.concat(
                                             ((ArgGroupSpec) ordered).synopsisText(colorScheme,
-                                                    outparam_groupArgs));
+                                                    outparamGroupArgs));
                         }
                     }
                     for (PositionalParamSpec positional : remainder) {
@@ -20092,7 +20098,7 @@ InitialValueState.CACHED;*/
                                         synopsis,
                                         colorScheme,
                                         (PositionalParamSpec) positional);
-                        outparam_groupArgs.add(positional);
+                        outparamGroupArgs.add(positional);
                     }
                 } else {
                     for (ArgSpec arg : args()) {
@@ -20112,7 +20118,7 @@ InitialValueState.CACHED;*/
                                             colorScheme,
                                             (PositionalParamSpec) arg);
                         }
-                        outparam_groupArgs.add(arg);
+                        outparamGroupArgs.add(arg);
                     }
                     for (ArgGroupSpec subgroup : subgroups()) {
                         if (synopsis.length1 > 0) {
@@ -20121,7 +20127,7 @@ InitialValueState.CACHED;*/
                         synopsis =
                                 synopsis.concat(
                                         subgroup.synopsisText(colorScheme,
-                                                outparam_groupArgs));
+                                                outparamGroupArgs));
                     }
                 }
                 return synopsis;
@@ -20130,6 +20136,8 @@ InitialValueState.CACHED;*/
             /**
              * Returns the Messages for this
              * argument group specification, or {@code null}.
+             *
+             * @return messages
              */
             public Messages messages() {
                 return messages;
@@ -20142,6 +20150,7 @@ InitialValueState.CACHED;*/
              * @param msgs the new Messages value, may be {@code null}
              * @see Command#resourceBundle()
              * @see #headingKey()
+             * @return ArgGroupSpec messages
              */
             public ArgGroupSpec messages(Messages msgs) {
                 messages = msgs;
@@ -20151,6 +20160,12 @@ InitialValueState.CACHED;*/
                 return this;
             }
 
+            /**
+             * equals.
+             *
+             * @param obj
+             * @return equals boolean
+             */
             @Override
             public boolean equals(Object obj) {
                 if (obj == this) {
@@ -20174,18 +20189,23 @@ InitialValueState.CACHED;*/
 
             @Override
             public int hashCode() {
-                int result = 17;
-                result += 37 * result + Assert.hashCode(exclusive);
-                result += 37 * result + Assert.hashCode(multiplicity);
-                result += 37 * result + Assert.hashCode(validate);
-                result += 37 * result + order;
-                result += 37 * result + Assert.hashCode(heading);
-                result += 37 * result + Assert.hashCode(headingKey);
-                result += 37 * result + Assert.hashCode(subgroups);
-                result += 37 * result + Assert.hashCode(args);
+                int result = SEVENTHEEN;
+                result += THIRTHY_SEVEN * result + Assert.hashCode(exclusive);
+                result += THIRTHY_SEVEN * result + Assert.hashCode(multiplicity);
+                result += THIRTHY_SEVEN * result + Assert.hashCode(validate);
+                result += THIRTHY_SEVEN * result + order;
+                result += THIRTHY_SEVEN * result + Assert.hashCode(heading);
+                result += THIRTHY_SEVEN * result + Assert.hashCode(headingKey);
+                result += THIRTHY_SEVEN * result + Assert.hashCode(subgroups);
+                result += THIRTHY_SEVEN * result + Assert.hashCode(args);
                 return result;
             }
 
+            /**
+             * toString.
+             *
+             * @return String
+             */
             @Override
             public String toString() {
                 return "ArgGroup[exclusive=" + exclusive + ", multiplicity="
@@ -20196,6 +20216,11 @@ InitialValueState.CACHED;*/
                         + ", subgroups=" + subgroups + "]";
             }
 
+            /**
+             * initUserObject.
+             *
+             * @param commandLine
+             */
             void initUserObject(CommandLine commandLine) {
                 if (commandLine == null) {
                     CommandLine.tracer(
@@ -20213,6 +20238,12 @@ InitialValueState.CACHED;*/
                 }
             }
 
+            /**
+             * tryInitUserObject.
+             *
+             * @param commandLine
+             * @throws Exception
+             */
             void tryInitUserObject(CommandLine commandLine) throws Exception {
                 Tracer tracer = tracer();
                 if (typeInfo() != null) {
@@ -20230,13 +20261,15 @@ InitialValueState.CACHED;*/
                     setUserObject(userObject, commandLine.factory);
                     for (ArgSpec arg : args()) {
                         tracer.debug(
-                                "Initializing %s in group %s: setting scope to user object %s and initializing initial and default values",
+                                "Initializing %s in group %s: setting scope to user object %s"
+                                        + " and initializing initial and default values",
                                 ArgSpec.describe(arg,
                                         "="),
                                 synopsis(),
                                 userObject);
                         arg.scope(
-                        ).set(userObject); // flip the actual user object for the arg (and all other args in this group; they share the same IScope instance)
+                        ).set(userObject); // flip the actual user object for the arg
+                        // (and all other args in this group; they share the same IScope instance)
                         commandLine.interpreter.parseResultBuilder.isInitializingDefaultValues =
                                 true;
                         arg.applyInitialValue();
@@ -20254,7 +20287,8 @@ InitialValueState.CACHED;*/
                                 synopsis(),
                                 userObject);
                         subgroup.scope(
-                        ).set(userObject); // flip the actual user object for the arg (and all other args in this group; they share the same IScope instance)
+                        ).set(userObject); // flip the actual user object for the arg
+                        // (and all other args in this group; they share the same IScope instance)
                     }
                     for (IAnnotatedElement specElement : specElements()) {
                         tracer.debug(
@@ -20266,24 +20300,28 @@ InitialValueState.CACHED;*/
                         specElement.setter().set(commandLine.getCommandSpec());
                     }
                 } else {
-                    tracer.debug(
-                            "No type information available for group %s: cannot create new user object. Scope for arg setters is not changed.",
-                            synopsis());
+                    tracer.debug("No type information available for group %s: cannot create"
+                            + " new user object. Scope for arg setters is not changed.", synopsis());
                 }
                 tracer.debug("Initialization complete for group %s",
                         synopsis());
             }
 
+            /**
+             * setUserObject.
+             *
+             * @param userObject
+             * @param factory
+             * @throws Exception
+             */
             void setUserObject(
                     Object userObject, IFactory factory) throws Exception {
                 if (typeInfo().isCollection()) {
                     Collection<Object> c = getter().get();
                     if (c == null) {
-                        @SuppressWarnings("unchecked") Collection<Object> c2 =
-                                (
-                                        Collection<Object>) DefaultFactory.create(factory,
-                                        typeInfo.getType());
-                        setter().set(c = c2);
+                        @SuppressWarnings("unchecked") Collection<Object> c2 = (Collection<Object>) DefaultFactory.create(factory,
+                                typeInfo.getType());
+                        setter().set(c == c2);
                     }
                     (c).add(userObject);
                 } else if (typeInfo().isArray()) {
@@ -20303,6 +20341,13 @@ InitialValueState.CACHED;*/
                 }
             }
 
+            /**
+             * validateArgs.
+             *
+             * @param commandLine
+             * @param matchedArgs
+             * @return validator
+             */
             ParseResult.GroupValidationResult validateArgs(
                     CommandLine commandLine, Collection<ArgSpec> matchedArgs) {
                 Set<ArgSpec> intersection = new LinkedHashSet<ArgSpec>(args());
@@ -20348,9 +20393,9 @@ InitialValueState.CACHED;*/
                     if (multiplicity().min > 0 && haveMissing) {
                         return new ParseResult.GroupValidationResult(
                                 ParseResult.GroupValidationResult.Type.FAILURE_ABSENT,
-                                new MissingParameterException(commandLine,
-                                        args(),
-                                        "Error: Missing required argument (specify one of these): " + requiredElements));
+                                new MissingParameterException(commandLine, args(),
+                                        "Error: Missing required argument (specify one of these): "
+                                                + requiredElements));
                     }
                 } else { // co-occurring group
                     if (someButNotAllSpecified) {
@@ -20368,7 +20413,9 @@ InitialValueState.CACHED;*/
                                         "Error: Missing required argument(s): " + missingElements));
                     }
                 }
-                return presentCount > 0 ? ParseResult.GroupValidationResult.SUCCESS_PRESENT : ParseResult.GroupValidationResult.SUCCESS_ABSENT;
+                return presentCount > 0
+                        ? ParseResult.GroupValidationResult.SUCCESS_PRESENT
+                        : ParseResult.GroupValidationResult.SUCCESS_ABSENT;
             }
 
             /**
@@ -20418,11 +20465,14 @@ InitialValueState.CACHED;*/
                  */
                 public Builder updateArgGroupAttributes(ArgGroup group) {
                     return this.heading(
-                            group.heading()).headingKey(group.headingKey()).exclusive(group.exclusive()).multiplicity(group.multiplicity()).validate(group.validate()).order(group.order());
+                            group.heading()).headingKey(group.headingKey()).exclusive(group.exclusive())
+                            .multiplicity(group.multiplicity()).validate(group.validate()).order(group.order());
                 }
 
                 /**
                  * Returns a valid {@code ArgGroupSpec} instance.
+                 *
+                 * @return ArgGroupSpec
                  */
                 public ArgGroupSpec build() {
                     return new ArgGroupSpec(this);
@@ -20436,6 +20486,7 @@ InitialValueState.CACHED;*/
                  *)} is {@code false}.
                  *
                  * @see ArgGroup#exclusive()
+                 * @return exclusive
                  */
                 public boolean exclusive() {
                     return exclusive;
@@ -20449,6 +20500,8 @@ InitialValueState.CACHED;*/
                  *)} is {@code false}.
                  *
                  * @see ArgGroup#exclusive()
+                 * @param newValue
+                 * @return exclusive
                  */
                 public Builder exclusive(boolean newValue) {
                     exclusive = newValue;
@@ -20468,6 +20521,7 @@ InitialValueState.CACHED;*/
                  * Ignored if {@link #validate()} is {@code false}.
                  *
                  * @see ArgGroup#multiplicity()
+                 * @return multiplicity
                  */
                 public Range multiplicity() {
                     return multiplicity;
@@ -20486,6 +20540,8 @@ InitialValueState.CACHED;*/
                  * Ignored if {@link #validate()} is {@code false}.
                  *
                  * @see ArgGroup#multiplicity()
+                 * @param newValue
+                 * @return  multiplicity(Range.valueOf(newValue)
                  */
                 public Builder multiplicity(String newValue) {
                     return multiplicity(Range.valueOf(newValue));
@@ -20504,6 +20560,8 @@ InitialValueState.CACHED;*/
                  * Ignored if {@link #validate()} is {@code false}.
                  *
                  * @see ArgGroup#multiplicity()
+                 * @param newValue
+                 * @return multiplicity
                  */
                 public Builder multiplicity(Range newValue) {
                     multiplicity = newValue;
@@ -20520,6 +20578,7 @@ InitialValueState.CACHED;*/
                  * {@code true} by default.
                  *
                  * @see ArgGroup#validate()
+                 * @return validate
                  */
                 public boolean validate() {
                     return validate;
@@ -20535,6 +20594,8 @@ InitialValueState.CACHED;*/
                  * {@code true} by default.
                  *
                  * @see ArgGroup#validate()
+                 * @param newValue
+                 * @return validate
                  */
                 public Builder validate(boolean newValue) {
                     validate = newValue;
@@ -20549,6 +20610,7 @@ InitialValueState.CACHED;*/
                  * This attribute is only honored
                  * for groups that have a {@link #heading(
                  *) heading} (or a {@link #headingKey() headingKey} with a non-{@code null} resource bundle value).
+                 * @return order
                  */
                 public int order() {
                     return order;
@@ -20557,9 +20619,12 @@ InitialValueState.CACHED;*/
                 /**
                  * Sets the position in the options list in the usage help
                  * message at which this group should be shown, and returns this builder.
+                 *
+                 * @param order1
+                 * @return order
                  */
-                public Builder order(int order) {
-                    this.order = order;
+                public Builder order(int order1) {
+                    this.order = order1;
                     return this;
                 }
 
@@ -20568,6 +20633,7 @@ InitialValueState.CACHED;*/
                  * used when generating the usage documentation.
                  *
                  * @see ArgGroup#heading()
+                 * @return heading
                  */
                 public String heading() {
                     return heading;
@@ -20579,6 +20645,8 @@ InitialValueState.CACHED;*/
                  * used when generating the usage documentation.
                  *
                  * @see ArgGroup#heading()
+                 * @param newValue
+                 * @return heading
                  */
                 public Builder heading(String newValue) {
                     this.heading = newValue;
@@ -20590,6 +20658,7 @@ InitialValueState.CACHED;*/
                  * group, used to get the heading from a resource bundle.
                  *
                  * @see ArgGroup#headingKey()
+                 * @return headingKey
                  */
                 public String headingKey() {
                     return headingKey;
@@ -20600,6 +20669,8 @@ InitialValueState.CACHED;*/
                  * used to get the heading from a resource bundle.
                  *
                  * @see ArgGroup#headingKey()
+                 * @param newValue
+                 * @return headingKey
                  */
                 public Builder headingKey(String newValue) {
                     this.headingKey = newValue;
@@ -20623,6 +20694,7 @@ InitialValueState.CACHED;*/
                  *
                  * @param newValue type information that does not require
                  *                 {@code Class} objects and be constructed both at runtime and compile time
+                 * @return typeInfo
                  */
                 public Builder typeInfo(ITypeInfo newValue) {
                     this.typeInfo = newValue;
@@ -20632,6 +20704,8 @@ InitialValueState.CACHED;*/
                 /**
                  * Returns the {@link IGetter} that is responsible for supplying
                  * the value of the annotated program element associated with this group.
+                 *
+                 * @return IGetter
                  */
                 public IGetter getter() {
                     return getter;
@@ -20640,15 +20714,20 @@ InitialValueState.CACHED;*/
                 /**
                  * Sets the {@link IGetter} that is responsible for getting the value
                  * of the annotated program element associated with this group, and returns this builder.
+                 *
+                 * @param getter1
+                 * @return getter
                  */
-                public Builder getter(IGetter getter) {
-                    this.getter = getter;
+                public Builder getter(IGetter getter1) {
+                    this.getter = getter1;
                     return this;
                 }
 
                 /**
                  * Returns the {@link ISetter} that is responsible for modifying
                  * the value of the annotated program element associated with this group.
+                 *
+                 * @return ISetter
                  */
                 public ISetter setter() {
                     return setter;
@@ -20657,9 +20736,12 @@ InitialValueState.CACHED;*/
                 /**
                  * Sets the {@link ISetter} that is responsible for modifying the value
                  * of the annotated program element associated with this group, and returns this builder.
+                 *
+                 * @param setter1
+                 * @return setter
                  */
-                public Builder setter(ISetter setter) {
-                    this.setter = setter;
+                public Builder setter(ISetter setter1) {
+                    this.setter = setter1;
                     return this;
                 }
 
@@ -20667,6 +20749,8 @@ InitialValueState.CACHED;*/
                  * Returns the {@link IScope}
                  * that determines where the setter sets the value (
                  * or the getter gets the value) of the annotated program element associated with this group.
+                 *
+                 * @return scope
                  */
                 public IScope scope() {
                     return scope;
@@ -20675,15 +20759,21 @@ InitialValueState.CACHED;*/
                 /**
                  * Sets the {@link IScope} that targets where the setter sets the value
                  * of the annotated program element associated with this group, and returns this builder.
+                 *
+                 * @param scope1
+                 * @return scope
                  */
-                public Builder scope(IScope scope) {
-                    this.scope = scope;
+                public Builder scope(IScope scope1) {
+                    this.scope = scope1;
                     return this;
                 }
 
                 /**
                  * Adds the specified argument to the list of
                  * options and positional parameters that depend on this group.
+                 *
+                 * @param arg
+                 * @return args
                  */
                 public Builder addArg(ArgSpec arg) {
                     args.add(arg);
@@ -20693,6 +20783,8 @@ InitialValueState.CACHED;*/
                 /**
                  * Returns the list of options and
                  * positional parameters that depend on this group.
+                 *
+                 * @return rgs
                  */
                 public List<ArgSpec> args() {
                     return args;
@@ -20701,6 +20793,9 @@ InitialValueState.CACHED;*/
                 /**
                  * Adds the specified group to the
                  * list of subgroups that this group is composed of.
+                 *
+                 * @param group
+                 * @return subgroups
                  */
                 public Builder addSubgroup(ArgGroupSpec group) {
                     subgroups.add(group);
@@ -20710,6 +20805,8 @@ InitialValueState.CACHED;*/
                 /**
                  * Returns the list of
                  * subgroups that this group is composed of.
+                 *
+                 * @return subgroups
                  */
                 public List<ArgGroupSpec> subgroups() {
                     return subgroups;
@@ -20720,6 +20817,8 @@ InitialValueState.CACHED;*/
                  * program element to the list of spec elements for this group.
                  *
                  * @since 4.6
+                 * @param element
+                 * @return specElements
                  */
                 public Builder addSpecElement(IAnnotatedElement element) {
                     specElements.add(element);
@@ -20731,6 +20830,7 @@ InitialValueState.CACHED;*/
                  * with {@code {@literal @}Spec} configured for this group.
                  *
                  * @since 4.6
+                 * @return specElements
                  */
                 public List<IAnnotatedElement> specElements() {
                     return specElements;
@@ -20748,7 +20848,7 @@ InitialValueState.CACHED;*/
          *
          * @since 3.0
          */
-        public static class UnmatchedArgsBinding {
+        public static final class UnmatchedArgsBinding {
             private final IGetter getter;
             private final ISetter setter;
             private Object initialValue;
@@ -20777,6 +20877,8 @@ InitialValueState.CACHED;*/
              *
              * @param setter consumes the
              *               String[] array with unmatched arguments.
+             *
+             * @return UnmatchedArgsBinding(null, setter)
              */
             public static UnmatchedArgsBinding forStringArrayConsumer(
                     ISetter setter) {
@@ -20789,6 +20891,8 @@ InitialValueState.CACHED;*/
              *
              * @param getter supplies a {@code Collection<String>}
              *               that the unmatched arguments can be added to.
+             *
+             * @return UnmatchedArgsBinding(getter, null)
              */
             public static UnmatchedArgsBinding forStringCollectionSupplier(
                     IGetter getter) {
@@ -20798,6 +20902,8 @@ InitialValueState.CACHED;*/
             /**
              * Returns the getter responsible for producing a
              * {@code Collection} that the unmatched arguments can be added to.
+             *
+             * @return getter
              */
             public IGetter getter() {
                 return getter;
@@ -20806,6 +20912,8 @@ InitialValueState.CACHED;*/
             /**
              * Returns the setter responsible
              * for consuming the unmatched arguments.
+             *
+             * @return setter
              */
             public ISetter setter() {
                 return setter;
@@ -20832,12 +20940,9 @@ InitialValueState.CACHED;*/
                         }
                         collection.addAll(Arrays.asList(unmatched));
                     } catch (Exception ex) {
-                        throw new PicocliException(
-                                String.format("Could not add unmatched argument array '%s' to collection returned by getter (%s): %s",
-                                        Arrays.toString(unmatched),
-                                        getter,
-                                        ex),
-                                ex);
+                        throw new PicocliException(String.format("Could not add unmatched "
+                                        + "argument array '%s' to collection returned by getter (%s): %s",
+                                        Arrays.toString(unmatched), getter, ex), ex);
                     }
                 }
             }
@@ -20874,10 +20979,10 @@ InitialValueState.CACHED;*/
          * @since 4.0
          */
         public static class MethodParam extends AccessibleObject {
-            final Method method;
-            final int paramIndex;
-            final String name;
-            int position;
+            private final Method method;
+            private final int paramIndex;
+            private final String name;
+            private int position;
 
             public MethodParam(Method method, int paramIndex) {
                 this.method = method;
@@ -20888,30 +20993,57 @@ InitialValueState.CACHED;*/
                             Method.class.getMethod("getParameters");
                     Object parameters = getParameters.invoke(method);
                     Object parameter = Array.get(parameters, paramIndex);
-                    tmp =
-                            (
-                                    String) Class.forName("java.lang.reflect.Parameter").getDeclaredMethod("getName").invoke(parameter);
+                    tmp = (String) Class.forName("java.lang.reflect.Parameter")
+                            .getDeclaredMethod("getName").invoke(parameter);
                 } catch (Exception ignored) {
                 }
                 this.name = tmp;
             }
 
+            /**
+             * getParameterizedTyp.
+             *
+             * @return method.getGenericParameterTypes
+             */
             public Type getParameterizedType() {
                 return method.getGenericParameterTypes()[paramIndex];
             }
 
+            /**
+             * getName.
+             *
+             * @return name
+             */
             public String getName() {
                 return name;
             }
 
+            /**
+             * getType.
+             *
+             * @return method.getParameterTypes
+             */
             public Class<?> getType() {
                 return method.getParameterTypes()[paramIndex];
             }
 
+            /**
+             * getDeclaringExecutable.
+             *
+             * @return method
+             */
             public Method getDeclaringExecutable() {
                 return method;
             }
 
+            /**
+             * getAnnotation.
+             *
+             * @param annotationClass the Class object corresponding to the
+             *        annotation type
+             * @return annotationClass.cast(annotation)
+             * @param <T>
+             */
             @Override
             public <T extends Annotation> T getAnnotation(
                     Class<T> annotationClass) {
@@ -20924,22 +21056,41 @@ InitialValueState.CACHED;*/
                 return null;
             }
 
+            /**
+             * getDeclaredAnnotations.
+             *
+             * @return method.getParameterAnnotations
+             */
             @Override
             public Annotation[] getDeclaredAnnotations() {
                 return method.getParameterAnnotations()[paramIndex];
             }
 
             @SuppressWarnings("deprecation")
+            /**
+             * isAccessible.
+             */
             @Override
             public boolean isAccessible() throws SecurityException {
                 return method.isAccessible();
             }
 
+            /**
+             * setAccessible.
+             *
+             * @param flag the new value for the {@code accessible} flag
+             * @throws SecurityException
+             */
             @Override
             public void setAccessible(boolean flag) throws SecurityException {
                 method.setAccessible(flag);
             }
 
+            /**
+             * toString.
+             *
+             * @return method.toString() + ":" + getName()
+             */
             @Override
             public String toString() {
                 return method.toString() + ":" + getName();
@@ -20947,7 +21098,7 @@ InitialValueState.CACHED;*/
         }
 
         static class RuntimeTypeInfo implements ITypeInfo {
-            final static String ERRORMSG =
+            static final String ERRORMSG =
                     "Unsupported generic type %s. Only List<T>, Map<K,V>, "
                             + "Optional<T>, and Map<K,Optional<V>> are supported. "
                             + "Type parameters may be char[], a non-array type, "
@@ -20964,11 +21115,10 @@ InitialValueState.CACHED;*/
                 this.auxiliaryTypes =
                         Assert.notNull(auxiliaryTypes,
                                 "auxiliaryTypes").clone();
-                this.actualGenericTypeArguments =
-                        actualGenericTypeArguments == null
-                                ? Collections.<String>emptyList()
-                                : Collections.unmodifiableList(
-                                new ArrayList<String>(actualGenericTypeArguments));
+                this.actualGenericTypeArguments = actualGenericTypeArguments == null
+                        ? Collections.<String>emptyList()
+                        : Collections.unmodifiableList(new ArrayList<String>(
+                                actualGenericTypeArguments));
             }
 
             static ITypeInfo createForAuxType(Class<?> type) {
@@ -21800,7 +21950,7 @@ InitialValueState.CACHED;*/
                 for (Enumeration<String> k = rb.getKeys();
                      k.hasMoreElements();
                      keys.add(k.nextElement())) {
-                    System.out.println("");
+                    System.out.print("");//Do nothing.
                 }
                 return keys;
             }
