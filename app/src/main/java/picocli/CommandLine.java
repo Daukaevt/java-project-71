@@ -23231,7 +23231,7 @@ InitialValueState.CACHED;*/
      *
      * @since 3.0
      */
-    public static class ParseResult {
+    public static final class ParseResult {
         private final CommandSpec commandSpec;
         private final Set<Model.OptionSpec> matchedUniqueOptions;
         private final Set<Model.PositionalParamSpec> matchedUniquePositionals;
@@ -23246,7 +23246,7 @@ InitialValueState.CACHED;*/
         private final List<Exception> errors;
         private final GroupMatchContainer groupMatchContainer;
         private final List<ParseResult> subcommands;
-        final List<Object> tentativeMatch;
+        private final List<Object> tentativeMatch;
 
         private final boolean usageHelpRequested;
         private final boolean versionHelpRequested;
@@ -23281,6 +23281,9 @@ InitialValueState.CACHED;*/
         /**
          * Creates and returns a new {@code ParseResult.Builder}
          * for the specified command spec.
+         *
+         * @param commandSpec
+         * @return new Builder(commandSpec)
          */
         public static Builder builder(CommandSpec commandSpec) {
             return new Builder(commandSpec);
@@ -23290,6 +23293,8 @@ InitialValueState.CACHED;*/
          * Returns the matches for the specified argument group.
          *
          * @since 4.0
+         * @param group
+         * @return groupMatchContainer.findMatchContainers
          */
         public List<GroupMatchContainer> findMatches(Model.ArgGroupSpec group) {
             return groupMatchContainer.findMatchContainers(
@@ -23324,6 +23329,7 @@ InitialValueState.CACHED;*/
          * </p>
          *
          * @since 4.0
+         * @return groupMatchContainer.matches()
          */
         public List<GroupMatch> getGroupMatches() {
             return groupMatchContainer.matches();
@@ -23353,6 +23359,8 @@ InitialValueState.CACHED;*/
          * </p>
          *
          * @see CommandSpec#findOption(char)
+         * @param shortName
+         * @return findOption(shortName, matchedOptions)
          */
         public Model.OptionSpec matchedOption(char shortName) {
             return CommandSpec.findOption(shortName, matchedOptions);
@@ -23386,6 +23394,7 @@ InitialValueState.CACHED;*/
          *             The specified name may
          *             include option name prefix characters or not.
          * @see CommandSpec#findOption(String)
+         * @return findOption(name, matchedOptions)
          */
         public Model.OptionSpec matchedOption(String name) {
             return CommandSpec.findOption(name, matchedOptions);
@@ -23396,6 +23405,9 @@ InitialValueState.CACHED;*/
          * that matched an argument at the specified
          * position, or {@code null} if no positional
          * parameters were matched at that position.
+         *
+         * @param position
+         * @return matchedPositionalParams.get(position).get(0)
          */
         public Model.PositionalParamSpec matchedPositional(int position) {
             if (
@@ -23411,6 +23423,9 @@ InitialValueState.CACHED;*/
          * that matched an argument at the specified
          * position, or an empty list if no positional
          * parameters were matched at that position.
+         *
+         * @param position
+         * @return matchedPositionalParams.get(position)
          */
         public List<Model.PositionalParamSpec> matchedPositionals(
                 int position) {
@@ -23425,6 +23440,8 @@ InitialValueState.CACHED;*/
 
         /**
          * Returns the {@code CommandSpec} for the matched command.
+         *
+         * @return commandSpec
          */
         public CommandSpec commandSpec() {
             return commandSpec;
@@ -23437,6 +23454,8 @@ InitialValueState.CACHED;*/
          * @param shortName used to search the matched options. May be an
          * alias of the option name that
          * was actually specified on the command line.
+         *
+         * @return matchedOption(shortName)
          */
         public boolean hasMatchedOption(char shortName) {
             return matchedOption(shortName) != null;
@@ -23451,6 +23470,8 @@ InitialValueState.CACHED;*/
          *             was actually specified on the command line.
          *             The specified name may
          *             include option name prefix characters or not.
+         *
+         * @return hasMatchedOption
          */
         public boolean hasMatchedOption(String name) {
             return matchedOption(name) != null;
@@ -23459,6 +23480,9 @@ InitialValueState.CACHED;*/
         /**
          * Returns whether the specified
          * option was matched on the command line.
+         *
+         * @param option
+         * @return matchedOptions.contains(option)
          */
         public boolean hasMatchedOption(Model.OptionSpec option) {
             return matchedOptions.contains(option);
@@ -23467,6 +23491,9 @@ InitialValueState.CACHED;*/
         /**
          * Returns whether a positional parameter
          * was matched at the specified position.
+         *
+         * @param position
+         * @return hasMatchedPositional
          */
         public boolean hasMatchedPositional(int position) {
             return matchedPositional(position) != null;
@@ -23475,6 +23502,9 @@ InitialValueState.CACHED;*/
         /**
          * Returns whether the specified positional
          * parameter was matched on the command line.
+         *
+         * @param positional
+         * @return matchedUniquePositionals.contains(positional)
          */
         public boolean hasMatchedPositional(Model
                     .PositionalParamSpec positional) {
@@ -23485,6 +23515,7 @@ InitialValueState.CACHED;*/
          * Returns a set of matched options.
          *
          * @since 4.0
+         * @return unmodifiableSet(matchedUniqueOptions)
          */
         public Set<Model.OptionSpec> matchedOptionsSet() {
             return Collections.unmodifiableSet(matchedUniqueOptions);
@@ -23495,6 +23526,8 @@ InitialValueState.CACHED;*/
          * in order they were matched on the command line.
          * The returned list may contain the same {@code OptionSpec} multiple
          * times, if the option was matched multiple times on the command line.
+         *
+         * @return unmodifiableList(matchedOptions)
          */
         public List<Model.OptionSpec> matchedOptions() {
             return Collections.unmodifiableList(matchedOptions);
@@ -23504,6 +23537,7 @@ InitialValueState.CACHED;*/
          * Returns a set of matched positional parameters.
          *
          * @since 4.0
+         * @return unmodifiableSet(matchedUniquePositionals)
          */
         public Set<Model.PositionalParamSpec> matchedPositionalsSet() {
             return Collections.unmodifiableSet(matchedUniquePositionals);
@@ -23515,6 +23549,8 @@ InitialValueState.CACHED;*/
          * The returned list may contain the same {@code PositionalParamSpec}
          * multiple times, if the parameter
          * was matched multiple times on the command line.
+         *
+         * @return unmodifiableList(matchedPositionals)
          */
         public List<Model.PositionalParamSpec> matchedPositionals() {
             return Collections.unmodifiableList(matchedPositionals);
@@ -23529,6 +23565,7 @@ InitialValueState.CACHED;*/
          * was matched multiple times on the command line.
          *
          * @since 4.0
+         * @return unmodifiableList(matchedArgs)
          */
         public List<Model.ArgSpec> matchedArgs() {
             return Collections.unmodifiableList(matchedArgs);
@@ -23537,6 +23574,8 @@ InitialValueState.CACHED;*/
         /**
          * Returns a list of command line arguments that
          * did not match any options or positional parameters.
+         *
+         * @return unmodifiableList(unmatched)
          */
         public List<String> unmatched() {
             return Collections.unmodifiableList(unmatched);
@@ -23549,6 +23588,7 @@ InitialValueState.CACHED;*/
          * before {@linkplain CommandLine#isExpandAtFiles() @-file expansion}.
          *
          * @see #expandedArgs()
+         * @return unmodifiableList(originalArgs)
          */
         public List<String> originalArgs() {
             return Collections.unmodifiableList(originalArgs);
@@ -23562,6 +23602,7 @@ InitialValueState.CACHED;*/
          *
          * @see #originalArgs()
          * @since 4.4
+         * @return unmodifiableList(expandedArgs)
          */
         public List<String> expandedArgs() {
             return Collections.unmodifiableList(expandedArgs);
@@ -23574,6 +23615,7 @@ InitialValueState.CACHED;*/
          * otherwise, returns an empty list.
          *
          * @since 3.2
+         * @return err
          */
         public List<Exception> errors() {
             return Collections.unmodifiableList(errors);
@@ -23586,6 +23628,11 @@ InitialValueState.CACHED;*/
          *) type} of the option,
          * or the specified default value
          * if no option with the specified name was matched.
+         *
+         * @param <T>
+         * @param defaultValue
+         * @param shortName
+         * @return matchedOptionValue
          */
         public <T> T matchedOptionValue(char shortName, T defaultValue) {
             return matchedOptionValue(matchedOption(shortName), defaultValue);
@@ -23598,6 +23645,11 @@ InitialValueState.CACHED;*/
          *) type} of the option,
          * or the specified default value
          * if no option with the specified name was matched.
+         *
+         * @param defaultValue
+         * @param <T>
+         * @param name
+         * @return atchedOptionValue
          */
         public <T> T matchedOptionValue(String name, T defaultValue) {
             return matchedOptionValue(matchedOption(name), defaultValue);
@@ -23609,6 +23661,11 @@ InitialValueState.CACHED;*/
          *) type} of the option,
          * or the specified default value
          * if the specified option is {@code null}.
+         *
+         * @param <T>
+         * @param defaultValue
+         * @param option
+         * @return matchedOptionValue
          */
         @SuppressWarnings("unchecked")
         private <T> T matchedOptionValue(Model.OptionSpec option,
@@ -23624,6 +23681,11 @@ InitialValueState.CACHED;*/
          *) type} of the positional parameter,
          * or the specified default value
          * if no positional parameter was matched at that position.
+         *
+         * @param defaultValue
+         * @param <T>
+         * @param position
+         * @return matchedPositionalValue
          */
         public <T> T matchedPositionalValue(int position, T defaultValue) {
             return matchedPositionalValue(
@@ -23637,6 +23699,11 @@ InitialValueState.CACHED;*/
          *) type} of the positional parameter,
          * or the specified default value
          * if the specified positional parameter is {@code null}.
+         *
+         * @param <T>
+         * @param positional
+         * @param defaultValue
+         * @return matchedPositionalValue
          */
         @SuppressWarnings("unchecked")
         private <T> T matchedPositionalValue(
@@ -23649,6 +23716,8 @@ InitialValueState.CACHED;*/
         /**
          * Returns {@code true} if a subcommand was
          * matched on the command line, {@code false} otherwise.
+         *
+         * @return !subcommands.isEmpty()
          */
         public boolean hasSubcommand() {
             return !subcommands.isEmpty();
@@ -23659,6 +23728,8 @@ InitialValueState.CACHED;*/
          * for the last subcommand of this command
          * that was matched on the command line,
          * or {@code null} if no subcommand was matched.
+         *
+         * @return subcommands.get(subcommands.size() - 1)
          */
         public ParseResult subcommand() {
             return !hasSubcommand(
@@ -23675,6 +23746,7 @@ InitialValueState.CACHED;*/
          *) subcommandsRepeatable} attribute is {@code true}.
          *
          * @since 4.2
+         * @return .unmodifiableList(subcommands)
          */
         public List<ParseResult> subcommands() {
             return Collections.unmodifiableList(subcommands);
@@ -23684,6 +23756,8 @@ InitialValueState.CACHED;*/
          * Returns {@code true} if one of the options that was matched
          * on the command line is a {@link Model.OptionSpec#usageHelp(
          *) usageHelp} option.
+         *
+         * @return usageHelpRequested
          */
         public boolean isUsageHelpRequested() {
             return usageHelpRequested;
@@ -23693,6 +23767,8 @@ InitialValueState.CACHED;*/
          * Returns {@code true} if one of the options that was matched
          * on the command line is a {@link Model.OptionSpec#versionHelp(
          *) versionHelp} option.
+         *
+         * @return versionHelpRequested
          */
         public boolean isVersionHelpRequested() {
             return versionHelpRequested;
@@ -23705,6 +23781,7 @@ InitialValueState.CACHED;*/
          * commands at each level of the hierarchy in the returned list.
          *
          * @since 3.0
+         * @return recursivelyAddCommandLineTo
          */
         public List<CommandLine> asCommandLineList() {
             return recursivelyAddCommandLineTo(new ArrayList<CommandLine>());
@@ -23729,7 +23806,7 @@ InitialValueState.CACHED;*/
         /**
          * Builds immutable {@code ParseResult} instances.
          */
-        public static class Builder {
+        public static final class Builder {
             private final CommandSpec commandSpec;
             private final List<Model.ArgSpec> matchedArgsList =
                     new ArrayList<Model.ArgSpec>();
@@ -23755,7 +23832,7 @@ InitialValueState.CACHED;*/
                     new ArrayList<ParseResult>();
             private boolean usageHelpRequested;
             private boolean versionHelpRequested;
-            boolean isInitializingDefaultValues;
+            private boolean isInitializingDefaultValues;
             private final List<Exception> errors = new ArrayList<Exception>(1);
             private List<Object> nowProcessing;
             private final GroupMatchContainer groupMatchContainer =
@@ -23768,6 +23845,8 @@ InitialValueState.CACHED;*/
             /**
              * Creates and returns a new {@code ParseResult}
              * instance for this builder's configuration.
+             *
+             * @return ParseResult
              */
             public ParseResult build() {
                 return new ParseResult(this);
@@ -23804,6 +23883,9 @@ InitialValueState.CACHED;*/
             /**
              * Adds the specified {@code OptionSpec} to
              * the list of options that were matched on the command line.
+             *
+             * @param option
+             * @return addOption
              */
             public Builder addOption(Model.OptionSpec option) {
                 if (!isInitializingDefaultValues) {
@@ -23847,6 +23929,10 @@ InitialValueState.CACHED;*/
              *
              * @position ignored if negative, remembered in
              * firstUnmatchedPosition if it precedes a previously set value
+             *
+             * @param arg
+             * @param position
+             * @return addUnmatched
              * @since 4.6
              */
             private Builder addUnmatched(int position, String arg) {
@@ -23861,6 +23947,9 @@ InitialValueState.CACHED;*/
             /**
              * Adds the specified command line argument
              * to the list of unmatched command line arguments.
+             *
+             * @param arg
+             * @return addUnmatched
              */
             public Builder addUnmatched(String arg) {
                 return addUnmatched(-1, arg);
@@ -23869,6 +23958,9 @@ InitialValueState.CACHED;*/
             /**
              * Adds all elements of the specified command line
              * arguments stack to the list of unmatched command line arguments.
+             *
+             * @param args
+             * @return addUnmatched
              */
             public Builder addUnmatched(Stack<String> args) {
                 while (!args.isEmpty()) {
@@ -23891,6 +23983,9 @@ InitialValueState.CACHED;*/
             /**
              * Sets the specified {@code ParseResult}
              * for a subcommand that was matched on the command line.
+             *
+             * @param subcommand
+             * @return subcommands.add(0, subcommand)
              */
             // implementation note: this method gets called
             // with the most recently matched subcommand first,
@@ -23901,14 +23996,17 @@ InitialValueState.CACHED;*/
             }
 
             /**
+             * originalArgs.
              * Sets the specified original command line arguments
              * that were passed to the {@link CommandLine#parseArgs(
-             *String...)} method,
+             * String...)} method,
              * before {@linkplain CommandLine#isExpandAtFiles()
              * @-file expansion}.
              *
              * @see #expandedArgs(Collection)
              * @see ParseResult#originalArgs()
+             * @param originalArgs
+             * @return originalArgList.addAll(Arrays.asList(originalArgs))
              */
             public Builder originalArgs(String[] originalArgs) {
                 originalArgList.addAll(Arrays.asList(originalArgs));
@@ -23924,6 +24022,8 @@ InitialValueState.CACHED;*/
              * @see #originalArgs(String[])
              * @see ParseResult#expandedArgs()
              * @since 4.4
+             * @param expandedArgs
+             * @return expandedArgList.addAll(expandedArgs)
              */
             public Builder expandedArgs(Collection<String> expandedArgs) {
                 expandedArgList.addAll(expandedArgs);
