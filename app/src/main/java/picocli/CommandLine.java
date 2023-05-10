@@ -24046,8 +24046,8 @@ InitialValueState.CACHED;*/
                 this.type = type;
             }
 
-            Type type;
-            ParameterException exception;
+            private Type type;
+            private ParameterException exception;
 
             static GroupValidationResult extractBlockingFailure(
                     List<GroupValidationResult> set) {
@@ -24065,7 +24065,8 @@ InitialValueState.CACHED;*/
             }
 
             /**
-             * FAILURE_PRESENT or FAILURE_PARTIAL
+             * FAILURE_PRESENT or FAILURE_PARTIAL.
+             * @return type == Type.FAILURE_PRESENT || type == Type.FAILURE_PARTIAL
              */
             boolean blockingFailure() {
                 return type == Type.FAILURE_PRESENT
@@ -24135,6 +24136,8 @@ InitialValueState.CACHED;*/
             /**
              * Returns the {@code ArgGroupSpec} whose
              * matches are captured in this {@code GroupMatchContainer}.
+             *
+             * @return group
              */
             public Model.ArgGroupSpec group() {
                 return group;
@@ -24150,11 +24153,17 @@ InitialValueState.CACHED;*/
              * {@code ArgGroupSpec}s
              * with a multiplicity greater
              * than one may be matched multiple times.
+             * @return unmodifiableList(matches)
              */
             public List<GroupMatch> matches() {
                 return Collections.unmodifiableList(matches);
             }
 
+            /**
+             * addMatch.
+             *
+             * @param commandLine
+             */
             void addMatch(CommandLine commandLine) {
                 Tracer tracer = CommandLine.tracer();
                 if (group != null && isMaxMultiplicityReached()) {
@@ -24180,6 +24189,11 @@ InitialValueState.CACHED;*/
                 group.initUserObject(commandLine);
             }
 
+            /**
+             * complete.
+             *
+             * @param commandLine
+             */
             void complete(CommandLine commandLine) {
                 if (parentContainer == null) {
                     addMatch(
@@ -24193,6 +24207,7 @@ InitialValueState.CACHED;*/
 
             /**
              * Returns the "active" multiple of this GroupMatchContainer.
+             * @return  matches.get(matches.size() - 1)
              */
             GroupMatch lastMatch() {
                 return matches.get(matches.size() - 1);
@@ -24203,6 +24218,7 @@ InitialValueState.CACHED;*/
              * {@code MatchedGroupMultiples} can be added
              * to this {@code GroupMatchContainer}.
              * Each multiple may be a complete or an incomplete match.
+             * @return matches.size() >= group.multiplicity.max
              */
             boolean isMaxMultiplicityReached() {
                 return matches.size() >= group.multiplicity.max;
@@ -24213,6 +24229,7 @@ InitialValueState.CACHED;*/
              * has at least the minimum
              * number of {@code MatchedGroupMultiples}.
              * Each multiple may be a complete or an incomplete match.
+             * @return boolean matches.size() >= group.multiplicity.min
              */
             boolean isMinMultiplicityReached() {
                 return matches.size() >= group.multiplicity.min;
@@ -24224,6 +24241,7 @@ InitialValueState.CACHED;*/
              * and each multiple has matched at least
              * the {@linkplain GroupMatch#matchedMinElements(
              *) minimum number of elements}.
+             * @return matchedFully(false)
              */
             boolean matchedMinElements() {
                 return matchedFully(false);
@@ -24238,6 +24256,7 @@ InitialValueState.CACHED;*/
              * while all other multiples have matched
              * at least the {@linkplain GroupMatch#matchedMinElements(
              *) minimum number of elements}.
+             * @return matchedFully(true)
              */
             boolean matchedMaxElements() {
                 return matchedFully(true);
@@ -24284,16 +24303,21 @@ InitialValueState.CACHED;*/
             }
 
             private GroupMatchContainer createGroupMatchContainer(
-                    Model.ArgGroupSpec group,
+                    Model.ArgGroupSpec argGroupSpec,
                     GroupMatchContainer parent,
                     CommandLine commandLine) {
                 GroupMatchContainer result =
-                        new GroupMatchContainer(group, commandLine);
+                        new GroupMatchContainer(argGroupSpec, commandLine);
                 result.parentContainer = parent;
-                parent.lastMatch().matchedSubgroups.put(group, result);
+                parent.lastMatch().matchedSubgroups.put(argGroupSpec, result);
                 return result;
             }
 
+            /**
+             * GroupMatchContainer.
+             *
+             * @return trimed
+             */
             GroupMatchContainer trim() {
                 for (Iterator<GroupMatch> iter =
                      matches.iterator(); iter.hasNext();) {
@@ -24301,40 +24325,54 @@ InitialValueState.CACHED;*/
                     if (multiple.isEmpty()) {
                         iter.remove();
                     }
-                    for (
-                            GroupMatchContainer sub : multiple
-                            .matchedSubgroups.values()) {
+                    for (GroupMatchContainer sub : multiple.matchedSubgroups.values()) {
                         sub.trim();
                     }
                 }
                 return this;
             }
 
+            /**
+             * findMatchContainers.
+             *
+             * @param argGroupSpec
+             * @param result
+             * @return result
+             */
             List<GroupMatchContainer> findMatchContainers(
-                    Model.ArgGroupSpec group,
+                    Model.ArgGroupSpec argGroupSpec,
                     List<GroupMatchContainer> result) {
-                if (this.group == group) {
+                if (this.group == argGroupSpec) {
                     result.add(this);
                     return result;
                 }
                 for (GroupMatch multiple : matches()) {
-                    for (
-                            GroupMatchContainer mg : multiple
-                            .matchedSubgroups.values()) {
-                        mg.findMatchContainers(group, result);
+                    for (GroupMatchContainer mg : multiple.matchedSubgroups.values()) {
+                        mg.findMatchContainers(argGroupSpec, result);
                     }
                 }
                 return result;
             }
 
+            /**
+             * findLastMatchContainer.
+             *
+             * @param argGroupSpec
+             * @return all.get(all.size() - 1)
+             */
             GroupMatchContainer findLastMatchContainer(
-                    Model.ArgGroupSpec group) {
+                    Model.ArgGroupSpec argGroupSpec) {
                 List<GroupMatchContainer> all =
                         findMatchContainers(
-                                group, new ArrayList<GroupMatchContainer>());
+                                argGroupSpec, new ArrayList<GroupMatchContainer>());
                 return all.isEmpty() ? null : all.get(all.size() - 1);
             }
 
+            /**
+             * toString.
+             *
+             * @return new StringBuilder()
+             */
             @Override
             public String toString() {
                 return toString(new StringBuilder()).toString();
@@ -24357,34 +24395,40 @@ InitialValueState.CACHED;*/
 
             }
 
-            void updateUnmatchedGroups(final Model.ArgGroupSpec group) {
+            /**
+             * updateUnmatchedGroups.
+             * @param argGroupSpec
+             */
+            void updateUnmatchedGroups(final Model.ArgGroupSpec argGroupSpec) {
                 Assert.assertTrue(
                         Assert.equals(group(),
-                                group.parentGroup()),
+                                argGroupSpec.parentGroup()),
                         new IHelpSectionRenderer() {
                             public String render(Help h) {
                                 return "Internal error: expected "
-                                        + group.parentGroup(
-                                ) + " (the parent of " + group
+                                        + argGroupSpec.parentGroup(
+                                ) + " (the parent of " + argGroupSpec
                                         + "), but was " + group();
                             }
                         });
 
                 List<GroupMatchContainer> groupMatchContainers =
                         findMatchContainers(
-                                group, new ArrayList<GroupMatchContainer>());
+                                argGroupSpec, new ArrayList<GroupMatchContainer>());
                 if (groupMatchContainers.isEmpty()) {
-                    this.unmatchedSubgroups.add(group);
+                    this.unmatchedSubgroups.add(argGroupSpec);
                 }
-                for (
-                        GroupMatchContainer groupMatchContainer
-                        : groupMatchContainers) {
-                    for (Model.ArgGroupSpec subGroup : group.subgroups()) {
+                for (GroupMatchContainer groupMatchContainer : groupMatchContainers) {
+                    for (Model.ArgGroupSpec subGroup : argGroupSpec.subgroups()) {
                         groupMatchContainer.updateUnmatchedGroups(subGroup);
                     }
                 }
             }
 
+            /**
+             * validator.
+             * @param commandLine
+             */
             void validate(CommandLine commandLine) {
                 // first, validate the top-level GroupMatchContainer:
                 // Even if cmd has more than one group that each have matches,
@@ -24469,14 +24513,14 @@ InitialValueState.CACHED;*/
                     msg += match;
                     Map<Model.ArgGroupSpec, GroupMatchContainer> subgroups =
                             match.matchedSubgroups();
-                    for (Model.ArgGroupSpec group : subgroups.keySet()) {
-                        if (group.validate()) { // don't raise errors
+                    for (Model.ArgGroupSpec argGroupSpec : subgroups.keySet()) {
+                        if (argGroupSpec.validate()) { // don't raise errors
                             // for non-validating groups:
                             // https://github.com/remkop/picocli/issues/810
                             addValueToListInMap(
                                     matchesPerGroup,
-                                    group,
-                                    subgroups.get(group).matches());
+                                    argGroupSpec,
+                                    subgroups.get(argGroupSpec).matches());
                         }
                     }
                 }
@@ -24496,9 +24540,9 @@ InitialValueState.CACHED;*/
                     Map<Model.ArgGroupSpec,
                             List<List<ParseResult.GroupMatch>>> matchesPerGroup,
                     CommandLine commandLine) {
-                for (Model.ArgGroupSpec group : matchesPerGroup.keySet()) {
+                for (Model.ArgGroupSpec argGroupSpec : matchesPerGroup.keySet()) {
                     List<ParseResult.GroupMatch> flat =
-                            flatList(matchesPerGroup.get(group));
+                            flatList(matchesPerGroup.get(argGroupSpec));
                     Set<Model.ArgSpec> matchedArgs =
                             new LinkedHashSet<Model.ArgSpec>();
                     for (ParseResult.GroupMatch match : flat) {
@@ -24507,11 +24551,11 @@ InitialValueState.CACHED;*/
                         }
                         matchedArgs.addAll(match.matchedValues.keySet());
                     }
-                    ParseResult.GroupValidationResult validationResult =
-                            group.validateArgs(commandLine, matchedArgs);
-                    if (validationResult.exception != null) {
+                    ParseResult.GroupValidationResult validationResult1 =
+                            argGroupSpec.validateArgs(commandLine, matchedArgs);
+                    if (validationResult1.exception != null) {
                         commandLine.interpreter.maybeThrow(
-                                validationResult
+                                validationResult1
                                         .exception); // there
                         // may be multiple failures,
                         // just throw on the first one for now
@@ -24566,6 +24610,11 @@ InitialValueState.CACHED;*/
                 }
             }
 
+            /**
+             * canMatchPositionalParam.
+             * @param positionalParam
+             * @return positionalParam.index().contains(localPosition)
+             */
             boolean canMatchPositionalParam(
                     Model.PositionalParamSpec positionalParam) {
                 boolean mayCreateNewMatch =
@@ -24605,20 +24654,20 @@ InitialValueState.CACHED;*/
          * @since 4.0
          */
         public static class GroupMatch {
-            int position;
-            final int startPosition;
-            final GroupMatchContainer container;
+            private int position;
+            private final int startPosition;
+            private final GroupMatchContainer container;
 
-            Map<Model.ArgGroupSpec, GroupMatchContainer> matchedSubgroups =
+            private Map<Model.ArgGroupSpec, GroupMatchContainer> matchedSubgroups =
                     new LinkedHashMap<Model.ArgGroupSpec, GroupMatchContainer>(
                             2); // preserve order: used in toString()
-            Map<Model.ArgSpec, List<Object>> matchedValues =
+            private Map<Model.ArgSpec, List<Object>> matchedValues =
                     new IdentityHashMap<Model.ArgSpec, List<Object>>(
                     ); // identity map for performance
-            Map<Model.ArgSpec, List<String>> originalStringValues =
+            private Map<Model.ArgSpec, List<String>> originalStringValues =
                     new LinkedHashMap<Model.ArgSpec, List<String>>(
                     ); // preserve order: used in toString()
-            Map<Model.ArgSpec,
+            private Map<Model.ArgSpec,
                     Map<Integer,
                             List<Object>>> matchedValuesAtPosition =
                     new IdentityHashMap<Model.ArgSpec,
@@ -24640,6 +24689,7 @@ InitialValueState.CACHED;*/
             /**
              * Returns {@code true} if this match
              * has no matched arguments and no matched subgroups.
+             * @return originalStringValues.isEmpty() && matchedSubgroups.isEmpty()
              */
             public boolean isEmpty() {
                 return originalStringValues.isEmpty()
@@ -24649,6 +24699,7 @@ InitialValueState.CACHED;*/
             /**
              * Returns the {@code ArgGroupSpec} of the
              * container {@code GroupMatchContainer} of this match.
+             * @return container.group
              */
             public Model.ArgGroupSpec group() {
                 return container.group;
@@ -24657,6 +24708,7 @@ InitialValueState.CACHED;*/
             /**
              * Returns the container {@code
              * GroupMatchContainer} of this match.
+             * @return container
              */
             public GroupMatchContainer container() {
                 return container;
@@ -24664,12 +24716,18 @@ InitialValueState.CACHED;*/
 
             /**
              * Returns matches for the subgroups, if any.
+             * @return unmodifiableMap(matchedSubgroups)
              */
             public Map<Model.ArgGroupSpec,
                     GroupMatchContainer> matchedSubgroups() {
                 return Collections.unmodifiableMap(matchedSubgroups);
             }
 
+            /**
+             * matchCount.
+             * @param argSpec
+             * @return  matchedValues.get(argSpec).size()
+             */
             int matchCount(Model.ArgSpec argSpec) {
                 return matchedValues.get(
                         argSpec) == null
@@ -24680,6 +24738,8 @@ InitialValueState.CACHED;*/
             /**
              * Returns the values matched for the specified
              * argument, converted to the type of the argument.
+             * @param argSpec
+             * @return unmodifiableList(matchedValues.get(argSpec)
              */
             public List<Object> matchedValues(Model.ArgSpec argSpec) {
                 return matchedValues.get(
@@ -24688,10 +24748,22 @@ InitialValueState.CACHED;*/
                         : Collections.unmodifiableList(matchedValues.get(argSpec));
             }
 
+            /**
+             * addOriginalStringValue.
+             * @param argSpec
+             * @param value
+             */
             void addOriginalStringValue(Model.ArgSpec argSpec, String value) {
                 addValueToListInMap(originalStringValues, argSpec, value);
             }
 
+            /**
+             * addMatchedValue.
+             * @param argSpec
+             * @param matchPosition
+             * @param stronglyTypedValue
+             * @param tracer
+             */
             void addMatchedValue(
                     Model.ArgSpec argSpec,
                     int matchPosition,
@@ -24709,10 +24781,16 @@ InitialValueState.CACHED;*/
                         positionalValues, matchPosition, stronglyTypedValue);
             }
 
-            boolean hasMatchedValueAtPosition(Model.ArgSpec arg, int position) {
+            /**
+             * hasMatchedValueAtPosition.
+             * @param arg
+             * @param position1
+             * @return atPos.containsKey(position1)
+             */
+            boolean hasMatchedValueAtPosition(Model.ArgSpec arg, int position1) {
                 Map<Integer, List<Object>> atPos =
                         matchedValuesAtPosition.get(arg);
-                return atPos != null && atPos.containsKey(position);
+                return atPos != null && atPos.containsKey(position1);
             }
 
             /**
@@ -24722,6 +24800,7 @@ InitialValueState.CACHED;*/
              * have been matched, and for each subgroup,
              * the {@linkplain GroupMatchContainer#matchedMinElements(
              *) minimum number of elements have been matched}.
+             * @return matchedFully false
              */
             boolean matchedMinElements() {
                 return matchedFully(false);
@@ -24734,6 +24813,7 @@ InitialValueState.CACHED;*/
              required or not) have been matched, and for each subgroup,
              * the {@linkplain GroupMatchContainer#matchedMaxElements(
                     ) maximum number of elements have been matched}.
+             @return matchedFully true
              */
             boolean matchedMaxElements() {
                 return matchedFully(true);
@@ -24775,6 +24855,10 @@ InitialValueState.CACHED;*/
                 return false;
             }
 
+            /**
+             * to String.
+             * @return new StringBuilder()
+             */
             @Override
             public String toString() {
                 return toString(new StringBuilder()).toString();
@@ -24804,6 +24888,11 @@ InitialValueState.CACHED;*/
                 return result;
             }
 
+            /**
+             * validator.
+             * @param commandLine
+             *
+             */
             void validate(CommandLine commandLine) {
                 validationResult =
                         GroupValidationResult.SUCCESS_PRESENT; // we matched
@@ -24917,7 +25006,7 @@ InitialValueState.CACHED;*/
      * Inner class to group the built-in
      * {@link ITypeConverter} implementations.
      */
-    private static class BuiltIn {
+    private static final class BuiltIn {
         private BuiltIn() {
         } // private constructor: never instantiate
 
