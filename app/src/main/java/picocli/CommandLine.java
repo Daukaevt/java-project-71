@@ -22197,13 +22197,12 @@ InitialValueState.CACHED;*/
                         }
                         CommandLine subcommandLine =
                                 toCommandLine(sub, factory);
+
                         parent.addSubcommand(subcommandName(sub),
                                 subcommandLine);
                         subcommandLine.getCommandSpec(
                         ).injectParentCommand(parent.userObject);
-                        for (
-                                CommandSpec mixin : subcommandLine
-                                .getCommandSpec().mixins().values()) {
+                        for (CommandSpec mixin : subcommandLine.getCommandSpec().mixins().values()) {
                             mixin.injectParentCommand(parent.userObject);
                         }
                     } catch (InitializationException ex) {
@@ -22220,15 +22219,10 @@ InitialValueState.CACHED;*/
             private static void initMethodSubcommands(
                     Class<?> cls, CommandSpec parent, IFactory factory) {
                 if (parent.isAddMethodSubcommands() && cls != null) {
-                    for (
-                            CommandLine sub : CommandSpec
-                            .createMethodSubcommands(cls,
-                            factory,
-                            false)) {
+                    for (CommandLine sub : CommandSpec
+                            .createMethodSubcommands(cls, factory,false)) {
                         parent.addSubcommand(sub.getCommandName(), sub);
-                        for (
-                                CommandSpec mixin : sub.getCommandSpec()
-                                .mixins().values()) {
+                        for (CommandSpec mixin : sub.getCommandSpec().mixins().values()) {
                             mixin.injectParentCommand(parent.userObject);
                         }
                     }
@@ -22755,7 +22749,7 @@ InitialValueState.CACHED;*/
 
         private static class PicocliInvocationHandler
                 implements InvocationHandler {
-            final Map<String, Object> map = new HashMap<String, Object>();
+            private final Map<String, Object> map = new HashMap<String, Object>();
 
             public Object invoke(
                     Object proxy,
@@ -22792,9 +22786,9 @@ InitialValueState.CACHED;*/
                 return (T) value;
             }
 
-            public <T> T set(T value) {
-                T result = value;
-                this.value = value;
+            public <T> T set(T value1) {
+                T result = value1;
+                this.value = value1;
                 return result;
             }
 
@@ -22807,7 +22801,7 @@ InitialValueState.CACHED;*/
         static class ObjectScope implements IScope {
             private Object value;
 
-            public ObjectScope(Object value) {
+            ObjectScope(Object value) {
                 this.value = value;
             }
 
@@ -22846,9 +22840,9 @@ InitialValueState.CACHED;*/
             }
 
             @SuppressWarnings("unchecked")
-            public <T> T set(T value) {
+            public <T> T set(T value1) {
                 T old = (T) this.value;
-                this.value = value;
+                this.value = value1;
                 return old;
             }
 
@@ -22857,7 +22851,7 @@ InitialValueState.CACHED;*/
             }
         }
 
-        static class CommandUserObject implements IScope {
+        static final class CommandUserObject implements IScope {
             private final IFactory factory;
             private Object instance;
             private Class<?> type;
@@ -22955,8 +22949,7 @@ InitialValueState.CACHED;*/
                         // initial values: this CUO _is_ the IScope for the command's args
                         for (ArgSpec arg : commandSpec.args()) {
                             if (arg.group() == null && !arg.hasInitialValue()) {
-                                arg.initialValue(
-                                ); // initializes isInitialValueCached
+                                arg.initialValue(); // initializes isInitialValueCached
                             }
                         }
                     }
@@ -22994,7 +22987,7 @@ InitialValueState.CACHED;*/
             private final Map<String, ILookup> lookups =
                     new LinkedHashMap<String, ILookup>();
 
-            public Interpolator(final CommandSpec commandSpec) {
+            Interpolator(final CommandSpec commandSpec) {
                 this.commandSpec = commandSpec;
                 lookups.put("sys:", new ILookup() {
                     public String get(String key) {
