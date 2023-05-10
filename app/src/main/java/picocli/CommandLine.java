@@ -21799,7 +21799,9 @@ InitialValueState.CACHED;*/
                 Set<String> keys = new LinkedHashSet<String>();
                 for (Enumeration<String> k = rb.getKeys();
                      k.hasMoreElements();
-                     keys.add(k.nextElement())) {}
+                     keys.add(k.nextElement())) {
+                    //do nothing.
+                }
                 return keys;
             }
 
