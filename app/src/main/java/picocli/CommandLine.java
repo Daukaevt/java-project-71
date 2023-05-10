@@ -22220,7 +22220,7 @@ InitialValueState.CACHED;*/
                     Class<?> cls, CommandSpec parent, IFactory factory) {
                 if (parent.isAddMethodSubcommands() && cls != null) {
                     for (CommandLine sub : CommandSpec
-                            .createMethodSubcommands(cls, factory,false)) {
+                            .createMethodSubcommands(cls, factory, false)) {
                         parent.addSubcommand(sub.getCommandName(), sub);
                         for (CommandSpec mixin : sub.getCommandSpec().mixins().values()) {
                             mixin.injectParentCommand(parent.userObject);
