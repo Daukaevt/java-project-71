@@ -18999,7 +18999,10 @@ InitialValueState.CACHED;*/
 
             public int hashCode() {
                 return super.hashCodeImpl(
-                ) + 37 * Assert.hashCode(help) + 37 * Assert.hashCode(usageHelp) + 37 * Assert.hashCode(versionHelp) + 37 * Arrays.hashCode(names) + 37 * Assert.hashCode(negatable) + 37 * Assert.hashCode(fallbackValue) + 37 * order;
+                ) + THIRTHY_SEVEN * Assert.hashCode(help) + THIRTHY_SEVEN * Assert.hashCode(usageHelp)
+                        + THIRTHY_SEVEN * Assert.hashCode(versionHelp) + THIRTHY_SEVEN * Arrays.hashCode(names)
+                        + THIRTHY_SEVEN * Assert.hashCode(negatable) + THIRTHY_SEVEN * Assert.hashCode(fallbackValue)
+                        + THIRTHY_SEVEN * order;
             }
 
             /**
@@ -19008,7 +19011,7 @@ InitialValueState.CACHED;*/
              *
              * @since 3.0
              */
-            public static class Builder extends ArgSpec.Builder<Builder> {
+            public static final class Builder extends ArgSpec.Builder<Builder> {
                 private String[] names;
                 private boolean help;
                 private boolean usageHelp;
@@ -19070,6 +19073,7 @@ InitialValueState.CACHED;*/
                  * names. At least one option name is required.
                  *
                  * @see Option#names()
+                 * @return names
                  */
                 public String[] names() {
                     return names.clone();
@@ -19080,8 +19084,8 @@ InitialValueState.CACHED;*/
                  * disables validation of the other arguments.
                  *
                  * @see Option#help()
-                 * @deprecated Use {@link #usageHelp(
-                 *)} and {@link #versionHelp()} instead.
+                 * @deprecated Use {@link #usageHelp()} and {@link #versionHelp()} instead.
+                 * @return help
                  */
                 @Deprecated
                 public boolean help() {
@@ -19093,6 +19097,7 @@ InitialValueState.CACHED;*/
                  * allows the user to request usage help.
                  *
                  * @see Option#usageHelp()
+                 * @return usageHelp
                  */
                 public boolean usageHelp() {
                     return usageHelp;
@@ -19103,6 +19108,7 @@ InitialValueState.CACHED;*/
                  * allows the user to request version information.
                  *
                  * @see Option#versionHelp()
+                 * @return versionHelp
                  */
                 public boolean versionHelp() {
                     return versionHelp;
@@ -19116,6 +19122,7 @@ InitialValueState.CACHED;*/
                  *
                  * @see Option#negatable()
                  * @since 4.0
+                 * @return negatable
                  */
                 public boolean negatable() {
                     return negatable;
@@ -19129,6 +19136,7 @@ InitialValueState.CACHED;*/
                  *
                  * @see Option#fallbackValue()
                  * @since 4.0
+                 * @return fallbackValue
                  */
                 public String fallbackValue() {
                     return fallbackValue;
@@ -19145,6 +19153,7 @@ InitialValueState.CACHED;*/
                  *
                  * @see Option#order()
                  * @since 3.9
+                 * @return order
                  */
                 public int order() {
                     return order;
@@ -19156,36 +19165,47 @@ InitialValueState.CACHED;*/
                  *
                  * @return this builder
                  * instance to provide a fluent interface
+                 *
+                 * @param names1
                  */
-                public Builder names(String... names) {
-                    this.names = Assert.notNull(names, "names").clone();
+                public Builder names(String... names1) {
+                    this.names = Assert.notNull(names1, "names").clone();
                     return self();
                 }
 
                 /**
                  * Sets whether this option disables validation
                  * of the other arguments, and returns this builder.
+                 *
+                 * @param help1
+                 * @return help
                  */
-                public Builder help(boolean help) {
-                    this.help = help;
+                public Builder help(boolean help1) {
+                    this.help = help1;
                     return self();
                 }
 
                 /**
                  * Sets whether this option allows the
                  * user to request usage help, and returns this builder.
+                 *
+                 * @param usageHelp1
+                 * @return usageHelp
                  */
-                public Builder usageHelp(boolean usageHelp) {
-                    this.usageHelp = usageHelp;
+                public Builder usageHelp(boolean usageHelp1) {
+                    this.usageHelp = usageHelp1;
                     return self();
                 }
 
                 /**
                  * Sets whether this option allows the user
                  * to request version information, and returns this builder.
+                 *
+                 * @param versionHelp1
+                 * @return versionHelp
                  */
-                public Builder versionHelp(boolean versionHelp) {
-                    this.versionHelp = versionHelp;
+                public Builder versionHelp(boolean versionHelp1) {
+                    this.versionHelp = versionHelp1;
                     return self();
                 }
 
@@ -19194,9 +19214,11 @@ InitialValueState.CACHED;*/
                  * option is automatically added, and returns this builder.
                  *
                  * @since 4.0
+                 * @param negatable1
+                 * @return self()
                  */
-                public Builder negatable(boolean negatable) {
-                    this.negatable = negatable;
+                public Builder negatable(boolean negatable1) {
+                    this.negatable = negatable1;
                     return self();
                 }
 
@@ -19208,9 +19230,11 @@ InitialValueState.CACHED;*/
                  *
                  * @see Option#fallbackValue()
                  * @since 4.0
+                 * @param fallbackValue1
+                 * @return self()
                  */
-                public Builder fallbackValue(String fallbackValue) {
-                    this.fallbackValue = fallbackValue;
+                public Builder fallbackValue(String fallbackValue1) {
+                    this.fallbackValue = fallbackValue1;
                     return self();
                 }
 
@@ -19219,9 +19243,11 @@ InitialValueState.CACHED;*/
                  * message at which this option should be shown, and returns this builder.
                  *
                  * @since 3.9
+                 * @param order1
+                 * @return self()
                  */
-                public Builder order(int order) {
-                    this.order = order;
+                public Builder order(int order1) {
+                    this.order = order1;
                     return self();
                 }
             }
@@ -19307,7 +19333,7 @@ InitialValueState.CACHED;*/
          *
          * @since 3.0
          */
-        public static class PositionalParamSpec extends ArgSpec {
+        public static final class PositionalParamSpec extends ArgSpec {
             private Range index;
             private Range capacity;
             private final Range builderCapacity;
@@ -19315,6 +19341,8 @@ InitialValueState.CACHED;*/
             /**
              * Ensures all attributes of this {@code PositionalParamSpec} have a
              * valid value; throws an {@link InitializationException} if this cannot be achieved.
+             *
+             * @param builder
              */
             private PositionalParamSpec(Builder builder) {
                 super(builder);
@@ -19345,6 +19373,8 @@ InitialValueState.CACHED;*/
              * from the specified {@code PositionalSpec}.
              *
              * @since 4.0
+             * @param original
+             * @return original
              */
             public static Builder builder(PositionalParamSpec original) {
                 return new Builder(original);
@@ -19395,6 +19425,7 @@ InitialValueState.CACHED;*/
              * line arguments should be assigned to this positional parameter.
              *
              * @see Parameters#index()
+             * @return index
              */
             public Range index() {
                 return index;
@@ -19406,7 +19437,7 @@ InitialValueState.CACHED;*/
 
             public int hashCode() {
                 return super.hashCodeImpl(
-                ) + 37 * Assert.hashCode(capacity) + 37 * Assert.hashCode(index);
+                ) + THIRTHY_SEVEN * Assert.hashCode(capacity) + THIRTHY_SEVEN * Assert.hashCode(index);
             }
 
             public boolean equals(Object obj) {
@@ -19429,7 +19460,7 @@ InitialValueState.CACHED;*/
              *
              * @since 3.0
              */
-            public static class Builder extends ArgSpec.Builder<Builder> {
+            public static final class Builder extends ArgSpec.Builder<Builder> {
                 private Range capacity;
                 private Range index;
 
@@ -19471,6 +19502,7 @@ InitialValueState.CACHED;*/
                  * command line arguments should be assigned to this positional parameter.
                  *
                  * @see Parameters#index()
+                 * @return index
                  */
                 public Range index() {
                     return index;
@@ -19479,6 +19511,9 @@ InitialValueState.CACHED;*/
                 /**
                  * Sets the index or range specifying which of the command line arguments
                  * should be assigned to this positional parameter, and returns this builder.
+                 *
+                 * @param range
+                 * @return index Range
                  */
                 public Builder index(String range) {
                     return index(Range.valueOf(range));
@@ -19487,9 +19522,12 @@ InitialValueState.CACHED;*/
                 /**
                  * Sets the index or range specifying which of the command line arguments
                  * should be assigned to this positional parameter, and returns this builder.
+                 *
+                 * @param index1
+                 * @return self()
                  */
-                public Builder index(Range index) {
-                    this.index = index;
+                public Builder index(Range index1) {
+                    this.index = index1;
                     return self();
                 }
 
@@ -19497,8 +19535,8 @@ InitialValueState.CACHED;*/
                     return capacity;
                 }
 
-                Builder capacity(Range capacity) {
-                    this.capacity = capacity;
+                Builder capacity(Range capacity1) {
+                    this.capacity = capacity1;
                     return self();
                 }
             }
@@ -19541,7 +19579,8 @@ InitialValueState.CACHED;*/
                                 builder.headingKey) ? null : builder.headingKey;
                 exclusive =
                         builder.exclusive
-                                && builder.validate; // non-validating groups cannot be exclusive: https://github.com/remkop/picocli/issues/810
+                                && builder.validate; // non-validating groups cannot be exclusive:
+                // https://github.com/remkop/picocli/issues/810
                 multiplicity = builder.multiplicity;
                 if (multiplicity.max() <= 0) {
                     throw new InitializationException(
@@ -19592,10 +19631,12 @@ InitialValueState.CACHED;*/
                     String sep = "";
                     for (ArgSpec arg : args) {
                         if (!arg.required()) {
-                            modifiedArgs += sep + (
-                                    arg.isOption() ? ((OptionSpec) arg).longestName() : (arg.paramLabel() + "[" + ((PositionalParamSpec) arg).index() + "]"));
+                            modifiedArgs += sep + (arg.isOption()
+                                            ? ((OptionSpec) arg).longestName()
+                                            : (arg.paramLabel() + "[" + ((PositionalParamSpec) arg).index() + "]"));
                             sep = ",";
-                            //Keep initial required as originallyRequired for Issue#1380 https://github.com/remkop/picocli/issues/1380
+                            //Keep initial required as originallyRequired for
+                            // Issue#1380 https://github.com/remkop/picocli/issues/1380
                             arg.originallyRequired = true;
                             arg.required = true;
                         }
@@ -19643,6 +19684,7 @@ InitialValueState.CACHED;*/
              *)} is {@code false}.
              *
              * @see ArgGroup#exclusive()
+             * @return exclusive
              */
             public boolean exclusive() {
                 return exclusive;
@@ -19661,6 +19703,7 @@ InitialValueState.CACHED;*/
              * Ignored if {@link #validate()} is {@code false}.
              *
              * @see ArgGroup#multiplicity()
+             * @return multiplicity
              */
             public Range multiplicity() {
                 return multiplicity;
@@ -19676,6 +19719,7 @@ InitialValueState.CACHED;*/
              * {@code true} by default.
              *
              * @see ArgGroup#validate()
+             * @return  validator
              */
             public boolean validate() {
                 return validate;
@@ -19689,6 +19733,8 @@ InitialValueState.CACHED;*/
              * This attribute is only honored
              * for groups that have a {@link #heading(
              *) heading} (or a {@link #headingKey() headingKey} with a non-{@code null} resource bundle value).
+             *
+             * @return order
              */
             public int order() {
                 return this.order;
@@ -19699,6 +19745,7 @@ InitialValueState.CACHED;*/
              * may be {@code null}), used when generating the usage documentation.
              *
              * @see ArgGroup#heading()
+             * @return headingKey
              */
             public String heading() {
                 if (messages() == null) {
@@ -19717,6 +19764,7 @@ InitialValueState.CACHED;*/
              * used to get the heading from a resource bundle.
              *
              * @see ArgGroup#headingKey()
+             * @return headingKey
              */
             public String headingKey() {
                 return headingKey;
@@ -19725,6 +19773,8 @@ InitialValueState.CACHED;*/
             /**
              * Returns the parent group that this group is part
              * of, or {@code null} if this group is not part of a composite.
+             *
+             * @return parentGroup
              */
             public ArgGroupSpec parentGroup() {
                 return parentGroup;
@@ -19746,6 +19796,7 @@ InitialValueState.CACHED;*/
              * with {@code {@literal @}Spec} configured for this group.
              *
              * @since 4.6
+             * @return specElements
              */
             public List<IAnnotatedElement> specElements() {
                 return specElements;
@@ -19786,6 +19837,8 @@ InitialValueState.CACHED;*/
             /**
              * Returns the {@link IGetter} that is responsible for supplying
              * the value of the annotated program element associated with this group.
+             *
+             * @return getter
              */
             public IGetter getter() {
                 return getter;
@@ -19794,6 +19847,8 @@ InitialValueState.CACHED;*/
             /**
              * Returns the {@link ISetter} that is responsible for modifying
              * the value of the annotated program element associated with this group.
+             *
+             * @return setter
              */
             public ISetter setter() {
                 return setter;
@@ -19803,11 +19858,18 @@ InitialValueState.CACHED;*/
              * Returns the {@link IScope} that
              * determines where the setter sets the value (
              * or the getter gets the value) of the annotated program element associated with this group.
+             *
+             * @return scope
              */
             public IScope scope() {
                 return scope;
             }
 
+            /**
+             * userObject.
+             *
+             * @return getter.
+             */
             Object userObject() {
                 try {
                     return getter.get();
@@ -19816,6 +19878,12 @@ InitialValueState.CACHED;*/
                 }
             }
 
+            /**
+             * userObjectOr.
+             *
+             * @param defaultValue
+             * @return
+             */
             Object userObjectOr(Object defaultValue) {
                 try {
                     return getter.get();
@@ -19824,10 +19892,20 @@ InitialValueState.CACHED;*/
                 }
             }
 
+            /**
+             * id.
+             *
+             * @return id
+             */
             String id() {
                 return id;
             }
 
+            /**
+             * localPositionalParamCount.
+             *
+             * @return result
+             */
             int localPositionalParamCount() {
                 int result = 0;
                 for (ArgSpec arg : args) {
@@ -19838,6 +19916,11 @@ InitialValueState.CACHED;*/
                 return result;
             }
 
+            /**
+             * argCount.
+             *
+             * @return result
+             */
             int argCount() {
                 int result = args.size();
                 for (ArgGroupSpec sub : subgroups()) {
@@ -19849,6 +19932,8 @@ InitialValueState.CACHED;*/
             /**
              * Returns the options and positional parameters
              * in this group; may be empty but not {@code null}.
+             *
+             * @return args
              */
             public Set<ArgSpec> args() {
                 return args;
@@ -19857,11 +19942,12 @@ InitialValueState.CACHED;*/
             /**
              * Returns the required options and positional
              * parameters in this group; may be empty but not {@code null}.
+             *
+             * @return unmodifiableSet(result)
              */
             public Set<ArgSpec> requiredArgs() {
                 Set<ArgSpec> result = new LinkedHashSet<ArgSpec>(args);
-                for (Iterator<ArgSpec> iter =
-                     result.iterator(); iter.hasNext(); ) {
+                for (Iterator<ArgSpec> iter = result.iterator(); iter.hasNext();) {
                     if (!iter.next().required()) {
                         iter.remove();
                     }
@@ -19946,6 +20032,11 @@ InitialValueState.CACHED;*/
                         new ArrayList<PositionalParamSpec>());
             }
 
+            /**
+             * synopsisUnit.
+             *
+             * @return synopsisUnitText
+             */
             String synopsisUnit() {
                 Help.ColorScheme colorScheme =
                         new Help.ColorScheme.Builder(Help.Ansi.OFF).build();
@@ -19957,6 +20048,8 @@ InitialValueState.CACHED;*/
 
             /**
              * Returns the synopsis of this group.
+             *
+             * @return synopsisText
              */
             public String synopsis() {
                 return synopsisText(
@@ -19980,7 +20073,7 @@ InitialValueState.CACHED;*/
              *
              * @param colorScheme        the color scheme to use
              *                           for options and positional parameters in this group and subgroups
-             * @param outparam_groupArgs all options and positional
+             * @param outparamGroupArgs all options and positional
              *                           parameters in the groups this method generates a synopsis for;
              *                           these options and positional
              *                           parameters should be excluded from appearing elsewhere in the synopsis
@@ -19988,9 +20081,9 @@ InitialValueState.CACHED;*/
              */
             public Text synopsisText(
                     Help.ColorScheme colorScheme,
-                    Set<ArgSpec> outparam_groupArgs) {
+                    Set<ArgSpec> outparamGroupArgs) {
                 Text synopsis =
-                        rawSynopsisUnitText(colorScheme, outparam_groupArgs);
+                        rawSynopsisUnitText(colorScheme, outparamGroupArgs);
                 Text result = synopsisUnitText(colorScheme, synopsis);
                 int i = 1;
                 for (; i < multiplicity.min(); i++) {
