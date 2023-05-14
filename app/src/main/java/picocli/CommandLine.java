@@ -16530,7 +16530,7 @@ public class CommandLine {
             private List<String> originalStringValues = new ArrayList<String>();
             public String toString;
             private final List<Object> typedValues = new ArrayList<Object>();
-            public final Map<Integer, Object> typedValueAtPosition =
+            private final Map<Integer, Object> typedValueAtPosition =
                     new TreeMap<Integer, Object>();
 
             /**
@@ -17832,6 +17832,10 @@ public class CommandLine {
             String[] interpolate(String[] values) {
                 return commandSpec == null ? values : commandSpec.interpolator.interpolate(
                         values);
+            }
+
+            public Map<Integer, Object> getTypedValueAtPosition() {
+                return typedValueAtPosition;
             }
 
             abstract static class Builder<T extends Builder<T>> {
@@ -34471,7 +34475,7 @@ InitialValueState.CACHED;*/
                     }
                 } else {
                     if (!indexRange.contains(localPosition)
-                            || positionalParam.typedValueAtPosition
+                            || positionalParam.getTypedValueAtPosition()
                             .get(localPosition) != null) {
                         continue;
                     }
