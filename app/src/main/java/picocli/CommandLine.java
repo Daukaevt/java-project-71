@@ -15001,27 +15001,29 @@ public class CommandLine {
             /**
              * Sets whether to show a {@code [@<filename>...]} entry
              * in the synopsis and parameter list of the usage help message.
-             * (
-             * The entry is not shown if {@linkplain CommandLine#isExpandAtFiles() expanding parameter files} is disabled.)
+             * (The entry is not shown if {@linkplain CommandLine#isExpandAtFiles()
+             * expanding parameter files} is disabled.)
              *
+             * @return showAtFileInUsageHelp
              * @see Command#showAtFileInUsageHelp()
              * @since 4.2
              */
             public boolean showAtFileInUsageHelp() {
-                return (
-                        showAtFileInUsageHelp == null) ? DEFAULT_SHOW_AT_FILE : showAtFileInUsageHelp;
+                return (showAtFileInUsageHelp == null) ? DEFAULT_SHOW_AT_FILE : showAtFileInUsageHelp;
             }
 
             /**
              * Sets whether to show a {@code [--]} (
              * End of Options) entry in the synopsis and options list of the usage help message.
              *
+             * @return showEndOfOptionsDelimiterInUsageHelp
              * @see Command#showEndOfOptionsDelimiterInUsageHelp()
              * @since 4.3
              */
             public boolean showEndOfOptionsDelimiterInUsageHelp() {
-                return (
-                        showEndOfOptionsDelimiterInUsageHelp == null) ? DEFAULT_SHOW_END_OF_OPTIONS : showEndOfOptionsDelimiterInUsageHelp;
+                return (showEndOfOptionsDelimiterInUsageHelp == null)
+                        ? DEFAULT_SHOW_END_OF_OPTIONS
+                        : showEndOfOptionsDelimiterInUsageHelp;
             }
 
             /**
@@ -15039,6 +15041,8 @@ public class CommandLine {
              * Returns the optional heading preceding the subcommand
              * list. Initialized from {@link Command#commandListHeading(
              *)}. {@code "Commands:%n"} by default.
+             *
+             * @return commandListHeading
              */
             public String commandListHeading() {
                 return str(
@@ -15051,6 +15055,8 @@ public class CommandLine {
              * Returns the optional heading preceding the exit codes
              * section, may contain {@code "%n"} line separators. {@code ""} (
              * empty string) by default.
+             *
+             * @return exitCodeListHeading
              */
             public String exitCodeListHeading() {
                 return str(
@@ -15099,6 +15105,8 @@ public class CommandLine {
              * Returns the optional heading preceding the footer
              * section. Initialized from {@link Command#footerHeading(
              *)}, or {@code ""} (empty string).
+             *
+             * @return footerHeading
              */
             public String footerHeading() {
                 return str(
@@ -15116,6 +15124,8 @@ public class CommandLine {
              * the help message has no footer.
              * Applications may programmatically
              * set this field to create a custom help message.
+             *
+             * @return footer
              */
             public String[] footer() {
                 return arr(
@@ -15129,10 +15139,11 @@ public class CommandLine {
              * Initialized from {@link Command#headerHeading(
              *)}, or null.
              *
+             * @param headerHeading1
              * @return this UsageMessageSpec for method chaining
              */
-            public UsageMessageSpec headerHeading(String headerHeading) {
-                this.headerHeading = headerHeading;
+            public UsageMessageSpec headerHeading(String headerHeading1) {
+                this.headerHeading = headerHeading1;
                 return this;
             }
 
@@ -15141,16 +15152,18 @@ public class CommandLine {
              * of the help message. For subcommands, the first header line is
              * displayed in the list of commands.
              *
+             * @param header1
              * @return this UsageMessageSpec for method chaining
              */
-            public UsageMessageSpec header(String... header) {
-                this.header = header;
+            public UsageMessageSpec header(String... header1) {
+                this.header = header1;
                 return this;
             }
 
             /**
              * Sets the optional heading preceding the synopsis.
              *
+             * @param newValue
              * @return this UsageMessageSpec for method chaining
              */
             public UsageMessageSpec synopsisHeading(String newValue) {
@@ -15161,6 +15174,7 @@ public class CommandLine {
             /**
              * Sets the String representing the subcommands in the synopsis.
              *
+             * @param newValue
              * @return this UsageMessageSpec for method chaining
              * @since 4.0
              */
@@ -15211,6 +15225,7 @@ public class CommandLine {
              * A positive value means the exact number of spaces
              * to indent for the 2nd line and subsequent lines of the synopsis.
              *
+             * @param newValue
              * @return this UsageMessageSpec for method chaining
              * @since 4.0
              */
@@ -15223,6 +15238,7 @@ public class CommandLine {
              * Sets whether the synopsis line(
              * s) should show an abbreviated synopsis without detailed option names.
              *
+             * @param newValue
              * @return this UsageMessageSpec for method chaining
              */
             public UsageMessageSpec abbreviateSynopsis(boolean newValue) {
@@ -15234,16 +15250,18 @@ public class CommandLine {
              * Sets the optional custom synopsis lines
              * to use instead of the auto-generated synopsis.
              *
+             * @param customSynopsis1
              * @return this UsageMessageSpec for method chaining
              */
-            public UsageMessageSpec customSynopsis(String... customSynopsis) {
-                this.customSynopsis = customSynopsis;
+            public UsageMessageSpec customSynopsis(String... customSynopsis1) {
+                this.customSynopsis = customSynopsis1;
                 return this;
             }
 
             /**
              * Sets the heading preceding the description section.
              *
+             * @param newValue
              * @return this UsageMessageSpec for method chaining
              */
             public UsageMessageSpec descriptionHeading(String newValue) {
@@ -15256,16 +15274,18 @@ public class CommandLine {
              * of the help message, displayed between the synopsis and the
              * options list.
              *
+             * @param description1
              * @return this UsageMessageSpec for method chaining
              */
-            public UsageMessageSpec description(String... description) {
-                this.description = description;
+            public UsageMessageSpec description(String... description1) {
+                this.description = description1;
                 return this;
             }
 
             /**
              * Sets the optional heading preceding the parameter list.
              *
+             * @param newValue
              * @return this UsageMessageSpec for method chaining
              */
             public UsageMessageSpec parameterListHeading(String newValue) {
@@ -15276,6 +15296,7 @@ public class CommandLine {
             /**
              * Sets the heading preceding the options list.
              *
+             * @param newValue
              * @return this UsageMessageSpec for method chaining
              */
             public UsageMessageSpec optionListHeading(String newValue) {
@@ -15287,6 +15308,7 @@ public class CommandLine {
              * Sets whether the options list in the
              * usage help message should be sorted alphabetically.
              *
+             * @param newValue
              * @return this UsageMessageSpec for method chaining
              */
             public UsageMessageSpec sortOptions(boolean newValue) {
@@ -15298,6 +15320,7 @@ public class CommandLine {
              * Sets whether the options in the
              * synopsis should be sorted alphabetically.
              *
+             * @param newValue
              * @return this UsageMessageSpec for method chaining
              * @since 4.7.1-SNAPSHOT
              */
@@ -15310,6 +15333,7 @@ public class CommandLine {
              * Sets the character used to prefix
              * required options in the options list.
              *
+             * @param newValue
              * @return this UsageMessageSpec for method chaining
              */
             public UsageMessageSpec requiredOptionMarker(char newValue) {
@@ -15321,6 +15345,7 @@ public class CommandLine {
              * Sets whether the options list in the usage help message
              * should show default values for all non-boolean options.
              *
+             * @param newValue
              * @return this UsageMessageSpec for method chaining
              */
             public UsageMessageSpec showDefaultValues(boolean newValue) {
@@ -15332,11 +15357,13 @@ public class CommandLine {
              * Sets whether to show a {@code [@<filename>...]} entry
              * in the synopsis and parameter list of the usage help message.
              * (
-             * The entry is not shown if {@linkplain CommandLine#isExpandAtFiles() expanding parameter files} is disabled.)
+             * The entry is not shown if {@linkplain CommandLine#isExpandAtFiles() expanding parameter files}
+             * is disabled.)
              *
              * @return this UsageMessageSpec for method chaining
              * @see Command#showAtFileInUsageHelp()
              * @since 4.2
+             * @param newValue
              */
             public UsageMessageSpec showAtFileInUsageHelp(boolean newValue) {
                 showAtFileInUsageHelp = newValue;
@@ -15350,6 +15377,7 @@ public class CommandLine {
              * @return this UsageMessageSpec for method chaining
              * @see Command#showEndOfOptionsDelimiterInUsageHelp()
              * @since 4.3
+             * @param newValue
              */
             public UsageMessageSpec showEndOfOptionsDelimiterInUsageHelp(
                     boolean newValue) {
@@ -15373,6 +15401,7 @@ public class CommandLine {
             /**
              * Sets the optional heading preceding the subcommand list.
              *
+             * @param newValue
              * @return this UsageMessageSpec for method chaining
              */
             public UsageMessageSpec commandListHeading(String newValue) {
@@ -15386,6 +15415,8 @@ public class CommandLine {
              * empty string) by default.
              *
              * @since 4.0
+             * @param newValue
+             * @return exitCodeListHeading
              */
             public UsageMessageSpec exitCodeListHeading(String newValue) {
                 exitCodeListHeading = newValue;
@@ -15410,6 +15441,7 @@ public class CommandLine {
              *                 to be displayed in the exit codes section
              * @see #keyValuesMap(String...)
              * @since 4.0
+             * @return exitCodeList
              */
             public UsageMessageSpec exitCodeList(Map<String, String> newValue) {
                 exitCodeList =
@@ -15421,6 +15453,7 @@ public class CommandLine {
             /**
              * Sets the optional heading preceding the footer section.
              *
+             * @param newValue
              * @return this UsageMessageSpec for method chaining
              */
             public UsageMessageSpec footerHeading(String newValue) {
@@ -15432,10 +15465,11 @@ public class CommandLine {
              * Sets the optional footer text lines
              * displayed at the bottom of the help message.
              *
+             * @param footer1
              * @return this UsageMessageSpec for method chaining
              */
-            public UsageMessageSpec footer(String... footer) {
-                this.footer = footer;
+            public UsageMessageSpec footer(String... footer1) {
+                this.footer = footer1;
                 return this;
             }
 
@@ -15460,6 +15494,7 @@ public class CommandLine {
              *             this {@linkplain CommandSpec#resourceBundle(
              *) command's resource bundle}, may be {@code null}
              * @since 3.6
+             * @return messages
              */
             public UsageMessageSpec messages(Messages msgs) {
                 messages = msgs;
@@ -15475,7 +15510,9 @@ public class CommandLine {
              * @since 4.0
              */
             public boolean adjustLineBreaksForWideCJKCharacters() {
-                return adjustLineBreaksForWideCJKCharacters == null ? DEFAULT_ADJUST_CJK : adjustLineBreaksForWideCJKCharacters;
+                return adjustLineBreaksForWideCJKCharacters == null
+                        ? DEFAULT_ADJUST_CJK
+                        : adjustLineBreaksForWideCJKCharacters;
             }
 
             /**
@@ -15485,6 +15522,7 @@ public class CommandLine {
              * @param adjustForWideChars if true, wide Chinese, Japanese and Korean characters
              *                           are counted as double the size of other characters for line-breaking purposes
              * @since 4.0
+             * @return adjustLineBreaksForWideCJKCharacters
              */
             public UsageMessageSpec adjustLineBreaksForWideCJKCharacters(
                     boolean adjustForWideChars) {
@@ -15492,6 +15530,13 @@ public class CommandLine {
                 return this;
             }
 
+            /**
+             * updateFromCommand.
+             *
+             * @param cmd
+             * @param commandSpec
+             * @param loadResourceBundle
+             */
             void updateFromCommand(
                     Command cmd,
                     CommandSpec commandSpec,
@@ -15621,158 +15666,98 @@ public class CommandLine {
                 } // validate
             }
 
+            /**
+             * initFromMixin.
+             *
+             * @param mixin
+             * @param commandSpec
+             */
             void initFromMixin(UsageMessageSpec mixin,
                                CommandSpec commandSpec) {
-                if (
-                        initializable(abbreviateSynopsis,
-                                mixin.abbreviateSynopsis(),
-                                DEFAULT_ABBREVIATE_SYNOPSIS)) {
+                if (initializable(abbreviateSynopsis, mixin.abbreviateSynopsis(), DEFAULT_ABBREVIATE_SYNOPSIS)) {
                     abbreviateSynopsis = mixin.abbreviateSynopsis();
                 }
-                if (
-                        initializable(adjustLineBreaksForWideCJKCharacters,
-                                mixin.adjustLineBreaksForWideCJKCharacters(),
-                                DEFAULT_ADJUST_CJK)) {
+                if (initializable(adjustLineBreaksForWideCJKCharacters,
+                        mixin.adjustLineBreaksForWideCJKCharacters(), DEFAULT_ADJUST_CJK)) {
                     adjustLineBreaksForWideCJKCharacters =
                             mixin.adjustLineBreaksForWideCJKCharacters();
                 }
-                if (
-                        initializable(autoWidth,
-                                mixin.autoWidth(),
-                                DEFAULT_USAGE_AUTO_WIDTH)) {
+                if (initializable(autoWidth, mixin.autoWidth(), DEFAULT_USAGE_AUTO_WIDTH)) {
                     autoWidth = mixin.autoWidth();
                 }
-                if (
-                        initializable(commandListHeading,
-                                mixin.commandListHeading(),
-                                DEFAULT_COMMAND_LIST_HEADING)) {
+                if (initializable(commandListHeading, mixin.commandListHeading(), DEFAULT_COMMAND_LIST_HEADING)) {
                     commandListHeading = mixin.commandListHeading();
                 }
-                if (
-                        initializable(customSynopsis,
-                                mixin.customSynopsis(),
-                                DEFAULT_MULTI_LINE)) {
+                if (initializable(customSynopsis, mixin.customSynopsis(), DEFAULT_MULTI_LINE)) {
                     customSynopsis = mixin.customSynopsis().clone();
                 }
-                if (
-                        initializable(description,
-                                mixin.description(),
-                                DEFAULT_MULTI_LINE)) {
+                if (initializable(description, mixin.description(), DEFAULT_MULTI_LINE)) {
                     description = mixin.description().clone();
                 }
-                if (
-                        initializable(descriptionHeading,
-                                mixin.descriptionHeading(),
-                                DEFAULT_SINGLE_VALUE)) {
+                if (initializable(descriptionHeading, mixin.descriptionHeading(), DEFAULT_SINGLE_VALUE)) {
                     descriptionHeading = mixin.descriptionHeading();
                 }
-                if (
-                        initializable(exitCodeList,
-                                mixin.exitCodeList(),
-                                Collections.emptyMap())
-                                && exitCodeListStrings == null) {
-                    exitCodeList =
-                            Collections.unmodifiableMap(
-                                    new LinkedHashMap<String,
-                                            String>(mixin.exitCodeList()));
+                if (initializable(exitCodeList, mixin.exitCodeList(), Collections.emptyMap())
+                        && exitCodeListStrings == null) {
+                    exitCodeList = Collections.unmodifiableMap(new LinkedHashMap<String, String>(
+                            mixin.exitCodeList()));
                 }
-                if (
-                        initializable(exitCodeListHeading,
-                                mixin.exitCodeListHeading(),
-                                DEFAULT_SINGLE_VALUE)) {
+                if (initializable(exitCodeListHeading, mixin.exitCodeListHeading(), DEFAULT_SINGLE_VALUE)) {
                     exitCodeListHeading = mixin.exitCodeListHeading();
                 }
                 if (initializable(footer, mixin.footer(), DEFAULT_MULTI_LINE)) {
                     footer = mixin.footer().clone();
                 }
-                if (
-                        initializable(footerHeading,
-                                mixin.footerHeading(),
-                                DEFAULT_SINGLE_VALUE)) {
+                if (initializable(footerHeading, mixin.footerHeading(), DEFAULT_SINGLE_VALUE)) {
                     footerHeading = mixin.footerHeading();
                 }
                 if (initializable(header, mixin.header(), DEFAULT_MULTI_LINE)) {
                     header = mixin.header().clone();
                 }
-                if (
-                        initializable(headerHeading,
-                                mixin.headerHeading(),
-                                DEFAULT_SINGLE_VALUE)) {
+                if (initializable(headerHeading, mixin.headerHeading(), DEFAULT_SINGLE_VALUE)) {
                     headerHeading = mixin.headerHeading();
                 }
                 if (initializable(hidden, mixin.hidden(), DEFAULT_HIDDEN)) {
                     hidden = mixin.hidden();
                 }
-                if (
-                        initializable(longOptionsMaxWidth,
-                                mixin.longOptionsMaxWidth(),
-                                DEFAULT_USAGE_LONG_OPTIONS_WIDTH)) {
+                if (initializable(longOptionsMaxWidth, mixin.longOptionsMaxWidth(),
+                        DEFAULT_USAGE_LONG_OPTIONS_WIDTH)) {
                     longOptionsMaxWidth = mixin.longOptionsMaxWidth();
                 }
-                if (
-                        Messages.empty(messages)
-                                && Messages.resourceBundleBaseName(messages) == null) {
+                if (Messages.empty(messages) && Messages.resourceBundleBaseName(messages) == null) {
                     messages(Messages.copy(commandSpec, mixin.messages()));
                 }
-                if (
-                        initializable(optionListHeading,
-                                mixin.optionListHeading(),
-                                DEFAULT_SINGLE_VALUE)) {
+                if (initializable(optionListHeading, mixin.optionListHeading(), DEFAULT_SINGLE_VALUE)) {
                     optionListHeading = mixin.optionListHeading();
                 }
-                if (
-                        initializable(parameterListHeading,
-                                mixin.parameterListHeading(),
-                                DEFAULT_SINGLE_VALUE)) {
+                if (initializable(parameterListHeading, mixin.parameterListHeading(), DEFAULT_SINGLE_VALUE)) {
                     parameterListHeading = mixin.parameterListHeading();
                 }
-                if (
-                        initializable(requiredOptionMarker,
-                                mixin.requiredOptionMarker(),
-                                DEFAULT_REQUIRED_OPTION_MARKER)) {
+                if (initializable(requiredOptionMarker, mixin.requiredOptionMarker(),
+                        DEFAULT_REQUIRED_OPTION_MARKER)) {
                     requiredOptionMarker = mixin.requiredOptionMarker();
                 }
-                if (
-                        initializable(showAtFileInUsageHelp,
-                                mixin.showAtFileInUsageHelp(),
-                                DEFAULT_SHOW_AT_FILE)) {
+                if (initializable(showAtFileInUsageHelp, mixin.showAtFileInUsageHelp(), DEFAULT_SHOW_AT_FILE)) {
                     showAtFileInUsageHelp = mixin.showAtFileInUsageHelp();
                 }
-                if (
-                        initializable(showDefaultValues,
-                                mixin.showDefaultValues(),
-                                DEFAULT_SHOW_DEFAULT_VALUES)) {
+                if (initializable(showDefaultValues, mixin.showDefaultValues(), DEFAULT_SHOW_DEFAULT_VALUES)) {
                     showDefaultValues = mixin.showDefaultValues();
                 }
-                if (
-                        initializable(showEndOfOptionsDelimiterInUsageHelp,
-                                mixin.showEndOfOptionsDelimiterInUsageHelp(),
-                                DEFAULT_SHOW_END_OF_OPTIONS)) {
-                    showEndOfOptionsDelimiterInUsageHelp =
-                            mixin.showEndOfOptionsDelimiterInUsageHelp();
+                if (initializable(showEndOfOptionsDelimiterInUsageHelp, mixin.showEndOfOptionsDelimiterInUsageHelp(),
+                        DEFAULT_SHOW_END_OF_OPTIONS)) {
+                    showEndOfOptionsDelimiterInUsageHelp = mixin.showEndOfOptionsDelimiterInUsageHelp();
                 }
-                if (
-                        initializable(sortOptions,
-                                mixin.sortOptions(),
-                                DEFAULT_SORT_OPTIONS)) {
+                if (initializable(sortOptions, mixin.sortOptions(), DEFAULT_SORT_OPTIONS)) {
                     sortOptions = mixin.sortOptions();
                 }
-                if (
-                        initializable(sortSynopsis,
-                                mixin.sortSynopsis(),
-                                DEFAULT_SORT_SYNOPSIS)) {
+                if (initializable(sortSynopsis, mixin.sortSynopsis(), DEFAULT_SORT_SYNOPSIS)) {
                     sortSynopsis = mixin.sortSynopsis();
                 }
-                if (
-                        initializable(synopsisHeading,
-                                mixin.synopsisHeading(),
-                                DEFAULT_SYNOPSIS_HEADING)) {
+                if (initializable(synopsisHeading, mixin.synopsisHeading(), DEFAULT_SYNOPSIS_HEADING)) {
                     synopsisHeading = mixin.synopsisHeading();
                 }
-                if (
-                        initializable(synopsisSubcommandLabel,
-                                mixin.synopsisSubcommandLabel(),
-                                DEFAULT_SYNOPSIS_SUBCOMMANDS)) {
+                if (initializable(synopsisSubcommandLabel, mixin.synopsisSubcommandLabel(),
+                        DEFAULT_SYNOPSIS_SUBCOMMANDS)) {
                     synopsisSubcommandLabel = mixin.synopsisSubcommandLabel();
                 }
                 if (initializable(width, mixin.width(), DEFAULT_USAGE_WIDTH)) {
@@ -15780,6 +15765,12 @@ public class CommandLine {
                 }
             }
 
+            /**
+             * initFrom.
+             *
+             * @param settings
+             * @param commandSpec
+             */
             void initFrom(UsageMessageSpec settings, CommandSpec commandSpec) {
                 abbreviateSynopsis = settings.abbreviateSynopsis;
                 adjustLineBreaksForWideCJKCharacters =
@@ -15863,6 +15854,8 @@ public class CommandLine {
              * Returns the String to use as the separator between
              * options and option parameters. {@code "="} by default,
              * initialized from {@link Command#separator()} if defined.
+             *
+             * @return separator
              */
             public String separator() {
                 return (separator == null) ? DEFAULT_SEPARATOR : separator;
@@ -15870,6 +15863,7 @@ public class CommandLine {
 
             /**
              * @see CommandLine#isStopAtUnmatched()
+             * @return stopAtUnmatched
              */
             public boolean stopAtUnmatched() {
                 return stopAtUnmatched;
@@ -15877,6 +15871,7 @@ public class CommandLine {
 
             /**
              * @see CommandLine#isStopAtPositional()
+             * @return stopAtPositional
              */
             public boolean stopAtPositional() {
                 return stopAtPositional;
@@ -15885,6 +15880,8 @@ public class CommandLine {
             /**
              * @see CommandLine#getEndOfOptionsDelimiter()
              * @since 3.5
+             * @return endOfOptionsDelimiter
+             *
              */
             public String endOfOptionsDelimiter() {
                 return endOfOptionsDelimiter;
@@ -15892,6 +15889,7 @@ public class CommandLine {
 
             /**
              * @see CommandLine#isToggleBooleanFlags()
+             * @return toggleBooleanFlags
              */
             public boolean toggleBooleanFlags() {
                 return toggleBooleanFlags;
@@ -15899,6 +15897,7 @@ public class CommandLine {
 
             /**
              * @see CommandLine#isOverwrittenOptionsAllowed()
+             * @return overwrittenOptionsAllowed
              */
             public boolean overwrittenOptionsAllowed() {
                 return overwrittenOptionsAllowed;
@@ -15913,6 +15912,7 @@ public class CommandLine {
 
             /**
              * @see CommandLine#isAbbreviatedSubcommandsAllowed()
+             * @return abbreviatedSubcommandsAllowed
              */
             public boolean abbreviatedSubcommandsAllowed() {
                 return abbreviatedSubcommandsAllowed;
@@ -15920,6 +15920,7 @@ public class CommandLine {
 
             /**
              * @see CommandLine#isAbbreviatedOptionsAllowed()
+             * @return abbreviatedOptionsAllowed
              */
             public boolean abbreviatedOptionsAllowed() {
                 return abbreviatedOptionsAllowed;
@@ -15927,6 +15928,7 @@ public class CommandLine {
 
             /**
              * @see CommandLine#isExpandAtFiles()
+             * @return expandAtFiles
              */
             public boolean expandAtFiles() {
                 return expandAtFiles;
@@ -15935,6 +15937,7 @@ public class CommandLine {
             /**
              * @see CommandLine#getAtFileCommentChar()
              * @since 3.5
+             * @return atFileCommentChar
              */
             public Character atFileCommentChar() {
                 return atFileCommentChar;
@@ -15943,6 +15946,7 @@ public class CommandLine {
             /**
              * @see CommandLine#isUseSimplifiedAtFiles()
              * @since 3.9
+             * @return useSimplifiedAtFiles
              */
             public boolean useSimplifiedAtFiles() {
                 String value =
@@ -15955,6 +15959,7 @@ public class CommandLine {
 
             /**
              * @see CommandLine#isPosixClusteredShortOptionsAllowed()
+             * @return posixClusteredShortOptionsAllowed
              */
             public boolean posixClusteredShortOptionsAllowed() {
                 return posixClusteredShortOptionsAllowed;
@@ -15963,6 +15968,7 @@ public class CommandLine {
             /**
              * @see CommandLine#isCaseInsensitiveEnumValuesAllowed()
              * @since 3.4
+             * @return aseInsensitiveEnumValuesAllowed
              */
             public boolean caseInsensitiveEnumValuesAllowed() {
                 return caseInsensitiveEnumValuesAllowed;
@@ -15971,6 +15977,7 @@ public class CommandLine {
             /**
              * @see CommandLine#isTrimQuotes()
              * @since 3.7
+             * @return trimQuotes
              */
             public boolean trimQuotes() {
                 return trimQuotes;
@@ -15979,6 +15986,7 @@ public class CommandLine {
             /**
              * @see CommandLine#isSplitQuotedStrings()
              * @since 3.7
+             * @return splitQuotedStrings
              */
             public boolean splitQuotedStrings() {
                 return splitQuotedStrings;
@@ -15986,6 +15994,7 @@ public class CommandLine {
 
             /**
              * @see CommandLine#isUnmatchedOptionsArePositionalParams()
+             * @return unmatchedOptionsArePositionalParams
              */
             public boolean unmatchedOptionsArePositionalParams() {
                 return unmatchedOptionsArePositionalParams;
@@ -15994,6 +16003,7 @@ public class CommandLine {
             /**
              * @see CommandLine#isUnmatchedOptionsAllowedAsOptionParameters()
              * @since 4.4
+             * @return unmatchedOptionsAllowedAsOptionParameters
              */
             public boolean unmatchedOptionsAllowedAsOptionParameters() {
                 return unmatchedOptionsAllowedAsOptionParameters;
