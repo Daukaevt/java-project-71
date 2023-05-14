@@ -16361,6 +16361,10 @@ public class CommandLine {
                 }
             }
 
+            /** toString.
+             *
+             * @return String.format
+             */
             public String toString() {
                 return String.format(
                         "abbreviatedOptionsAllowed=%s, "
@@ -16504,7 +16508,7 @@ public class CommandLine {
             private final String prompt;
             private final String splitRegex;
             private final String splitRegexSynopsisLabel;
-            protected final ITypeInfo typeInfo;
+            final ITypeInfo typeInfo;
             private final ITypeConverter<?>[] converters;
             private final Iterable<String> completionCandidates;
             private final IParameterConsumer parameterConsumer;
@@ -16524,9 +16528,9 @@ public class CommandLine {
             private Range arity;
             private List<String> stringValues = new ArrayList<String>();
             private List<String> originalStringValues = new ArrayList<String>();
-            protected String toString;
+            String toString;
             private final List<Object> typedValues = new ArrayList<Object>();
-            Map<Integer, Object> typedValueAtPosition =
+            protected Map<Integer, Object> typedValueAtPosition =
                     new TreeMap<Integer, Object>();
 
             /**
@@ -16818,7 +16822,7 @@ public class CommandLine {
             }
 
             /**
-             * Returns a description of the option or positional arg, e.g. {@code -a=<a>}.
+             * Returns a description of the option or positional arg.
              *
              * @param separator separator between
              *                  arg and arg parameter label, usually '='
