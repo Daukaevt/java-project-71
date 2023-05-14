@@ -17000,6 +17000,7 @@ public class CommandLine {
              * returns the same as {@link #type()}.
              *
              * @see Option#type()
+             * @return auxiliaryTypes
              */
             public Class<?>[] auxiliaryTypes() {
                 return typeInfo.getAuxiliaryTypes();
@@ -17014,6 +17015,7 @@ public class CommandLine {
              * that is different from the normal conversion for the arg spec's type.
              *
              * @see Option#converter()
+             * @return converters
              */
             public ITypeConverter<?>[] converters() {
                 return converters.clone();
@@ -17024,6 +17026,7 @@ public class CommandLine {
              * values or {@code ""} if the value should not be split.
              *
              * @see Option#split()
+             * @return splitRegex
              */
             public String splitRegex() {
                 return interpolate(splitRegex);
@@ -17035,6 +17038,7 @@ public class CommandLine {
              *
              * @see Option#splitSynopsisLabel()
              * @since 4.3
+             * @return splitRegexSynopsisLabel
              */
             public String splitRegexSynopsisLabel() {
                 return interpolate(splitRegexSynopsisLabel);
@@ -17045,6 +17049,7 @@ public class CommandLine {
              * should be excluded from the usage message.
              *
              * @see Option#hidden()
+             * @return hidden
              */
             public boolean hidden() {
                 return hidden;
@@ -17055,6 +17060,7 @@ public class CommandLine {
              *
              * @see Option#scope()
              * @since 4.3.0
+             * @return inherited
              */
             public boolean inherited() {
                 return inherited;
@@ -17068,6 +17074,7 @@ public class CommandLine {
              *
              * @see Option#scope()
              * @since 4.6.0
+             * @return ArgSpec root()
              */
             public ArgSpec root() {
                 return root;
@@ -17080,8 +17087,9 @@ public class CommandLine {
              * This may be a container type like
              * {@code List}, {@code Map}, or {@code Optional},
              * in which case the type or types of the
-             * elements are returned by {@link #auxiliaryTypes(
-             *)}.
+             * elements are returned by {@link #auxiliaryTypes()}.
+             *
+             * @return typeInfo
              */
             public Class<?> type() {
                 return typeInfo.getType();
@@ -17093,6 +17101,7 @@ public class CommandLine {
              * by annotation processors) and at runtime.
              *
              * @since 4.0
+             * @return typeInfo
              */
             public ITypeInfo typeInfo() {
                 return typeInfo;
@@ -17134,6 +17143,7 @@ public class CommandLine {
              * @see Option#mapFallbackValue()
              * @see Parameters#mapFallbackValue()
              * @since 4.6
+             * @return mapFallbackValue
              */
             public String mapFallbackValue() {
                 String result = interpolate(mapFallbackValue);
@@ -17170,6 +17180,8 @@ public class CommandLine {
              * regardless of whether a default value exists),
              * to clear values that would otherwise
              * remain from parsing previous input.
+             *
+             * @return initialValue
              */
             public Object initialValue() {
                 // not not initialize if already CACHED,
@@ -17193,14 +17205,19 @@ public class CommandLine {
              * parameter will be reset to the {@link #initialValue(
              *)}
              * before parsing new input.
+             * @return hasInitialValue
              */
             public boolean hasInitialValue() {
-                return hasInitialValue || initialValueState == InitialValueState.CACHED || initialValueState == InitialValueState.POSTPONED;
+                return hasInitialValue
+                        || initialValueState == InitialValueState.CACHED
+                        || initialValueState == InitialValueState.POSTPONED;
             }
 
             /**
              * Returns whether this option or positional parameter's
              * default value should be shown in the usage help.
+             *
+             * @return showDefaultValue
              */
             public Help.Visibility showDefaultValue() {
                 return showDefaultValue;
@@ -17211,6 +17228,7 @@ public class CommandLine {
              * displaying it in the description, without interpolating variables.
              *
              * @see #defaultValueString(boolean)
+             * @return defaultValueString
              */
             public String defaultValueString() {
                 return defaultValueString(false);
@@ -17235,6 +17253,7 @@ public class CommandLine {
              * @see CommandSpec#defaultValueProvider()
              * @see ArgSpec#defaultValue()
              * @since 4.0
+             * @return defaultValueString
              */
             public String defaultValueString(boolean interpolateVariables) {
                 // implementation note: don't call this.defaultValue(),
@@ -17243,9 +17262,7 @@ public class CommandLine {
                 if (value != null && value.getClass().isArray()) {
                     StringBuilder sb = new StringBuilder();
                     for (int i = 0; i < Array.getLength(value); i++) {
-                        sb.append(i > 0 ? "," : "")
-                                .append(Array.get(value, i)
-                                );
+                        sb.append(i > 0 ? "," : "").append(Array.get(value, i));
                     }
                     return sb.insert(0, "[").append("]").toString();
                 }
@@ -17298,6 +17315,7 @@ public class CommandLine {
              * when passing arguments through to another program.
              *
              * @since 4.0
+             * @return parameterConsumer
              */
             public IParameterConsumer parameterConsumer() {
                 return parameterConsumer;
@@ -17309,6 +17327,7 @@ public class CommandLine {
              * for the parameter(s) of this option or position.
              *
              * @since 4.6
+             * @return preprocessor
              */
             public IParameterPreprocessor preprocessor() {
                 return preprocessor;
@@ -17317,6 +17336,8 @@ public class CommandLine {
             /**
              * Returns the {@link IGetter} that is responsible
              * for supplying the value of this argument.
+             *
+             * @return getter
              */
             public IGetter getter() {
                 return getter;
@@ -17325,6 +17346,8 @@ public class CommandLine {
             /**
              * Returns the {@link ISetter} that is responsible
              * for modifying the value of this argument.
+             *
+             * @return setter
              */
             public ISetter setter() {
                 return setter;
@@ -17334,6 +17357,8 @@ public class CommandLine {
              * Returns the binding {@link IScope} that
              * determines on which object to set the value (
              * or from which object to get the value) of this argument.
+             *
+             * @return scope
              */
             public IScope scope() {
                 return scope;
@@ -17356,16 +17381,17 @@ public class CommandLine {
              *)} method is able to get an actual value from the current {@link #getter()}.
              *
              * @since 4.7
+             * @return isValueGettable boolean
              */
             public boolean isValueGettable() {
                 if (getter instanceof IScoped) {
                     IScoped scoped = (IScoped) getter;
-                    IScope scope = scoped.getScope();
-                    if (scope == null) {
+                    IScope scope1 = scoped.getScope();
+                    if (scope1 == null) {
                         return false;
                     }
                     try {
-                        return scope.get() != null;
+                        return scope1.get() != null;
                     } catch (Exception e) {
                         return false;
                     }
@@ -17375,8 +17401,10 @@ public class CommandLine {
 
             /**
              * Returns the current value of this argument.
-             * Delegates to the current {@link #getter(
-             *)}.
+             * Delegates to the current {@link #getter()}.
+             *
+             * @param <T>
+             * @return getValue
              */
             public <T> T getValue() throws PicocliException {
                 if (!isValueGettable()) {
@@ -17394,8 +17422,11 @@ public class CommandLine {
 
             /**
              * Sets the value of this argument to the specified value and
-             * returns the previous value. Delegates to the current {@link #setter(
-             *)}.
+             * returns the previous value. Delegates to the current {@link #setter()}.
+             *
+             * @param <T>
+             * @param newValue
+             * @return newValue
              */
             public <T> T setValue(T newValue) throws PicocliException {
                 try {
@@ -17417,6 +17448,11 @@ public class CommandLine {
              * @since 3.5
              * @deprecated use {@link #setValue(
              *Object)} instead. This was a design mistake.
+             *
+             * @param newValue
+             * @param <T>
+             * @param commandLine
+             * @return newValue
              */
             @Deprecated
             public <T> T setValue(
@@ -17430,6 +17466,8 @@ public class CommandLine {
              *)} is an array,
              * a {@code Collection} or a {@code Map},
              * {@code false} otherwise.
+             *
+             * @return isMultiValue
              */
             public boolean isMultiValue() {
                 return typeInfo.isMultiValue();
@@ -17438,12 +17476,16 @@ public class CommandLine {
             /**
              * Returns {@code true} if this argument
              * is a named option, {@code false} otherwise.
+             *
+             * @return sOption
              */
             public abstract boolean isOption();
 
             /**
              * Returns {@code true} if this argument
              * is a positional parameter, {@code false} otherwise.
+             *
+             * @return isPositional
              */
             public abstract boolean isPositional();
 
@@ -17452,6 +17494,7 @@ public class CommandLine {
              * belongs to, or {@code null} if this option is not part of a group.
              *
              * @since 4.0
+             * @return ArgGroupSpec group
              */
             public ArgGroupSpec group() {
                 return group;
@@ -17462,13 +17505,14 @@ public class CommandLine {
              * or positional parameter belongs to.
              * <p>Beware that it is possible to programmatically add
              * an option or positional parameter to more than one command model.
-             * (
-             * This will not happen in models that are auto-generated from annotations). In that case this method will only return
+             * (This will not happen in models that are auto-generated from annotations).
+             * In that case this method will only return
              * the one it was added to last.
              * <p>If the option or positional parameter has not
              * yet been attached to a command, {@code null} will be returned.
              *
              * @since 4.1
+             * @return commandSpec
              */
             public CommandSpec command() {
                 return commandSpec;
@@ -17546,7 +17590,9 @@ public class CommandLine {
              * should be shown, potentially overriding the specified global setting.
              *
              * @param usageHelpShowDefaults whether the command's
-             *                              UsageMessageSpec is configured to show default values.
+             * UsageMessageSpec is configured to show default values.
+             *
+             * @return internalShowDefaultValue
              */
             protected boolean internalShowDefaultValue(
                     boolean usageHelpShowDefaults) {
@@ -17569,6 +17615,7 @@ public class CommandLine {
              * Returns the Messages for this arg specification, or {@code null}.
              *
              * @since 3.6
+             * @return messages
              */
             public Messages messages() {
                 return messages;
@@ -17582,6 +17629,7 @@ public class CommandLine {
              * @see OptionSpec#description()
              * @see PositionalParamSpec#description()
              * @since 3.6
+             * @return Messages
              */
             public ArgSpec messages(Messages msgs) {
                 messages = msgs;
@@ -17591,6 +17639,8 @@ public class CommandLine {
             /**
              * Returns a string respresentation
              * of this option or positional parameter.
+             *
+             * @return toString
              */
             public String toString() {
                 return toString;
@@ -17599,13 +17649,13 @@ public class CommandLine {
             String[] splitValue(
                     String value,
                     ParserSpec parser,
-                    Range arity,
+                    Range arity1,
                     int consumed) {
                 if (splitRegex().length() == 0) {
                     return new String[]{value};
                 }
                 int limit =
-                        parser.limitSplit() ? Math.max(arity.max - consumed,
+                        parser.limitSplit() ? Math.max(arity1.max - consumed,
                                 0) : 0;
                 if (parser.splitQuotedStrings()) {
                     return debug(
@@ -17664,8 +17714,16 @@ public class CommandLine {
             }
 
             protected int hashCodeImpl() {
-                return 17 + 37 * Assert.hashCode(
-                        defaultValue) + 37 * Assert.hashCode(mapFallbackValue) + 37 * Assert.hashCode(arity) + 37 * Assert.hashCode(hidden) + 37 * Assert.hashCode(inherited) + 37 * Assert.hashCode(paramLabel) + 37 * Assert.hashCode(hideParamSyntax) + 37 * Assert.hashCode(required) + 37 * Assert.hashCode(splitRegex) + 37 * Assert.hashCode(splitRegexSynopsisLabel) + 37 * Arrays.hashCode(description) + 37 * Assert.hashCode(descriptionKey) + 37 * Assert.hashCode(parameterConsumer) + 37 * Assert.hashCode(preprocessor) + 37 * typeInfo.hashCode() + 37 * scopeType.hashCode();
+                return SEVENTHEEN + THIRTHY_SEVEN * Assert.hashCode(defaultValue)
+                        + THIRTHY_SEVEN * Assert.hashCode(mapFallbackValue)
+                        + THIRTHY_SEVEN * Assert.hashCode(arity) + THIRTHY_SEVEN * Assert.hashCode(hidden)
+                        + THIRTHY_SEVEN * Assert.hashCode(inherited) + THIRTHY_SEVEN * Assert.hashCode(paramLabel)
+                        + THIRTHY_SEVEN * Assert.hashCode(hideParamSyntax) + THIRTHY_SEVEN * Assert.hashCode(required)
+                        + THIRTHY_SEVEN * Assert.hashCode(splitRegex) + THIRTHY_SEVEN
+                        * Assert.hashCode(splitRegexSynopsisLabel) + THIRTHY_SEVEN * Arrays.hashCode(description)
+                        + THIRTHY_SEVEN * Assert.hashCode(descriptionKey) + THIRTHY_SEVEN
+                        * Assert.hashCode(parameterConsumer) + THIRTHY_SEVEN * Assert.hashCode(preprocessor)
+                        + THIRTHY_SEVEN * typeInfo.hashCode() + THIRTHY_SEVEN * scopeType.hashCode();
             }
 
             String interpolate(String value) {
@@ -17941,6 +17999,7 @@ public class CommandLine {
                  * a required option or positional parameter.
                  *
                  * @see Option#required()
+                 * @return required
                  */
                 public boolean required() {
                     return required;
@@ -17951,6 +18010,7 @@ public class CommandLine {
                  * the user to enter a value on the command line.
                  *
                  * @see Option#interactive()
+                 * @return interactive
                  */
                 public boolean interactive() {
                     return interactive;
@@ -17963,6 +18023,7 @@ public class CommandLine {
                  * @see Option#echo()
                  * @see Parameters#echo()
                  * @since 4.6
+                 * @return echo
                  */
                 public boolean echo() {
                     return echo;
@@ -17975,6 +18036,7 @@ public class CommandLine {
                  * @see Option#prompt()
                  * @see Parameters#prompt()
                  * @since 4.6
+                 * @return prompt
                  */
                 public String prompt() {
                     return prompt;
@@ -17985,6 +18047,7 @@ public class CommandLine {
                  * used when generating the usage documentation.
                  *
                  * @see Option#description()
+                 * @return description
                  */
                 public String[] description() {
                     return description;
@@ -18065,6 +18128,7 @@ public class CommandLine {
                  * that is different from the normal conversion for the arg spec's type.
                  *
                  * @see Option#converter()
+                 * @return converters
                  */
                 public ITypeConverter<?>[] converters() {
                     return converters;
@@ -18775,8 +18839,8 @@ InitialValueState.CACHED;*/
                 /**
                  * Sets the string representation of this option or positional
                  * parameter to the specified value, and returns this builder.
-                 * 
-                 * @param toString1 
+                 *
+                 * @param toString1
                  * @return withToString
                  */
                 public T withToString(String toString1) {
