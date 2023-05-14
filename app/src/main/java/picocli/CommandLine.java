@@ -17997,6 +17997,7 @@ public class CommandLine {
                  * @see Option#descriptionKey()
                  * @see Parameters#descriptionKey()
                  * @since 3.6
+                 * @return descriptionKey
                  */
                 public String descriptionKey() {
                     return descriptionKey;
@@ -18007,6 +18008,7 @@ public class CommandLine {
                  * this option or positional parameter requires.
                  *
                  * @see Option#arity()
+                 * @return arity
                  */
                 public Range arity() {
                     return arity;
@@ -18018,6 +18020,7 @@ public class CommandLine {
                  *
                  * @see Option#paramLabel()
                  * @see Parameters#paramLabel()
+                 * @return paramLabel
                  */
                 public String paramLabel() {
                     return paramLabel;
@@ -18033,6 +18036,7 @@ public class CommandLine {
                  * "...") when multiple values can be specified.
                  *
                  * @since 3.6.0
+                 * @return hideParamSyntax
                  */
                 public boolean hideParamSyntax() {
                     return hideParamSyntax;
@@ -18046,6 +18050,7 @@ public class CommandLine {
                  * Map}, {@code Optional} or an abstract class.
                  *
                  * @see Option#type()
+                 * @return auxiliaryTypes
                  */
                 public Class<?>[] auxiliaryTypes() {
                     return auxiliaryTypes;
@@ -18070,6 +18075,7 @@ public class CommandLine {
                  * values or {@code ""} if the value should not be split.
                  *
                  * @see Option#split()
+                 * @return splitRegex
                  */
                 public String splitRegex() {
                     return splitRegex;
@@ -18081,6 +18087,7 @@ public class CommandLine {
                  *
                  * @see Option#splitSynopsisLabel()
                  * @since 4.3
+                 * @return splitRegexSynopsisLabel
                  */
                 public String splitRegexSynopsisLabel() {
                     return splitRegexSynopsisLabel;
@@ -18091,6 +18098,7 @@ public class CommandLine {
                  * should be excluded from the usage message.
                  *
                  * @see Option#hidden()
+                 * @return hidden
                  */
                 public boolean hidden() {
                     return hidden;
@@ -18102,6 +18110,7 @@ public class CommandLine {
                  *
                  * @see Option#scope()
                  * @since 4.3.0
+                 * @return inherited
                  */
                 public boolean inherited() {
                     return inherited;
@@ -18115,6 +18124,7 @@ public class CommandLine {
                  *
                  * @see Option#scope()
                  * @since 4.6.0
+                 * @return root
                  */
                 public ArgSpec root() {
                     return root;
@@ -18127,8 +18137,9 @@ public class CommandLine {
                  * This may be a container type like
                  * {@code List}, {@code Map}, or {@code Optional},
                  * in which case the type or types of
-                 * the elements are returned by {@link #auxiliaryTypes(
-                 *)}.
+                 * the elements are returned by {@link #auxiliaryTypes()}.
+                 *
+                 * @return type
                  */
                 public Class<?> type() {
                     return type;
@@ -18173,6 +18184,7 @@ public class CommandLine {
                  * @see Option#mapFallbackValue()
                  * @see Parameters#mapFallbackValue()
                  * @since 4.6
+                 * @return mapFallbackValue
                  */
                 public String mapFallbackValue() {
                     return mapFallbackValue;
@@ -18183,6 +18195,8 @@ public class CommandLine {
                  * positional parameter, before splitting and type conversion.
                  * A value of {@code null} means this option
                  * or positional parameter does not have a default.
+                 *
+                 * @return defaultValue
                  */
                 public String defaultValue() {
                     return defaultValue;
@@ -18197,6 +18211,8 @@ public class CommandLine {
                  * regardless of whether a default value exists),
                  * to clear values that would
                  * otherwise remain from parsing previous input.
+                 *
+                 * @return initialValue
                  */
                 public Object initialValue() {
                     return initialValue;
@@ -18207,6 +18223,8 @@ public class CommandLine {
                  * parameter will be reset to the {@link #initialValue(
                  *)}
                  * before parsing new input.
+                 *
+                 * @return hasInitialValue
                  */
                 public boolean hasInitialValue() {
                     return hasInitialValue;
@@ -18215,6 +18233,8 @@ public class CommandLine {
                 /**
                  * Returns whether this option or positional
                  * parameter's default value should be shown in the usage help.
+                 *
+                 * @return showDefaultValue
                  */
                 public Help.Visibility showDefaultValue() {
                     return showDefaultValue;
@@ -18225,6 +18245,7 @@ public class CommandLine {
                  * this option or positional parameter, or {@code null}.
                  *
                  * @since 3.2
+                 * @return completionCandidates
                  */
                 public Iterable<String> completionCandidates() {
                     return completionCandidates;
@@ -18235,6 +18256,7 @@ public class CommandLine {
                  * this option or positional parameter, or {@code null}.
                  *
                  * @since 4.0
+                 * @return parameterConsumer
                  */
                 public IParameterConsumer parameterConsumer() {
                     return parameterConsumer;
@@ -18247,6 +18269,7 @@ public class CommandLine {
                  * this option or position, or {@code null}.
                  *
                  * @since 4.6
+                 * @return preprocessor
                  */
                 public IParameterPreprocessor preprocessor() {
                     return preprocessor;
@@ -18255,6 +18278,8 @@ public class CommandLine {
                 /**
                  * Returns the {@link IGetter} that is
                  * responsible for supplying the value of this argument.
+                 *
+                 * @return getter
                  */
                 public IGetter getter() {
                     return getter;
@@ -18263,6 +18288,8 @@ public class CommandLine {
                 /**
                  * Returns the {@link ISetter} that is
                  * responsible for modifying the value of this argument.
+                 *
+                 * @return setter
                  */
                 public ISetter setter() {
                     return setter;
@@ -18272,6 +18299,8 @@ public class CommandLine {
                  * Returns the binding {@link IScope} that determines the
                  * instance of the enclosing element where the setter sets the value (
                  * or the getter gets the value) of this argument.
+                 *
+                 * @return IScope scope
                  */
                 public IScope scope() {
                     return scope;
@@ -18295,36 +18324,48 @@ public class CommandLine {
                 /**
                  * Sets whether this is a required option
                  * or positional parameter, and returns this builder.
+                 *
+                 * @param required1
+                 * @return T required
                  */
-                public T required(boolean required) {
-                    this.required = required;
+                public T required(boolean required1) {
+                    this.required = required1;
                     return self();
                 }
 
                 /**
                  * Sets whether this option prompts the user to
                  * enter a value on the command line, and returns this builder.
+                 *
+                 * @param interactive1
+                 * @return T interactive
                  */
-                public T interactive(boolean interactive) {
-                    this.interactive = interactive;
+                public T interactive(boolean interactive1) {
+                    this.interactive = interactive1;
                     return self();
                 }
 
                 /**
                  * Sets whether the user input is echoed to the console
                  * or not for an interactive option or positional parameter.
+                 *
+                 * @param echo1
+                 * @return T echo
                  */
-                public T echo(boolean echo) {
-                    this.echo = echo;
+                public T echo(boolean echo1) {
+                    this.echo = echo1;
                     return self();
                 }
 
                 /**
                  * Sets the text displayed to the end user for an interactive
                  * option or positional parameter when asking for user input.
+                 *
+                 * @param prompt1
+                 * @return T prompt
                  */
-                public T prompt(String prompt) {
-                    this.prompt = prompt;
+                public T prompt(String prompt1) {
+                    this.prompt = prompt1;
                     return self();
                 }
 
@@ -18333,10 +18374,12 @@ public class CommandLine {
                  * generating the usage documentation, and returns this builder.
                  *
                  * @see Option#description()
+                 * @param description1
+                 * @return T description
                  */
-                public T description(String... description) {
+                public T description(String... description1) {
                     this.description =
-                            Assert.notNull(description, "description").clone();
+                            Assert.notNull(description1, "description").clone();
                     return self();
                 }
 
@@ -18347,15 +18390,20 @@ public class CommandLine {
                  * @see Option#descriptionKey()
                  * @see Parameters#descriptionKey()
                  * @since 3.6
+                 * @param descriptionKey1
+                 * @return T descriptionKey
                  */
-                public T descriptionKey(String descriptionKey) {
-                    this.descriptionKey = descriptionKey;
+                public T descriptionKey(String descriptionKey1) {
+                    this.descriptionKey = descriptionKey1;
                     return self();
                 }
 
                 /**
                  * Sets how many arguments this option or
                  * positional parameter requires, and returns this builder.
+                 *
+                 * @param range
+                 * @return T arity
                  */
                 public T arity(String range) {
                     return arity(Range.valueOf(range));
@@ -18364,18 +18412,25 @@ public class CommandLine {
                 /**
                  * Sets how many arguments this option or
                  * positional parameter requires, and returns this builder.
+                 *
+                 *
+                 * @param arity1
+                 * @return T arity
                  */
-                public T arity(Range arity) {
-                    this.arity = Assert.notNull(arity, "arity");
+                public T arity(Range arity1) {
+                    this.arity = Assert.notNull(arity1, "arity");
                     return self();
                 }
 
                 /**
                  * Sets the name of the option or positional parameter
                  * used in the usage help message, and returns this builder.
+                 *
+                 * @param paramLabel1
+                 * @return T paramLabel
                  */
-                public T paramLabel(String paramLabel) {
-                    this.paramLabel = Assert.notNull(paramLabel, "paramLabel");
+                public T paramLabel(String paramLabel1) {
+                    this.paramLabel = Assert.notNull(paramLabel1, "paramLabel");
                     return self();
                 }
 
@@ -18389,20 +18444,22 @@ public class CommandLine {
                  * "...") when multiple values can be specified.
                  *
                  * @since 3.6.0
+                 * @param hideParamSyntax1
+                 * @return T hideParamSyntax
                  */
-                public T hideParamSyntax(boolean hideParamSyntax) {
-                    this.hideParamSyntax = hideParamSyntax;
+                public T hideParamSyntax(boolean hideParamSyntax1) {
+                    this.hideParamSyntax = hideParamSyntax1;
                     return self();
                 }
 
                 /**
                  * Sets auxiliary type information, and returns this builder.
                  *
-                 * @param types the element type(
-                 *              s) when the {@link #type()} is a generic type like {@code Collection},
-                 *              {@code Map} or {@code Optional};
-                 *              or the concrete type when the {@link #type(
-                 *)} is an abstract class.
+                 * @param types the element type(s) when the {@link #type()} is a generic type
+                 * like {@code Collection}, {@code Map} or {@code Optional};
+                 * or the concrete type when the {@link #type()} is an abstract class.
+                 *
+                 * @return T auxiliaryTypes
                  */
                 public T auxiliaryTypes(Class<?>... types) {
                     this.auxiliaryTypes =
@@ -18413,30 +18470,38 @@ public class CommandLine {
                 /**
                  * Sets option/positional param-specific converter (
                  * or converters for Maps), and returns this builder.
+                 * @param cs1
+                 * @return T converters
                  */
-                public T converters(ITypeConverter<?>... cs) {
+                public T converters(ITypeConverter<?>... cs1) {
                     this.converters =
-                            Assert.notNull(cs, "type converters").clone();
+                            Assert.notNull(cs1, "type converters").clone();
                     return self();
                 }
 
                 /**
                  * Sets a regular expression to split option parameter values
                  * or {@code ""} if the value should not be split, and returns this builder.
+                 *
+                 * @param splitRegex1
+                 * @return T splitRegex
                  */
-                public T splitRegex(String splitRegex) {
-                    this.splitRegex = Assert.notNull(splitRegex, "splitRegex");
+                public T splitRegex(String splitRegex1) {
+                    this.splitRegex = Assert.notNull(splitRegex1, "splitRegex");
                     return self();
                 }
 
                 /**
                  * Sets a regular expression to
                  * split option parameter for usage information.
+                 *
+                 * @param splitRegexSynopsisLabel1
+                 * @return splitRegexSynopsisLabel
                  */
-                public T splitRegexSynopsisLabel(String splitRegexSynopsisLabel) {
+                public T splitRegexSynopsisLabel(String splitRegexSynopsisLabel1) {
                     this.splitRegexSynopsisLabel =
                             Assert.notNull(
-                                    splitRegexSynopsisLabel,
+                                    splitRegexSynopsisLabel1,
                                     "splitRegexSynopsisLabel");
                     return self();
                 }
@@ -18444,9 +18509,12 @@ public class CommandLine {
                 /**
                  * Sets whether this option or positional parameter's default
                  * value should be shown in the usage help, and returns this builder.
+                 *
+                 * @param visibility1
+                 * @return showDefaultValue
                  */
-                public T showDefaultValue(Help.Visibility visibility) {
-                    showDefaultValue = Assert.notNull(visibility, "visibility");
+                public T showDefaultValue(Help.Visibility visibility1) {
+                    showDefaultValue = Assert.notNull(visibility1, "visibility");
                     return self();
                 }
 
@@ -18455,10 +18523,11 @@ public class CommandLine {
                  * option or positional parameter, and returns this builder.
                  *
                  * @since 3.2
+                 * @param completionCandidates1
+                 * @return T completionCandidates
                  */
-                public T completionCandidates(
-                        Iterable<String> completionCandidates) {
-                    this.completionCandidates = completionCandidates;
+                public T completionCandidates(Iterable<String> completionCandidates1) {
+                    this.completionCandidates = completionCandidates1;
                     return self();
                 }
 
@@ -18467,9 +18536,11 @@ public class CommandLine {
                  * or positional parameter, and returns this builder.
                  *
                  * @since 4.0
+                 * @param parameterConsumer1
+                 * @return T parameterConsumer
                  */
-                public T parameterConsumer(IParameterConsumer parameterConsumer) {
-                    this.parameterConsumer = parameterConsumer;
+                public T parameterConsumer(IParameterConsumer parameterConsumer1) {
+                    this.parameterConsumer = parameterConsumer1;
                     return self();
                 }
 
@@ -18478,18 +18549,23 @@ public class CommandLine {
                  * for this option or position, and returns this builder.
                  *
                  * @since 4.6
+                 * @param preprocessor1
+                 * @return T preprocessor
                  */
-                public T preprocessor(IParameterPreprocessor preprocessor) {
-                    this.preprocessor = preprocessor;
+                public T preprocessor(IParameterPreprocessor preprocessor1) {
+                    this.preprocessor = preprocessor1;
                     return self();
                 }
 
                 /**
                  * Sets whether this option should be excluded
                  * from the usage message, and returns this builder.
+                 *
+                 * @param hidden1
+                 * @return T hidden
                  */
-                public T hidden(boolean hidden) {
-                    this.hidden = hidden;
+                public T hidden(boolean hidden1) {
+                    this.hidden = hidden1;
                     return self();
                 }
 
@@ -18498,9 +18574,11 @@ public class CommandLine {
                  * from a parent command, and returns this builder.
                  *
                  * @since 4.3.0
+                 * @param inherited1
+                 * @return T inherited
                  */
-                public T inherited(boolean inherited) {
-                    this.inherited = inherited;
+                public T inherited(boolean inherited1) {
+                    this.inherited = inherited1;
                     return self();
                 }
 
@@ -18509,9 +18587,11 @@ public class CommandLine {
                  * inherited option, and returns this builder.
                  *
                  * @since 4.6.0
+                 * @param root1
+                 * @return T root
                  */
-                public T root(ArgSpec root) {
-                    this.root = root;
+                public T root(ArgSpec root1) {
+                    this.root = root1;
                     return self();
                 }
 
@@ -18521,8 +18601,10 @@ public class CommandLine {
                  *Object) setting} the value, and returns this builder.
                  *
                  * @param propertyType the type of this option or parameter. For
-                 *                     multi-value options and positional parameters this can be an array, or a (
-                 *                     sub-type of) Collection or Map.
+                 * multi-value options and positional parameters this can be an array, or a (
+                 * sub-type of) Collection or Map.
+                 *
+                 * @return T type
                  */
                 public T type(Class<?> propertyType) {
                     this.type = Assert.notNull(propertyType, "type");
@@ -18533,12 +18615,13 @@ public class CommandLine {
                  * Sets the type info for this option
                  * or positional parameter, and returns this builder.
                  *
-                 * @param typeInfo type information that does not require
+                 * @param typeInfo1 type information that does not require
                  *                 {@code Class} objects and be constructed both at runtime and compile time
                  * @since 4.0
+                 * @return T typeInfo
                  */
-                public T typeInfo(ITypeInfo typeInfo) {
-                    setTypeInfo(Assert.notNull(typeInfo, "typeInfo"));
+                public T typeInfo(ITypeInfo typeInfo1) {
+                    setTypeInfo(Assert.notNull(typeInfo1, "typeInfo"));
                     return self();
                 }
 
@@ -18554,12 +18637,13 @@ public class CommandLine {
                  * Sets the user object associated with this
                  * option or positional parameters, and returns this builder.
                  *
-                 * @param userObject may be the annotated
+                 * @param userObject1 may be the annotated
                  *                   program element, or some other useful object
                  * @since 4.0
+                 * @return T userObject
                  */
-                public T userObject(Object userObject) {
-                    this.userObject = Assert.notNull(userObject, "userObject");
+                public T userObject(Object userObject1) {
+                    this.userObject = Assert.notNull(userObject1, "userObject");
                     return self();
                 }
 
@@ -18576,6 +18660,8 @@ public class CommandLine {
                  * @see Option#mapFallbackValue()
                  * @see Parameters#mapFallbackValue()
                  * @since 4.6
+                 * @param fallbackValue
+                 * @return mapFallbackValue
                  */
                 public Builder mapFallbackValue(String fallbackValue) {
                     this.mapFallbackValue = fallbackValue;
@@ -18590,9 +18676,12 @@ public class CommandLine {
                  *) splitting} and {@linkplain #converters() type converting}
                  * this default value is applied to the option or positional parameter.
                  * A value of {@code null} or {@code "__no_default_value__"} means no default.
+                 *
+                 * @param defaultValue1
+                 * @return T defaultValue
                  */
-                public T defaultValue(String defaultValue) {
-                    this.defaultValue = defaultValue;
+                public T defaultValue(String defaultValue1) {
+                    this.defaultValue = defaultValue1;
                     return self();
                 }
 
@@ -18604,12 +18693,17 @@ public class CommandLine {
                  * the option will be reset to the initial value before parsing (regardless
                  * of whether a default value exists), to clear
                  * values that would otherwise remain from parsing previous input.
+                 *
+                 * @param initialValue1
+                 * @return T initialValue
                  */
-                // TODO test ModelCommandSpecTest.testDontClearScalarOptionOldValueBeforeParseIfInitialValueFalse and Groovy CliBuilder before setting state to CACHED
-                //   testDontClearListOptionOldValueBeforeParseIfInitialValueFalse and testDontClearArrayOptionOldValueBeforeParse
-                public T initialValue(Object initialValue) {
+                // TODO test ModelCommandSpecTest.testDontClearScalarOptionOldValueBeforeParseIfInitialValueFalse
+                //  and Groovy CliBuilder before setting state to CACHED
+                //   testDontClearListOptionOldValueBeforeParseIfInitialValueFalse
+                //   and testDontClearArrayOptionOldValueBeforeParse
+                public T initialValue(Object initialValue1) {
                     this.initialValue =
-                            initialValue; /*initialValueState=
+                            initialValue1; /*initialValueState=
 InitialValueState.CACHED;*/
                     return self();
                 }
@@ -18619,36 +18713,48 @@ InitialValueState.CACHED;*/
                  * parameter will be reset to the {@link #initialValue(
                  *)}
                  * before parsing new input.
+                 *
+                 * @param hasInitialValue1
+                 * @return T hasInitialValue
                  */
-                public T hasInitialValue(boolean hasInitialValue) {
-                    this.hasInitialValue = hasInitialValue;
+                public T hasInitialValue(boolean hasInitialValue1) {
+                    this.hasInitialValue = hasInitialValue1;
                     return self();
                 }
 
                 /**
                  * Sets the {@link IGetter} that is responsible for
                  * getting the value of this argument, and returns this builder.
+                 *
+                 * @param getter1
+                 * @return T getter
                  */
-                public T getter(IGetter getter) {
-                    this.getter = getter;
+                public T getter(IGetter getter1) {
+                    this.getter = getter1;
                     return self();
                 }
 
                 /**
                  * Sets the {@link ISetter} that is responsible for
                  * modifying the value of this argument, and returns this builder.
+                 *
+                 * @param setter1
+                 * @return T setter
                  */
-                public T setter(ISetter setter) {
-                    this.setter = setter;
+                public T setter(ISetter setter1) {
+                    this.setter = setter1;
                     return self();
                 }
 
                 /**
                  * Sets the binding {@link IScope} that targets
                  * where the setter sets the value, and returns this builder.
+                 *
+                 * @param scope1
+                 * @return T scope
                  */
-                public T scope(IScope scope) {
-                    this.scope = scope;
+                public T scope(IScope scope1) {
+                    this.scope = scope1;
                     return self();
                 }
 
@@ -18658,18 +18764,23 @@ InitialValueState.CACHED;*/
                  * and sub-sub) commands, and returns this builder.
                  *
                  * @since 4.3
+                 * @param scopeType1
+                 * @return T scopeType
                  */
-                public T scopeType(ScopeType scopeType) {
-                    this.scopeType = scopeType;
+                public T scopeType(ScopeType scopeType1) {
+                    this.scopeType = scopeType1;
                     return self();
                 }
 
                 /**
                  * Sets the string representation of this option or positional
                  * parameter to the specified value, and returns this builder.
+                 * 
+                 * @param toString1 
+                 * @return withToString
                  */
-                public T withToString(String toString) {
-                    this.toString = toString;
+                public T withToString(String toString1) {
+                    this.toString = toString1;
                     return self();
                 }
             }
@@ -18748,7 +18859,7 @@ InitialValueState.CACHED;*/
          *
          * @since 3.0
          */
-        public static class OptionSpec extends ArgSpec implements IOrdered {
+        public static final class OptionSpec extends ArgSpec implements IOrdered {
             public static final String DEFAULT_FALLBACK_VALUE = "";
             static final int DEFAULT_ORDER = -1;
             private final String[] names;
@@ -18772,6 +18883,7 @@ InitialValueState.CACHED;*/
             /**
              * Ensures all attributes of this {@code OptionSpec} have a valid
              * value; throws an {@link InitializationException} if this cannot be achieved.
+             * @param builder
              */
             private OptionSpec(Builder builder) {
                 super(builder);
@@ -18820,6 +18932,8 @@ InitialValueState.CACHED;*/
              * from the specified {@code OptionSpec}.
              *
              * @since 4.0
+             * @param original
+             * @return OptionSpec.Builder
              */
             public static OptionSpec.Builder builder(OptionSpec original) {
                 return new Builder(original);
@@ -18878,6 +18992,7 @@ InitialValueState.CACHED;*/
              * returned array will contain at least one option name.
              *
              * @see Option#names()
+             * @return interpolate names
              */
             public String[] names() {
                 return interpolate(names.clone());
@@ -18885,6 +19000,8 @@ InitialValueState.CACHED;*/
 
             /**
              * Returns the longest {@linkplain #names() option name}.
+             *
+             * @return longestName
              */
             public String longestName() {
                 return Help.ShortestFirst.longestFirst(names())[0];
@@ -18894,6 +19011,7 @@ InitialValueState.CACHED;*/
              * Returns the shortest {@linkplain #names() option name}.
              *
              * @since 3.8
+             * @return shortestName
              */
             public String shortestName() {
                 return Help.ShortestFirst.sort(names())[0];
@@ -18910,6 +19028,7 @@ InitialValueState.CACHED;*/
              *
              * @see Option#order()
              * @since 3.9
+             * @return order
              */
             public int order() {
                 return this.order;
@@ -18920,8 +19039,8 @@ InitialValueState.CACHED;*/
              * disables validation of the other arguments.
              *
              * @see Option#help()
-             * @deprecated Use {@link #usageHelp(
-             *)} and {@link #versionHelp()} instead.
+             * @deprecated Use {@link #usageHelp()} and {@link #versionHelp()} instead.
+             * @return help
              */
             @Deprecated
             public boolean help() {
@@ -18933,6 +19052,7 @@ InitialValueState.CACHED;*/
              * allows the user to request usage help.
              *
              * @see Option#usageHelp()
+             * @return usageHelp
              */
             public boolean usageHelp() {
                 return usageHelp;
@@ -18943,6 +19063,7 @@ InitialValueState.CACHED;*/
              * the user to request version information.
              *
              * @see Option#versionHelp()
+             * @return versionHelp
              */
             public boolean versionHelp() {
                 return versionHelp;
@@ -18956,6 +19077,7 @@ InitialValueState.CACHED;*/
              *
              * @see Option#negatable()
              * @since 4.0
+             * @return negatable
              */
             public boolean negatable() {
                 return negatable;
@@ -18972,6 +19094,7 @@ InitialValueState.CACHED;*/
              * @see Option#fallbackValue()
              * @see #defaultValue()
              * @since 4.0
+             * @return fallbackValue
              */
             public String fallbackValue() {
                 return interpolate(fallbackValue);
@@ -18985,16 +19108,15 @@ InitialValueState.CACHED;*/
                     return false;
                 }
                 OptionSpec other = (OptionSpec) obj;
-                return super.equalsImpl(
-                        other)
+                return super.equalsImpl(other)
                         && help == other.help
                         && usageHelp == other.usageHelp
                         && versionHelp == other.versionHelp
                         && order == other.order
                         && negatable == other.negatable
-                        && Assert.equals(fallbackValue,
-                        other.fallbackValue)
-                        && new HashSet<String>(Arrays.asList(names)).equals(new HashSet<String>(Arrays.asList(other.names)));
+                        && Assert.equals(fallbackValue, other.fallbackValue)
+                        && new HashSet<String>(Arrays.asList(names))
+                        .equals(new HashSet<String>(Arrays.asList(other.names)));
             }
 
             public int hashCode() {
@@ -19882,7 +20004,7 @@ InitialValueState.CACHED;*/
              * userObjectOr.
              *
              * @param defaultValue
-             * @return
+             * @return userObjectOr
              */
             Object userObjectOr(Object defaultValue) {
                 try {
