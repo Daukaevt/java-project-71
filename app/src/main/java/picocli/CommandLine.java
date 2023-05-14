@@ -16496,7 +16496,7 @@ public class CommandLine {
             private final String descriptionKey;
             private final Help.Visibility showDefaultValue;
             private Messages messages;
-            public CommandSpec commandSpec = null;
+            private CommandSpec commandSpec = null;
             private ArgGroupSpec group;
             private final Object userObject;
 
@@ -16508,7 +16508,7 @@ public class CommandLine {
             private final String prompt;
             private final String splitRegex;
             private final String splitRegexSynopsisLabel;
-            public ITypeInfo typeInfo;
+            private ITypeInfo typeInfo;
             private final ITypeConverter<?>[] converters;
             private final Iterable<String> completionCandidates;
             private final IParameterConsumer parameterConsumer;
@@ -16528,7 +16528,7 @@ public class CommandLine {
             private Range arity;
             private List<String> stringValues = new ArrayList<String>();
             private List<String> originalStringValues = new ArrayList<String>();
-            public String toString;
+            private String toString;
             private final List<Object> typedValues = new ArrayList<Object>();
             private final Map<Integer, Object> typedValueAtPosition =
                     new TreeMap<Integer, Object>();
@@ -17838,6 +17838,26 @@ public class CommandLine {
                 return typedValueAtPosition;
             }
 
+            public String getToString() {
+                return toString;
+            }
+
+            public CommandSpec getCommandSpec() {
+                return commandSpec;
+            }
+
+            public ITypeInfo getTypeInfo() {
+                return typeInfo;
+            }
+
+            public void setToString(String toString) {
+                this.toString = toString;
+            }
+
+            public void setCommandSpec(CommandSpec commandSpec) {
+                this.commandSpec = commandSpec;
+            }
+
             abstract static class Builder<T extends Builder<T>> {
                 private Object userObject;
                 private Range arity;
@@ -19070,8 +19090,8 @@ InitialValueState.CACHED;*/
                     throw new InitializationException(
                             "Invalid names: " + Arrays.toString(names));
                 }
-                if (toString == null) {
-                    toString = "option " + longestName();
+                if (getToString() == null) {
+                    setToString("option " + longestName());
                 }
 
                 // https://github.com/remkop/picocli/issues/511
@@ -19635,14 +19655,14 @@ InitialValueState.CACHED;*/
             private PositionalParamSpec(Builder builder) {
                 super(builder);
                 if (builder.index == null) {
-                    index = Range.defaultParameterIndex(typeInfo);
+                    index = Range.defaultParameterIndex(getTypeInfo());
                 } else {
                     index = builder.index;
                 }
                 builderCapacity = builder.capacity;
                 initCapacity();
-                if (toString == null) {
-                    toString = "positional parameter[" + index() + "]";
+                if (getToString() == null) {
+                    setToString("positional parameter[" + index() + "]");
                 }
             }
 
@@ -20398,7 +20418,7 @@ InitialValueState.CACHED;*/
                         text,
                         colorScheme,
                         option,
-                        createLabelRenderer(option.commandSpec));
+                        createLabelRenderer(option.getCommandSpec()));
             }
 
             private Text concatPositionalText(
@@ -20411,7 +20431,7 @@ InitialValueState.CACHED;*/
                         text,
                         colorScheme,
                         positionalParam,
-                        createLabelRenderer(positionalParam.commandSpec));
+                        createLabelRenderer(positionalParam.getCommandSpec()));
             }
 
             /**
@@ -26363,8 +26383,7 @@ InitialValueState.CACHED;*/
                             commandSpec); // uses help separator
 
             this.registerSubcommands(commandSpec.subcommands());
-            atFilePositionalParam.commandSpec =
-                    commandSpec; // for interpolation
+            atFilePositionalParam.setCommandSpec(commandSpec); // for interpolation
         }
 
         private static Comparator<Model.OptionSpec> createOrderComparatorIfNecessary(
@@ -26729,13 +26748,13 @@ InitialValueState.CACHED;*/
                 String nameString = option.shortestName();
                 if (option.negatable) {
                     INegatableOptionTransformer trans =
-                            option.commandSpec == null
+                            option.getCommandSpec() == null
                                     ? RegexTransformer.createDefault()
-                                    : option.commandSpec
+                                    : option.getCommandSpec()
                                     .negatableOptionTransformer();
                     nameString =
                             trans.makeSynopsis(
-                                    option.shortestName(), option.commandSpec);
+                                    option.shortestName(), option.getCommandSpec());
                 }
                 Text name = colorScheme.optionText(nameString);
                 Text param =
@@ -27864,8 +27883,7 @@ InitialValueState.CACHED;*/
                             ? this.endOfOptionsOption
                             : createEndOfOptionsOption(
                             commandSpec.parser().endOfOptionsDelimiter());
-            endOfOptionsOption1.commandSpec =
-                    this.commandSpec; // needed for interpolation
+            endOfOptionsOption1.setCommandSpec(this.commandSpec); // needed for interpolation
             try {
                 endOfOptionsOption1.messages(
                         commandSpec.usageMessage().messages());
@@ -27873,7 +27891,7 @@ InitialValueState.CACHED;*/
                 layout.addOption(endOfOptionsOption1, parameterLabelRenderer());
                 return layout.toString();
             } finally {
-                endOfOptionsOption1.commandSpec = null;
+                endOfOptionsOption1.setCommandSpec(null);
             }
         }
 
@@ -29697,16 +29715,16 @@ InitialValueState.CACHED;*/
 
                 if (option.negatable()) {
                     INegatableOptionTransformer transformer =
-                            option.commandSpec.negatableOptionTransformer();
+                            option.getCommandSpec().negatableOptionTransformer();
                     if (shortOptionCount > 0) {
                         shortOption =
                                 transformer.makeSynopsis(
-                                        shortOption, option.commandSpec);
+                                        shortOption, option.getCommandSpec());
                     }
                     for (int i = 0; i < names.length; i++) {
                         names[i] =
                                 transformer.makeSynopsis(
-                                        names[i], option.commandSpec);
+                                        names[i], option.getCommandSpec());
                     }
                 }
 
@@ -29796,8 +29814,8 @@ InitialValueState.CACHED;*/
                     ColorScheme scheme) {
                 Text optionText = option.negatable()
                         ? scheme.optionText(option
-                        .commandSpec.negatableOptionTransformer()
-                        .makeSynopsis(option.names()[0], option.commandSpec))
+                        .getCommandSpec().negatableOptionTransformer()
+                        .makeSynopsis(option.names()[0], option.getCommandSpec()))
                         : scheme.optionText(option.names()[0]);
                 Text paramLabelText =
                         parameterLabelRenderer.renderParameterLabel(
