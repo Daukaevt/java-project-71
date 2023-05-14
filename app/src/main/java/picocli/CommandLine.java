@@ -77,6 +77,7 @@ import java.util.Currency;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.Enumeration;
+import java.util.Formatter;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
@@ -16001,6 +16002,7 @@ public class CommandLine {
             /**
              * @see CommandLine#isAllowSubcommandsAsOptionParameters()
              * @since 4.7.1-SNAPSHOT
+             * @return allowSubcommandsAsOptionParameters
              */
             public boolean allowSubcommandsAsOptionParameters() {
                 return allowSubcommandsAsOptionParameters;
@@ -16009,6 +16011,7 @@ public class CommandLine {
             /**
              * @see CommandLine#isAllowOptionsAsOptionParameters()
              * @since 4.7.1-SNAPSHOT
+             * @return allowOptionsAsOptionParameters
              */
             public boolean allowOptionsAsOptionParameters() {
                 return allowOptionsAsOptionParameters;
@@ -16023,6 +16026,8 @@ public class CommandLine {
              * first before any further processing and the number of
              * parts resulting from the split
              * is limited to the max arity of the argument.
+             *
+             * @return limitSplit
              */
             public boolean limitSplit() {
                 return limitSplit;
@@ -16031,6 +16036,8 @@ public class CommandLine {
             /**
              * Returns true if options with attached arguments should not consume
              * subsequent arguments and should not validate arity. The default is {@code false}.
+             *
+             * @return aritySatisfiedByAttachedOptionParam
              */
             public boolean aritySatisfiedByAttachedOptionParam() {
                 return aritySatisfiedByAttachedOptionParam;
@@ -16040,10 +16047,10 @@ public class CommandLine {
              * Returns true if exceptions during
              * parsing should be collected instead of thrown.
              * Multiple errors may be encountered during parsing.
-             * These can be obtained from {@link ParseResult#errors(
-             *)}.
+             * These can be obtained from {@link ParseResult#errors()}.
              *
              * @since 3.2
+             * @return collectErrors
              */
             public boolean collectErrors() {
                 return collectErrors;
@@ -16053,146 +16060,177 @@ public class CommandLine {
              * Sets the String to use as the separator
              * between options and option parameters.
              *
+             * @param separator1
              * @return this ParserSpec for method chaining
              */
-            public ParserSpec separator(String separator) {
-                this.separator = separator;
+            public ParserSpec separator(String separator1) {
+                this.separator = separator1;
                 return this;
             }
 
             /**
              * @see CommandLine#setStopAtUnmatched(boolean)
+             * @param stopAtUnmatched1
+             * @return stopAtUnmatched
              */
-            public ParserSpec stopAtUnmatched(boolean stopAtUnmatched) {
-                this.stopAtUnmatched = stopAtUnmatched;
+            public ParserSpec stopAtUnmatched(boolean stopAtUnmatched1) {
+                this.stopAtUnmatched = stopAtUnmatched1;
                 return this;
             }
 
             /**
              * @see CommandLine#setStopAtPositional(boolean)
+             * @param stopAtPositional1
+             * @return stopAtPositional
              */
-            public ParserSpec stopAtPositional(boolean stopAtPositional) {
-                this.stopAtPositional = stopAtPositional;
+            public ParserSpec stopAtPositional(boolean stopAtPositional1) {
+                this.stopAtPositional = stopAtPositional1;
                 return this;
             }
 
             /**
              * @see CommandLine#setEndOfOptionsDelimiter(String)
              * @since 3.5
+             * @param delimiter1
+             * @return endOfOptionsDelimiter
              */
-            public ParserSpec endOfOptionsDelimiter(String delimiter) {
+            public ParserSpec endOfOptionsDelimiter(String delimiter1) {
                 this.endOfOptionsDelimiter =
-                        Assert.notNull(delimiter, "end-of-options delimiter");
+                        Assert.notNull(delimiter1, "end-of-options delimiter");
                 return this;
             }
 
             /**
              * @see CommandLine#setToggleBooleanFlags(boolean)
+             * @param toggleBooleanFlags1
+             * @return toggleBooleanFlags
              */
-            public ParserSpec toggleBooleanFlags(boolean toggleBooleanFlags) {
-                this.toggleBooleanFlags = toggleBooleanFlags;
+            public ParserSpec toggleBooleanFlags(boolean toggleBooleanFlags1) {
+                this.toggleBooleanFlags = toggleBooleanFlags1;
                 return this;
             }
 
             /**
              * @see CommandLine#setOverwrittenOptionsAllowed(boolean)
+             * @param overwrittenOptionsAllowed1
+             * @return overwrittenOptionsAllowed
              */
             public ParserSpec overwrittenOptionsAllowed(
-                    boolean overwrittenOptionsAllowed) {
-                this.overwrittenOptionsAllowed = overwrittenOptionsAllowed;
+                    boolean overwrittenOptionsAllowed1) {
+                this.overwrittenOptionsAllowed = overwrittenOptionsAllowed1;
                 return this;
             }
 
             /**
              * @see CommandLine#setUnmatchedArgumentsAllowed(boolean)
+             * @param unmatchedArgumentsAllowed1
+             * @return unmatchedArgumentsAllowed
              */
             public ParserSpec unmatchedArgumentsAllowed(
-                    boolean unmatchedArgumentsAllowed) {
-                this.unmatchedArgumentsAllowed = unmatchedArgumentsAllowed;
+                    boolean unmatchedArgumentsAllowed1) {
+                this.unmatchedArgumentsAllowed = unmatchedArgumentsAllowed1;
                 return this;
             }
 
             /**
              * @see CommandLine#setAbbreviatedSubcommandsAllowed(boolean)
+             * @param abbreviatedSubcommandsAllowed1
+             * @return abbreviatedSubcommandsAllowed
              */
             public ParserSpec abbreviatedSubcommandsAllowed(
-                    boolean abbreviatedSubcommandsAllowed) {
+                    boolean abbreviatedSubcommandsAllowed1) {
                 this.abbreviatedSubcommandsAllowed =
-                        abbreviatedSubcommandsAllowed;
+                        abbreviatedSubcommandsAllowed1;
                 return this;
             }
 
             /**
              * @see CommandLine#setAbbreviatedOptionsAllowed(boolean)
+             * @param abbreviatedOptionsAllowed1
+             * @return bbreviatedOptionsAllowed
              */
             public ParserSpec abbreviatedOptionsAllowed(
-                    boolean abbreviatedOptionsAllowed) {
-                this.abbreviatedOptionsAllowed = abbreviatedOptionsAllowed;
+                    boolean abbreviatedOptionsAllowed1) {
+                this.abbreviatedOptionsAllowed = abbreviatedOptionsAllowed1;
                 return this;
             }
 
             /**
              * @see CommandLine#setExpandAtFiles(boolean)
+             * @param expandAtFiles1
+             * @return expandAtFiles
              */
-            public ParserSpec expandAtFiles(boolean expandAtFiles) {
-                this.expandAtFiles = expandAtFiles;
+            public ParserSpec expandAtFiles(boolean expandAtFiles1) {
+                this.expandAtFiles = expandAtFiles1;
                 return this;
             }
 
             /**
              * @see CommandLine#setAtFileCommentChar(Character)
              * @since 3.5
+             * @param atFileCommentChar1
+             * @return  atFileCommentChar
              */
-            public ParserSpec atFileCommentChar(Character atFileCommentChar) {
-                this.atFileCommentChar = atFileCommentChar;
+            public ParserSpec atFileCommentChar(Character atFileCommentChar1) {
+                this.atFileCommentChar = atFileCommentChar1;
                 return this;
             }
 
             /**
              * @see CommandLine#setUseSimplifiedAtFiles(boolean)
              * @since 3.9
+             * @param useSimplifiedAtFiles1
+             * @return useSimplifiedAtFiles
              */
-            public ParserSpec useSimplifiedAtFiles(boolean useSimplifiedAtFiles) {
-                this.useSimplifiedAtFiles = useSimplifiedAtFiles;
+            public ParserSpec useSimplifiedAtFiles(boolean useSimplifiedAtFiles1) {
+                this.useSimplifiedAtFiles = useSimplifiedAtFiles1;
                 return this;
             }
 
             /**
              * @see CommandLine#setPosixClusteredShortOptionsAllowed(boolean)
+             * @param posixClusteredShortOptionsAllowed1
+             * @return posixClusteredShortOptionsAllowed
              */
             public ParserSpec posixClusteredShortOptionsAllowed(
-                    boolean posixClusteredShortOptionsAllowed) {
+                    boolean posixClusteredShortOptionsAllowed1) {
                 this.posixClusteredShortOptionsAllowed =
-                        posixClusteredShortOptionsAllowed;
+                        posixClusteredShortOptionsAllowed1;
                 return this;
             }
 
             /**
              * @see CommandLine#setCaseInsensitiveEnumValuesAllowed(boolean)
              * @since 3.4
+             * @param caseInsensitiveEnumValuesAllowed1
+             * @return caseInsensitiveEnumValuesAllowed
              */
             public ParserSpec caseInsensitiveEnumValuesAllowed(
-                    boolean caseInsensitiveEnumValuesAllowed) {
+                    boolean caseInsensitiveEnumValuesAllowed1) {
                 this.caseInsensitiveEnumValuesAllowed =
-                        caseInsensitiveEnumValuesAllowed;
+                        caseInsensitiveEnumValuesAllowed1;
                 return this;
             }
 
             /**
              * @see CommandLine#setTrimQuotes(boolean)
              * @since 3.7
+             * @param trimQuotes1
+             * @return trimQuotes
              */
-            public ParserSpec trimQuotes(boolean trimQuotes) {
-                this.trimQuotes = trimQuotes;
+            public ParserSpec trimQuotes(boolean trimQuotes1) {
+                this.trimQuotes = trimQuotes1;
                 return this;
             }
 
             /**
              * @see CommandLine#setSplitQuotedStrings(boolean)
              * @since 3.7
+             * @param splitQuotedStrings1
+             * @return splitQuotedStrings
              */
-            public ParserSpec splitQuotedStrings(boolean splitQuotedStrings) {
-                this.splitQuotedStrings = splitQuotedStrings;
+            public ParserSpec splitQuotedStrings(boolean splitQuotedStrings1) {
+                this.splitQuotedStrings = splitQuotedStrings1;
                 return this;
             }
 
@@ -16200,43 +16238,54 @@ public class CommandLine {
              * @see CommandLine#setUnmatchedOptionsAllowedAsOptionParameters(
              *boolean)
              * @since 4.4
+             * @param unmatchedOptionsAllowedAsOptionParameters1
+             * @return unmatchedOptionsAllowedAsOptionParameters
              */
             public ParserSpec unmatchedOptionsAllowedAsOptionParameters(
-                    boolean unmatchedOptionsAllowedAsOptionParameters) {
+                    boolean unmatchedOptionsAllowedAsOptionParameters1) {
                 this.unmatchedOptionsAllowedAsOptionParameters =
-                        unmatchedOptionsAllowedAsOptionParameters;
+                        unmatchedOptionsAllowedAsOptionParameters1;
                 return this;
             }
 
             /**
              * @see CommandLine#setUnmatchedOptionsArePositionalParams(boolean)
+             *
+             * @param unmatchedOptionsArePositionalParams1
+             * @return unmatchedOptionsArePositionalParams
              */
             public ParserSpec unmatchedOptionsArePositionalParams(
-                    boolean unmatchedOptionsArePositionalParams) {
+                    boolean unmatchedOptionsArePositionalParams1) {
                 this.unmatchedOptionsArePositionalParams =
-                        unmatchedOptionsArePositionalParams;
+                        unmatchedOptionsArePositionalParams1;
                 return this;
             }
 
             /**
              * @see CommandLine#setAllowSubcommandsAsOptionParameters(boolean)
              * @since 4.7.1-SNAPSHOT
+             *
+             * @param allowSubcommandsAsOptionParameters1
+             * @return allowSubcommandsAsOptionParameters
              */
             public ParserSpec allowSubcommandsAsOptionParameters(
-                    boolean allowSubcommandsAsOptionParameters) {
+                    boolean allowSubcommandsAsOptionParameters1) {
                 this.allowSubcommandsAsOptionParameters =
-                        allowSubcommandsAsOptionParameters;
+                        allowSubcommandsAsOptionParameters1;
                 return this;
             }
 
             /**
              * @see CommandLine#setAllowOptionsAsOptionParameters(boolean)
              * @since 4.7.1-SNAPSHOT
+             *
+             * @param allowOptionsAsOptionParameters1
+             * @return allowOptionsAsOptionParameters
              */
             public ParserSpec allowOptionsAsOptionParameters(
-                    boolean allowOptionsAsOptionParameters) {
+                    boolean allowOptionsAsOptionParameters1) {
                 this.allowOptionsAsOptionParameters =
-                        allowOptionsAsOptionParameters;
+                        allowOptionsAsOptionParameters1;
                 return this;
             }
 
@@ -16244,19 +16293,23 @@ public class CommandLine {
              * Sets whether exceptions during parsing
              * should be collected instead of thrown.
              * Multiple errors may be encountered during parsing.
-             * These can be obtained from {@link ParseResult#errors(
-             *)}.
+             * These can be obtained from {@link ParseResult#errors()}.
              *
              * @since 3.2
+             * @param collectErrors1
+             * @return collectErrors
              */
-            public ParserSpec collectErrors(boolean collectErrors) {
-                this.collectErrors = collectErrors;
+            public ParserSpec collectErrors(boolean collectErrors1) {
+                this.collectErrors = collectErrors1;
                 return this;
             }
 
             /**
              * Returns true if options with attached arguments should not consume
              * subsequent arguments and should not validate arity. The default is {@code false}.
+             *
+             * @param newValue
+             * @return aritySatisfiedByAttachedOptionParam
              */
             public ParserSpec aritySatisfiedByAttachedOptionParam(
                     boolean newValue) {
@@ -16269,9 +16322,12 @@ public class CommandLine {
              *) split} first before any further processing.
              * If true, the original argument will only
              * be split into as many parts as allowed by max arity.
+             *
+             * @param limitSplit1
+             * @return limitSplit
              */
-            public ParserSpec limitSplit(boolean limitSplit) {
-                this.limitSplit = limitSplit;
+            public ParserSpec limitSplit(boolean limitSplit1) {
+                this.limitSplit = limitSplit1;
                 return this;
             }
 
@@ -16283,12 +16339,22 @@ public class CommandLine {
                 return Boolean.parseBoolean(value);
             }
 
+            /**
+             * initSeparator.
+             *
+             * @param value
+             */
             void initSeparator(String value) {
                 if (initializable(separator, value, DEFAULT_SEPARATOR)) {
                     separator = value;
                 }
             }
 
+            /**
+             * updateSeparator.
+             *
+             * @param value
+             */
             void updateSeparator(String value) {
                 if (isNonDefault(value, DEFAULT_SEPARATOR)) {
                     separator = value;
@@ -16345,6 +16411,11 @@ public class CommandLine {
                         useSimplifiedAtFiles);
             }
 
+            /**
+             * initFrom.
+             *
+             * @param settings
+             */
             void initFrom(ParserSpec settings) {
                 abbreviatedOptionsAllowed = settings.abbreviatedOptionsAllowed;
                 abbreviatedSubcommandsAllowed =
@@ -16445,7 +16516,7 @@ public class CommandLine {
             private Object initialValue;
             private final boolean hasInitialValue;
             private InitialValueState initialValueState;
-            protected final IAnnotatedElement annotatedElement;
+            private final IAnnotatedElement annotatedElement;
             private final IGetter getter;
             private final ISetter setter;
             private final IScope scope;
@@ -16460,6 +16531,8 @@ public class CommandLine {
 
             /**
              * Constructs a new {@code ArgSpec}.
+             * @param <T>
+             * @param builder
              */
             private <T extends Builder<T>> ArgSpec(Builder<T> builder) {
                 userObject = builder.userObject;
@@ -16512,9 +16585,9 @@ public class CommandLine {
                     if (interactive) {
                         tempArity = Range.valueOf("0");
                     } else if (isOption()) {
-                        tempArity =
-                                (
-                                        builder.type == null || isBoolean(builder.type)) ? Range.valueOf("0") : Range.valueOf("1");
+                        tempArity = (builder.type == null || isBoolean(builder.type))
+                                ? Range.valueOf("0")
+                                : Range.valueOf("1");
                     } else {
                         tempArity = Range.valueOf("1");
                     }
@@ -16546,7 +16619,8 @@ public class CommandLine {
                 }
                 if (interactive && !arity.isValidForInteractiveArgs()) {
                     throw new InitializationException(
-                            "Interactive options and positional parameters are only supported for arity=0 and arity=0..1; not for arity=" + arity);
+                            "Interactive options and positional parameters are only supported for arity=0"
+                                    + " and arity=0..1; not for arity=" + arity);
                 }
                 // https://github.com/remkop/picocli/issues/745
                 if (
@@ -16554,7 +16628,9 @@ public class CommandLine {
                                 && !typeInfo.isMultiValue()
                                 && System.getProperty("picocli.ignore.invalid.split") == null) {
                     throw new InitializationException(
-                            "Only multi-value options and positional parameters should have a split regex (this check can be disabled by setting system property 'picocli.ignore.invalid.split')");
+                            "Only multi-value options and positional parameters"
+                                    + " should have a split regex (this check can be disabled"
+                                    + " by setting system property 'picocli.ignore.invalid.split')");
                 }
             }
 
@@ -16592,7 +16668,8 @@ public class CommandLine {
                 StringBuilder splittable = new StringBuilder();
                 StringBuilder temp = new StringBuilder();
                 StringBuilder current = splittable;
-                boolean escaping = false, inQuote = false;
+                boolean escaping = false;
+                boolean inQuote = false;
                 for (int ch, i =
                      0; i < value.length(); i += Character.charCount(ch)) {
                     ch = value.codePointAt(i);
@@ -16655,7 +16732,9 @@ public class CommandLine {
                     Queue<String> quotedValues,
                     ParserSpec parser) {
                 StringBuilder result = new StringBuilder();
-                boolean escaping = false, inQuote = false, skip = false;
+                boolean escaping = false;
+                boolean inQuote = false;
+                boolean skip = false;
                 for (int ch, i =
                      0; i < part.length(); i += Character.charCount(ch)) {
                     ch = part.codePointAt(i);
@@ -16739,30 +16818,32 @@ public class CommandLine {
             }
 
             /**
-             * Returns a description of the option
-             * or positional arg, e.g. {@code -a=<a>}
+             * Returns a description of the option or positional arg, e.g. {@code -a=<a>}.
              *
              * @param separator separator between
              *                  arg and arg parameter label, usually '='
+             * @param argSpec
+             * @return describe
              */
             private static String describe(ArgSpec argSpec, String separator) {
                 return describe(argSpec, separator, argSpec.paramLabel());
             }
 
             /**
-             * Returns a description of the option or positional arg
+             * Returns a description of the option or positional arg.
              *
              * @param separator separator between
              *                  arg and arg parameter value, usually '='
              * @param value     the value to append after the separator
+             * @param argSpec
+             * @return describe
              */
             private static String describe(
                     ArgSpec argSpec, String separator, String value) {
-                String prefix =
-                        (
-                                argSpec.isOption()) ? ((OptionSpec) argSpec).longestName() : "params[" + ((PositionalParamSpec) argSpec).index() + "]";
-                return argSpec.arity(
-                ).min > 0 ? prefix + separator + value : prefix;
+                String prefix = (argSpec.isOption())
+                        ? ((OptionSpec) argSpec).longestName()
+                        : "params[" + ((PositionalParamSpec) argSpec).index() + "]";
+                return argSpec.arity().min > 0 ? prefix + separator + value : prefix;
             }
 
             /**
@@ -16771,6 +16852,7 @@ public class CommandLine {
              *
              * @see Option#required()
              * @since 4.7.1-SNAPSHOT
+             * @return originallyRequired
              */
             public boolean originallyRequired() {
                 return originallyRequired;
@@ -16784,6 +16866,7 @@ public class CommandLine {
              * so it is not necessarily a required argument for the command).
              *
              * @see Option#required()
+             * @return required
              */
             public boolean required() {
                 //#261 not required if it has a default; #676 default value may be a variable
@@ -16797,6 +16880,7 @@ public class CommandLine {
              *
              * @see Parameters#interactive()
              * @see Option#interactive()
+             * @return interactive
              */
             public boolean interactive() {
                 return interactive;
@@ -16809,6 +16893,7 @@ public class CommandLine {
              * @see Option#echo()
              * @see Parameters#echo()
              * @since 4.6
+             * @return echo
              */
             public boolean echo() {
                 return echo;
@@ -16821,6 +16906,7 @@ public class CommandLine {
              * @see Option#prompt()
              * @see Parameters#prompt()
              * @since 4.6
+             * @return an interactive option or positional parameter when asking for user input.
              */
             public String prompt() {
                 return prompt;
@@ -16851,6 +16937,7 @@ public class CommandLine {
              * @see #getAdditionalDescriptionKeys()
              * @see Parameters#description()
              * @see Option#description()
+             * @return description
              */
             public String[] description() {
                 String[] result = description.clone();
@@ -16885,6 +16972,7 @@ public class CommandLine {
              * @see OptionSpec#getAdditionalDescriptionKeys()
              * @see PositionalParamSpec#getAdditionalDescriptionKeys()
              * @since 4.0
+             * @return getAdditionalDescriptionKeys
              */
             protected abstract Collection<String> getAdditionalDescriptionKeys();
 
@@ -16895,6 +16983,7 @@ public class CommandLine {
              * @see Option#descriptionKey()
              * @see Parameters#descriptionKey()
              * @since 3.6
+             * @return descriptionKey
              */
             public String descriptionKey() {
                 return interpolate(descriptionKey);
@@ -16948,6 +17037,8 @@ public class CommandLine {
 
             /**
              * @deprecated Use {@link #description()} instead
+             *
+             * @return renderedDescription
              */
             @Deprecated
             public String[] renderedDescription() {
@@ -16959,6 +17050,7 @@ public class CommandLine {
              * option or positional parameter requires.
              *
              * @see Option#arity()
+             * @return arity
              */
             public Range arity() {
                 return arity;
@@ -16970,6 +17062,7 @@ public class CommandLine {
              *
              * @see Option#paramLabel()
              * @see Parameters#paramLabel()
+             * @return paramLabel
              */
             public String paramLabel() {
                 return interpolate(paramLabel);
@@ -16985,6 +17078,7 @@ public class CommandLine {
              * "...") when multiple values can be specified.
              *
              * @since 3.6.0
+             * @return hideParamSyntax
              */
             public boolean hideParamSyntax() {
                 return hideParamSyntax;
@@ -28050,6 +28144,26 @@ InitialValueState.CACHED;*/
          * line breaks. Long lines will be wrapped
          * on word boundaries to ensure they do not
          * exceed the {@linkplain Model.UsageMessageSpec#width(
+         * ) usage message width}.
+         * Embedded {@code @|style[,style] ...|@} markup will
+         * be converted to {@linkplain Text Ansi} escape codes when
+         * {@linkplain Ansi#enabled() Ansi
+         * is enabled}, and stripped out otherwise.
+         *
+         * @return a help section heading String
+         * @since 4.1
+         */
+        private String createHeading() {
+            return createHeading(null, (Object) null);
+        }
+
+        /**
+         * Returns a String that can be used as
+         * a help section heading. Embedded {@code %n} format
+         * specifiers will be converted to platform-specific
+         * line breaks. Long lines will be wrapped
+         * on word boundaries to ensure they do not
+         * exceed the {@linkplain Model.UsageMessageSpec#width(
          *) usage message width}.
          * Embedded {@code @|style[,style] ...|@} markup will
          * be converted to {@linkplain Ansi.Text Ansi} escape codes when
@@ -32005,7 +32119,7 @@ InitialValueState.CACHED;*/
          *               are ignored. The number of arguments
          *               is variable and may be zero.
          *
-         * @see Formatter_
+         * @see Formatter
          */
         public void warn(String msg, Object... params) {
             TraceLevel.WARN.print(this, msg, params);
@@ -32023,7 +32137,7 @@ InitialValueState.CACHED;*/
          *               the extra arguments are ignored.
          *               The number of arguments is variable and may be zero.
          *
-         * @see Formatter_
+         * @see Formatter
          */
         public void info(String msg, Object... params) {
             TraceLevel.INFO.print(this, msg, params);
@@ -32041,7 +32155,7 @@ InitialValueState.CACHED;*/
          *               are ignored. The number of arguments
          *               is variable and may be zero.
          *
-         * @see Formatter_
+         * @see Formatter
          *
          */
         public void debug(String msg, Object... params) {
