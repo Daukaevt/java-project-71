@@ -14000,8 +14000,8 @@ public class CommandLine {
                     "exitCodeListHeading";
 
             /**
-             * {@linkplain #sectionKeys(
-                    ) Section key} to {@linkplain #sectionMap() control} the {@linkplain IHelpSectionRenderer section renderer} for the Exit Code List section.
+             * {@linkplain #sectionKeys() Section key} to {@linkplain #sectionMap() control}
+             * the {@linkplain IHelpSectionRenderer section renderer} for the Exit Code List section.
              * The default renderer for this
              * section calls {@link Help#exitCodeList(
                     )}.
@@ -14035,19 +14035,19 @@ public class CommandLine {
              * Constant holding the default
              * usage message width: <code>{@value}</code>.
              */
-            public final int DEFAULT_USAGE_WIDTH = 80;
+            private final int defaultUsageWidth = 80;
             static final int DEFAULT_USAGE_LONG_OPTIONS_WIDTH = 20;
             /**
              * Constant Boolean holding the default setting for whether to
              * attempt to adjust the width to the terminal width: <code>{@value}</code>.
              */
-            final Boolean DEFAULT_USAGE_AUTO_WIDTH = Boolean.FALSE;
+            private final Boolean defaultUsageAutoWidth = Boolean.FALSE;
             /**
              * Constant String holding the default
              * synopsis heading: <code>{@value}</code>.
              */
-            final String DEFAULT_SYNOPSIS_HEADING = "Usage: ";
-            private final static double DEFAULT_SYNOPSIS_AUTO_INDENT_THRESHOLD =
+            private final String defaultSynopsisHeading = "Usage: ";
+            private final double DEFAULT_SYNOPSIS_AUTO_INDENT_THRESHOLD =
                     0.5;
             /**
              * Constant String holding the default
@@ -14105,8 +14105,8 @@ public class CommandLine {
              * breaks should take wide CJK characters into account: <code>{@value}</code>.
              */
             static final Boolean DEFAULT_ADJUST_CJK = Boolean.TRUE;
-            private final int MINIMUM_USAGE_WIDTH = 55;
-            private final int DEFAULT_SYNOPSIS_INDENT =
+            private final int minimumUsageWidth = 55;
+            private final int defaultSynopsisIndent =
                     -1; // by default,
             // fall back to aligning to the synopsis heading
             private static final double MAX_SYNOPSIS_AUTO_INDENT_THRESHOLD =
@@ -14365,9 +14365,9 @@ public class CommandLine {
              * @throws IllegalArgumentException if the specified width is less than 55
              */
             public UsageMessageSpec width(int newValue) {
-                if (newValue < MINIMUM_USAGE_WIDTH) {
+                if (newValue < minimumUsageWidth) {
                     throw new InitializationException(
-                            "Invalid usage message width " + newValue + ". Minimum value is " + MINIMUM_USAGE_WIDTH);
+                            "Invalid usage message width " + newValue + ". Minimum value is " + minimumUsageWidth);
                 }
                 width = newValue;
                 return this;
@@ -14412,7 +14412,7 @@ public class CommandLine {
                         cachedTerminalWidth = getTerminalWidth();
                     }
                     return cachedTerminalWidth < 0 ? defaultWidth : Math.max(
-                            cachedTerminalWidth, MINIMUM_USAGE_WIDTH);
+                            cachedTerminalWidth, minimumUsageWidth);
                 }
                 String userValue = System.getProperty("picocli.usage.width");
                 if (userValue == null) {
@@ -14420,12 +14420,12 @@ public class CommandLine {
                 }
                 try {
                     int width1 = Integer.parseInt(userValue);
-                    if (width1 < MINIMUM_USAGE_WIDTH) {
+                    if (width1 < minimumUsageWidth) {
                         CommandLine.tracer(
                         ).warn("Invalid picocli.usage.width value %d. Using minimum usage width %d.",
                                 width1,
-                                MINIMUM_USAGE_WIDTH);
-                        return MINIMUM_USAGE_WIDTH;
+                                minimumUsageWidth);
+                        return minimumUsageWidth;
                     }
                     return width1;
                 } catch (NumberFormatException ex) {
@@ -14443,14 +14443,14 @@ public class CommandLine {
              * if set, otherwise returns the value set via the {@link #width(
              *int)} method,
              * or if not set,
-             * the {@linkplain #DEFAULT_USAGE_WIDTH default width}.
+             * the {@linkplain #defaultUsageWidth default width}.
              *
              * @return the maximum usage help
              * message width. Never returns less than 55.
              */
             public int width() {
                 return getSysPropertyWidthOrDefault(
-                        width == null ? DEFAULT_USAGE_WIDTH : width,
+                        width == null ? defaultUsageWidth : width,
                         autoWidth());
             }
 
@@ -14487,7 +14487,7 @@ public class CommandLine {
              */
             public boolean autoWidth() {
                 return shouldDetectTerminalSize(
-                        (autoWidth == null) ? DEFAULT_USAGE_AUTO_WIDTH : autoWidth);
+                        (autoWidth == null) ? defaultUsageAutoWidth : autoWidth);
             }
 
             /**
@@ -14855,7 +14855,7 @@ public class CommandLine {
                 return str(
                         resourceStr("usage.synopsisHeading"),
                         synopsisHeading,
-                        DEFAULT_SYNOPSIS_HEADING);
+                        defaultSynopsisHeading);
             }
 
             /**
@@ -14910,7 +14910,7 @@ public class CommandLine {
              * @since 4.0
              */
             public int synopsisIndent() {
-                return synopsisIndent == null ? DEFAULT_SYNOPSIS_INDENT : synopsisIndent;
+                return synopsisIndent == null ? defaultSynopsisIndent : synopsisIndent;
             }
 
             /**
@@ -15619,7 +15619,7 @@ public class CommandLine {
                 }
                 if (
                         isNonDefault(cmd.usageHelpAutoWidth(),
-                                DEFAULT_USAGE_AUTO_WIDTH)) {
+                                defaultUsageAutoWidth)) {
                     autoWidth = cmd.usageHelpAutoWidth();
                 }
                 if (
@@ -15703,7 +15703,7 @@ public class CommandLine {
                 }
                 if (
                         isNonDefault(cmd.synopsisHeading(),
-                                DEFAULT_SYNOPSIS_HEADING)) {
+                                defaultSynopsisHeading)) {
                     synopsisHeading = cmd.synopsisHeading();
                 }
                 if (
@@ -15711,7 +15711,7 @@ public class CommandLine {
                                 DEFAULT_SYNOPSIS_SUBCOMMANDS)) {
                     synopsisSubcommandLabel = cmd.synopsisSubcommandLabel();
                 }
-                if (isNonDefault(cmd.usageHelpWidth(), DEFAULT_USAGE_WIDTH)) {
+                if (isNonDefault(cmd.usageHelpWidth(), defaultUsageWidth)) {
                     width(cmd.usageHelpWidth());
                 } // validate
             }
@@ -15732,7 +15732,7 @@ public class CommandLine {
                     adjustLineBreaksForWideCJKCharacters =
                             mixin.adjustLineBreaksForWideCJKCharacters();
                 }
-                if (initializable(autoWidth, mixin.autoWidth(), DEFAULT_USAGE_AUTO_WIDTH)) {
+                if (initializable(autoWidth, mixin.autoWidth(), defaultUsageAutoWidth)) {
                     autoWidth = mixin.autoWidth();
                 }
                 if (initializable(commandListHeading, mixin.commandListHeading(), DEFAULT_COMMAND_LIST_HEADING)) {
@@ -15803,14 +15803,14 @@ public class CommandLine {
                 if (initializable(sortSynopsis, mixin.sortSynopsis(), DEFAULT_SORT_SYNOPSIS)) {
                     sortSynopsis = mixin.sortSynopsis();
                 }
-                if (initializable(synopsisHeading, mixin.synopsisHeading(), DEFAULT_SYNOPSIS_HEADING)) {
+                if (initializable(synopsisHeading, mixin.synopsisHeading(), defaultSynopsisHeading)) {
                     synopsisHeading = mixin.synopsisHeading();
                 }
                 if (initializable(synopsisSubcommandLabel, mixin.synopsisSubcommandLabel(),
                         DEFAULT_SYNOPSIS_SUBCOMMANDS)) {
                     synopsisSubcommandLabel = mixin.synopsisSubcommandLabel();
                 }
-                if (initializable(width, mixin.width(), DEFAULT_USAGE_WIDTH)) {
+                if (initializable(width, mixin.width(), defaultUsageWidth)) {
                     width = mixin.width();
                 }
             }
