@@ -255,11 +255,16 @@ public class CommandLine {
     public static final int SIXTHEEN  = 16;
     public static final int SEVENTHEEN = 17;
     public static final int TWENTHY = 20;
+    public static final int TWENTYFIVE = 25;
     public static final int THIRTHY_SIX = 36;
     public static final int THIRTHY_SEVEN = 37;
     public static final int THIRTHY_EIGTH  = 38;
     public static final int FORTHY_EIGTH = 48;
     public static final int HIEST_WORD_CHAR = 255;
+    public static final int TWOTHOUSAND = 2000;
+    public static final int HEXDEC0xFF61 = 0xFF61;
+    public static final int HEXDEC0x00b1 = 0x00b1;
+    public static final double DOUBLE1000000 = 1000000.0;
 
     private static final Tracer TRACER = new Tracer();
 
@@ -14007,11 +14012,10 @@ public class CommandLine {
                     "exitCodeList";
 
             /**
-             * {@linkplain #sectionKeys(
-                    ) Section key} to {@linkplain #sectionMap() control} the {@linkplain IHelpSectionRenderer section renderer} for the Footer Heading section.
+             * {@linkplain #sectionKeys() Section key} to {@linkplain #sectionMap() control}
+             * the {@linkplain IHelpSectionRenderer section renderer} for the Footer Heading section.
              * The default renderer for this
-             * section calls {@link Help#footerHeading(
-                    Object...)}.
+             * section calls {@link Help#footerHeading(Object...)}.
              *
              * @since 3.9
              */
@@ -14019,10 +14023,9 @@ public class CommandLine {
                     "footerHeading";
 
             /**
-             * {@linkplain #sectionKeys(
-                    ) Section key} to {@linkplain #sectionMap() control} the {@linkplain IHelpSectionRenderer section renderer} for the Footer section.
-             * The default renderer for this section calls {@link Help#footer(
-                    Object...)}.
+             * {@linkplain #sectionKeys() Section key} to {@linkplain #sectionMap() control}
+             * the {@linkplain IHelpSectionRenderer section renderer} for the Footer section.
+             * The default renderer for this section calls {@link Help#footer(Object...)}.
              *
              * @since 3.9
              */
@@ -14032,18 +14035,18 @@ public class CommandLine {
              * Constant holding the default
              * usage message width: <code>{@value}</code>.
              */
-            public final static int DEFAULT_USAGE_WIDTH = 80;
-            final static int DEFAULT_USAGE_LONG_OPTIONS_WIDTH = 20;
+            public final int DEFAULT_USAGE_WIDTH = 80;
+            static final int DEFAULT_USAGE_LONG_OPTIONS_WIDTH = 20;
             /**
              * Constant Boolean holding the default setting for whether to
              * attempt to adjust the width to the terminal width: <code>{@value}</code>.
              */
-            static final Boolean DEFAULT_USAGE_AUTO_WIDTH = Boolean.FALSE;
+            final Boolean DEFAULT_USAGE_AUTO_WIDTH = Boolean.FALSE;
             /**
              * Constant String holding the default
              * synopsis heading: <code>{@value}</code>.
              */
-            static final String DEFAULT_SYNOPSIS_HEADING = "Usage: ";
+            final String DEFAULT_SYNOPSIS_HEADING = "Usage: ";
             private final static double DEFAULT_SYNOPSIS_AUTO_INDENT_THRESHOLD =
                     0.5;
             /**
@@ -14102,11 +14105,11 @@ public class CommandLine {
              * breaks should take wide CJK characters into account: <code>{@value}</code>.
              */
             static final Boolean DEFAULT_ADJUST_CJK = Boolean.TRUE;
-            private final static int MINIMUM_USAGE_WIDTH = 55;
-            private final static int DEFAULT_SYNOPSIS_INDENT =
+            private final int MINIMUM_USAGE_WIDTH = 55;
+            private final int DEFAULT_SYNOPSIS_INDENT =
                     -1; // by default,
             // fall back to aligning to the synopsis heading
-            private final static double MAX_SYNOPSIS_AUTO_INDENT_THRESHOLD =
+            private static final double MAX_SYNOPSIS_AUTO_INDENT_THRESHOLD =
                     0.9;
 
             static final String DEFAULT_SINGLE_VALUE = "";
@@ -14193,38 +14196,27 @@ public class CommandLine {
                 final Tracer tracer = CommandLine.tracer();
                 final AtomicInteger size = new AtomicInteger(-1);
                 final String[] cmd =
-                        (
-                                Help.Ansi.isWindows()
-                                        && !Help.Ansi.isPseudoTTY()) ? new String[]{"cmd.exe",
-                                "/c",
-                                "mode con"} : (Help.Ansi.isMac() ? new String[]{"tput",
-                                "cols"} : new String[]{"stty",
-                                "-a",
-                                "-F",
-                                "/dev/tty"});
+                        (Help.Ansi.isWindows() && !Help.Ansi.isPseudoTTY())
+                                ? new String[]{"cmd.exe", "/c", "mode con"}
+                                : (Help.Ansi.isMac()
+                                ? new String[]{"tput", "cols"}
+                                : new String[]{"stty", "-a", "-F", "/dev/tty"});
                 Thread t = new Thread(new Runnable() {
                     public void run() {
                         Process proc = null;
                         BufferedReader reader = null;
                         try {
                             ProcessBuilder pb = new ProcessBuilder(cmd);
-                            tracer.debug(
-                                    "getTerminalWidth() executing command %s",
-                                    pb.command());
+                            tracer.debug("getTerminalWidth() executing command %s", pb.command());
                             //proc=
-                            Runtime.getRuntime(
-                            ).exec(new String[]{"sh",
-                                    "-c",
-                                    "tput cols 2> /dev/tty"});
-                            Class<?> redirectClass =
-                                    Class.forName(
-                                            "java.lang.ProcessBuilder$Redirect");
-                            Object INHERIT =
+                            Runtime.getRuntime().exec(new String[]{"sh", "-c", "tput cols 2> /dev/tty"});
+                            Class<?> redirectClass = Class.forName("java.lang.ProcessBuilder$Redirect");
+                            Object inherit =
                                     redirectClass.getField("INHERIT").get(null);
                             Method redirectError =
                                     ProcessBuilder.class.getDeclaredMethod(
                                             "redirectError", redirectClass);
-                            redirectError.invoke(pb, INHERIT);
+                            redirectError.invoke(pb, inherit);
                             proc = pb.start();
                             reader =
                                     new BufferedReader(
@@ -14238,11 +14230,11 @@ public class CommandLine {
                                     "getTerminalWidth() parsing output: %s",
                                     txt);
                             Pattern pattern =
-                                    (
-                                            Help.Ansi.isWindows()
-                                                    && !Help.Ansi.isPseudoTTY()) ? Pattern.compile(".*?:\\s*(\\d+)\\D.*?:\\s*(\\d+)\\D.*",
-                                            Pattern.DOTALL) : (Help.Ansi.isMac() ? Pattern.compile("(\\s*)(\\d+)\\s*") : Pattern.compile(".*olumns(:)?\\s+(\\d+)\\D.*",
-                                            Pattern.DOTALL));
+                                    (Help.Ansi.isWindows() && !Help.Ansi.isPseudoTTY())
+                                            ? Pattern.compile(".*?:\\s*(\\d+)\\D.*?:\\s*(\\d+)\\D.*", Pattern.DOTALL)
+                                            : (Help.Ansi.isMac()
+                                            ? Pattern.compile("(\\s*)(\\d+)\\s*")
+                                            : Pattern.compile(".*olumns(:)?\\s+(\\d+)\\D.*", Pattern.DOTALL));
                             Matcher matcher = pattern.matcher(txt);
                             if (matcher.matches()) {
                                 size.set(Integer.parseInt(matcher.group(2)));
@@ -14265,12 +14257,12 @@ public class CommandLine {
                         break;
                     }
                     try {
-                        Thread.sleep(25);
+                        Thread.sleep(TWENTYFIVE);
                     } catch (InterruptedException ignored) {
                     }
                 } while (
-                        System.currentTimeMillis() < now + 2000 && t.isAlive());
-                double duration = (System.nanoTime() - start) / 1000000.0;
+                        System.currentTimeMillis() < now + TWOTHOUSAND && t.isAlive());
+                double duration = (System.nanoTime() - start) / DOUBLE1000000;
                 tracer.debug(
                         "getTerminalWidth() returning: %s in %,.1fms",
                         size,
@@ -14282,7 +14274,8 @@ public class CommandLine {
              * Given a codePoint, is this codePoint
              * considered to be a CJK character?
              * Shamelessly stolen from
-             * <a href="http://stackoverflow.com/questions/1499804/how-can-i-detect-japanese-text-in-a-java-string">StackOverflow</a>
+             * <a href="http://stackoverflow.com/questions/1499804
+             * /how-can-i-detect-japanese-text-in-a-java-string">StackOverflow</a>
              * where it was contributed by user Rakesh N. (Upvote! :-) )
              *
              * @param codePoint code point to test
@@ -14291,12 +14284,25 @@ public class CommandLine {
             static boolean isCodePointCJK(int codePoint) {
                 Character.UnicodeBlock unicodeBlock =
                         Character.UnicodeBlock.of(codePoint);
-                return (
-                        codePoint == 0x00b1 || unicodeBlock == Character.UnicodeBlock.HIRAGANA) || (unicodeBlock == Character.UnicodeBlock.KATAKANA) || (unicodeBlock == Character.UnicodeBlock.KATAKANA_PHONETIC_EXTENSIONS) || (unicodeBlock == Character.UnicodeBlock.HANGUL_COMPATIBILITY_JAMO) || (unicodeBlock == Character.UnicodeBlock.HANGUL_JAMO) || (unicodeBlock == Character.UnicodeBlock.HANGUL_SYLLABLES) || (unicodeBlock == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS) || (unicodeBlock == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A) || (unicodeBlock == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_B) || (unicodeBlock == Character.UnicodeBlock.CJK_COMPATIBILITY_FORMS) || (unicodeBlock == Character.UnicodeBlock.CJK_COMPATIBILITY_IDEOGRAPHS) || (unicodeBlock == Character.UnicodeBlock.CJK_RADICALS_SUPPLEMENT) || (unicodeBlock == Character.UnicodeBlock.CJK_SYMBOLS_AND_PUNCTUATION) || (unicodeBlock == Character.UnicodeBlock.ENCLOSED_CJK_LETTERS_AND_MONTHS)
+                return (codePoint == HEXDEC0x00b1
+                        || unicodeBlock == Character.UnicodeBlock.HIRAGANA)
+                        || (unicodeBlock == Character.UnicodeBlock.KATAKANA)
+                        || (unicodeBlock == Character.UnicodeBlock.KATAKANA_PHONETIC_EXTENSIONS)
+                        || (unicodeBlock == Character.UnicodeBlock.HANGUL_COMPATIBILITY_JAMO)
+                        || (unicodeBlock == Character.UnicodeBlock.HANGUL_JAMO)
+                        || (unicodeBlock == Character.UnicodeBlock.HANGUL_SYLLABLES)
+                        || (unicodeBlock == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS)
+                        || (unicodeBlock == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A)
+                        || (unicodeBlock == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_B)
+                        || (unicodeBlock == Character.UnicodeBlock.CJK_COMPATIBILITY_FORMS)
+                        || (unicodeBlock == Character.UnicodeBlock.CJK_COMPATIBILITY_IDEOGRAPHS)
+                        || (unicodeBlock == Character.UnicodeBlock.CJK_RADICALS_SUPPLEMENT)
+                        || (unicodeBlock == Character.UnicodeBlock.CJK_SYMBOLS_AND_PUNCTUATION)
+                        || (unicodeBlock == Character.UnicodeBlock.ENCLOSED_CJK_LETTERS_AND_MONTHS)
                         //The magic number here is the separating index between full-width and half-width
                         || (
                         unicodeBlock == Character.UnicodeBlock.HALFWIDTH_AND_FULLWIDTH_FORMS
-                                && codePoint < 0xFF61);
+                                && codePoint < HEXDEC0xFF61);
             }
 
             private static boolean shouldDetectTerminalSize(
@@ -14370,8 +14376,10 @@ public class CommandLine {
             /**
              * Sets the maximum usage help long options
              * column max width to the specified value.
-             * This value controls the maximum width of the long options column: any positional parameter labels or long options that are
-             * longer than the specified value will overflow into the description column, and cause the description to be displayed on the next line.
+             * This value controls the maximum width of the long options column:
+             * any positional parameter labels or long options that are
+             * longer than the specified value will overflow into the description column,
+             * and cause the description to be displayed on the next line.
              *
              * @param newValue the new maximum usage help long options column
              *                 max width. Must be 20 or greater, otherwise the new value will be ignored.
@@ -14411,15 +14419,15 @@ public class CommandLine {
                     return defaultWidth;
                 }
                 try {
-                    int width = Integer.parseInt(userValue);
-                    if (width < MINIMUM_USAGE_WIDTH) {
+                    int width1 = Integer.parseInt(userValue);
+                    if (width1 < MINIMUM_USAGE_WIDTH) {
                         CommandLine.tracer(
                         ).warn("Invalid picocli.usage.width value %d. Using minimum usage width %d.",
-                                width,
+                                width1,
                                 MINIMUM_USAGE_WIDTH);
                         return MINIMUM_USAGE_WIDTH;
                     }
-                    return width;
+                    return width1;
                 } catch (NumberFormatException ex) {
                     CommandLine.tracer(
                     ).warn("Invalid picocli.usage.width value '%s'. Using usage width %d.",
@@ -14449,8 +14457,10 @@ public class CommandLine {
             /**
              * Returns the maximum usage help long
              * options column max width to the specified value.
-             * This value controls the maximum width of the long options column: any positional parameter labels or long options that are
-             * longer than the specified value will overflow into the description column, and cause the description to be displayed on the next line.
+             * This value controls the maximum width of the long options column:
+             * any positional parameter labels or long options that are
+             * longer than the specified value will overflow into the description column,
+             * and cause the description to be displayed on the next line.
              *
              * @return the new maximum usage help long
              * options column max width. Always 20 or greater.
@@ -14471,6 +14481,7 @@ public class CommandLine {
              * This feature requires Java 7
              * or greater. The default is {@code false}.
              *
+             * @return autoWidth
              * @see Command#usageHelpAutoWidth()
              * @since 4.0
              */
@@ -14486,6 +14497,7 @@ public class CommandLine {
              *
              * @param detectTerminalSize whether picocli
              *                           should attempt to detect the terminal size
+             * @return UsageMessageSpec
              * @see Command#usageHelpAutoWidth()
              * @since 4.0
              */
@@ -14498,6 +14510,8 @@ public class CommandLine {
              * Returns the help section renderers for the
              * predefined section keys. see: {@link #sectionKeys(
              *)}
+             *
+             * @return createHelpSectionRendererMap
              */
             private Map<String,
                     IHelpSectionRenderer> createHelpSectionRendererMap(
@@ -14582,7 +14596,8 @@ public class CommandLine {
                         return help.optionList();
                     }
                 });
-                //e.g. [--] This option can be used to separate command-line options from the list of positional parameters.
+                //e.g. [--] This option can be used to separate command-line options from the list
+                // of positional parameters.
                 result.put(
                         SECTION_KEY_END_OF_OPTIONS, new IHelpSectionRenderer() {
                             public String render(Help help) {
@@ -14675,6 +14690,7 @@ public class CommandLine {
              * SECTION_KEY_FOOTER}</li>
              * </ol>
              *
+             * @return sectionKeys
              * @since 3.9
              */
             public List<String> sectionKeys() {
@@ -14685,6 +14701,8 @@ public class CommandLine {
              * Sets the section keys in the order that
              * the usage help message should render the sections.
              *
+             * @param keys
+             * @return sectionKeys
              * @see #sectionKeys
              * @since 3.9
              */
@@ -14706,6 +14724,7 @@ public class CommandLine {
              * or not in the list returned by {@link #sectionKeys(
              *) sectionKeys} are omitted.
              *
+             * @return sectionMap
              * @see #sectionKeys
              * @since 3.9
              */
@@ -14735,6 +14754,7 @@ public class CommandLine {
              * Returns the {@code IHelpFactory} that
              * is used to construct the usage help message.
              *
+             * @return helpFactory
              * @see #setHelpFactory(IHelpFactory)
              * @since 3.9
              */
@@ -14749,13 +14769,13 @@ public class CommandLine {
              * Sets a new {@code IHelpFactory}
              * to customize the usage help message.
              *
-             * @param helpFactory the new
+             * @param helpFactory1 the new
              *                    help factory. Must be non-{@code null}.
              * @return this {@code UsageMessageSpec}
              * object, to allow method chaining
              */
-            public UsageMessageSpec helpFactory(IHelpFactory helpFactory) {
-                this.helpFactory = Assert.notNull(helpFactory, "helpFactory");
+            public UsageMessageSpec helpFactory(IHelpFactory helpFactory1) {
+                this.helpFactory = Assert.notNull(helpFactory1, "helpFactory");
                 return this;
             }
 
@@ -14794,6 +14814,8 @@ public class CommandLine {
              * Returns the optional heading preceding the header
              * section. Initialized from {@link Command#headerHeading(
              *)}, or {@code ""} (empty string).
+             *
+             * @return headerHeading
              */
             public String headerHeading() {
                 return str(
@@ -14812,6 +14834,8 @@ public class CommandLine {
              * otherwise this is an empty array and the help message has no
              * header. Applications may programmatically
              * set this field to create a custom help message.
+             *
+             * @return header
              */
             public String[] header() {
                 return arr(
@@ -14824,6 +14848,8 @@ public class CommandLine {
              * Returns the optional heading preceding the synopsis.
              * Initialized from {@link Command#synopsisHeading(
              *)}, {@code "Usage: "} by default.
+             *
+             * @return synopsisHeading
              */
             public String synopsisHeading() {
                 return str(
@@ -14837,6 +14863,7 @@ public class CommandLine {
              * synopsis. Initialized from {@link Command#synopsisSubcommandLabel(
              *)}, {@code "[COMMANDS]"} by default.
              *
+             * @return synopsisSubcommandLabel
              * @since 4.0
              */
             public String synopsisSubcommandLabel() {
@@ -14858,10 +14885,13 @@ public class CommandLine {
              * synopsis will be aligned to the {@link #synopsisIndent(
              *)} instead of the end of the command name.
              *
+             * @return synopsisAutoIndentThreshold
              * @since 4.0
              */
             public double synopsisAutoIndentThreshold() {
-                return synopsisAutoIndentThreshold == null ? DEFAULT_SYNOPSIS_AUTO_INDENT_THRESHOLD : synopsisAutoIndentThreshold;
+                return synopsisAutoIndentThreshold == null
+                        ? DEFAULT_SYNOPSIS_AUTO_INDENT_THRESHOLD
+                        : synopsisAutoIndentThreshold;
             }
 
             /**
@@ -14876,6 +14906,7 @@ public class CommandLine {
              * A positive value means the exact number of spaces
              * to indent for the 2nd line and subsequent lines of the synopsis.
              *
+             * @return synopsisIndent
              * @since 4.0
              */
             public int synopsisIndent() {
@@ -14885,6 +14916,8 @@ public class CommandLine {
             /**
              * Returns whether the synopsis line(
              * s) should show an abbreviated synopsis without detailed option names.
+             *
+             * @return abbreviateSynopsis
              */
             public boolean abbreviateSynopsis() {
                 return (
@@ -14899,6 +14932,8 @@ public class CommandLine {
              * otherwise this is an empty array and the synopsis is generated.
              * Applications may programmatically
              * set this field to create a custom help message.
+             *
+             * @return customSynopsis
              */
             public String[] customSynopsis() {
                 return arr(
@@ -14911,6 +14946,8 @@ public class CommandLine {
              * Returns the optional heading preceding the description
              * section. Initialized from {@link Command#descriptionHeading(
              *)}, or null.
+             *
+             * @return descriptionHeading
              */
             public String descriptionHeading() {
                 return str(
@@ -14928,6 +14965,8 @@ public class CommandLine {
              * and the help message has no description.
              * Applications may programmatically
              * set this field to create a custom help message.
+             *
+             * @return description
              */
             public String[] description() {
                 return arr(
@@ -14940,6 +14979,8 @@ public class CommandLine {
              * Returns the optional heading preceding the parameter
              * list. Initialized from {@link Command#parameterListHeading(
              *)}, or null.
+             *
+             * @return parameterListHeading
              */
             public String parameterListHeading() {
                 return str(
@@ -14952,6 +14993,8 @@ public class CommandLine {
              * Returns the optional heading preceding the options
              * list. Initialized from {@link Command#optionListHeading(
              *)}, or null.
+             *
+             * @return optionListHeading
              */
             public String optionListHeading() {
                 return str(
@@ -14963,6 +15006,8 @@ public class CommandLine {
             /**
              * Returns whether the options list in the
              * usage help message should be sorted alphabetically.
+             *
+             * @return ortOptions
              */
             public boolean sortOptions() {
                 return (
@@ -14973,6 +15018,7 @@ public class CommandLine {
              * Returns whether the options in
              * the synopsis should be sorted alphabetically.
              *
+             * @return sortSynopsis
              * @since 4.7.1-SNAPSHOT
              */
             public boolean sortSynopsis() {
@@ -14983,6 +15029,8 @@ public class CommandLine {
             /**
              * Returns the character used to
              * prefix required options in the options list.
+             *
+             * @return requiredOptionMarker
              */
             public char requiredOptionMarker() {
                 return (
@@ -14992,6 +15040,8 @@ public class CommandLine {
             /**
              * Returns whether the options list in the usage help
              * message should show default values for all non-boolean options.
+             *
+             * @return showDefaultValues
              */
             public boolean showDefaultValues() {
                 return (
@@ -15904,6 +15954,8 @@ public class CommandLine {
             }
 
             /**
+             *
+             * @return unmatchedArgumentsAllowed
              * @see CommandLine#isUnmatchedArgumentsAllowed()
              */
             public boolean unmatchedArgumentsAllowed() {
