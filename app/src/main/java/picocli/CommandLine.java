@@ -11081,7 +11081,7 @@ public class CommandLine {
          *
          * @since 3.0
          */
-        public static class CommandSpec {
+        public static final class CommandSpec {
             /**
              * Constant String holding the default
              * program name: {@code "<main class>" }.
@@ -11219,10 +11219,12 @@ public class CommandLine {
                 //   and point them to this CommandSpec instance.
 //                result.commands.clear();                result.commands.putAll(this.commands);
 //                result.optionsByNameMap.clear();        result.optionsByNameMap.putAll(this.optionsByNameMap);
-//                result.negatedOptionsByNameMap.clear(); result.negatedOptionsByNameMap.putAll(this.negatedOptionsByNameMap);
+//                result.negatedOptionsByNameMap.clear();
+//                result.negatedOptionsByNameMap.putAll(this.negatedOptionsByNameMap);
 //                result.posixOptionsByKeyMap.clear();    result.posixOptionsByKeyMap.putAll(this.posixOptionsByKeyMap);
 //                result.mixins.clear();                  result.mixins.putAll(this.mixins);
-//                result.mixinAnnotatedElements.clear();  result.mixinAnnotatedElements.putAll(this.mixinAnnotatedElements);
+//                result.mixinAnnotatedElements.clear();
+//                result.mixinAnnotatedElements.putAll(this.mixinAnnotatedElements);
 //                result.requiredArgs.clear();            result.requiredArgs.addAll(requiredArgs);
 //                result.args.clear();                    result.args.addAll(args);
 //                result.options.clear();                 result.options.addAll(options);
@@ -11237,6 +11239,8 @@ public class CommandLine {
             /**
              * Creates and returns a new {@code CommandSpec}
              * without any associated user object.
+             *
+             * @return create
              */
             public static CommandSpec create() {
                 return wrapWithoutInspection(null);
@@ -11250,6 +11254,7 @@ public class CommandLine {
              *
              * @param userObject the associated user
              *                   object. May be any object, may be {@code null}.
+             * @return wrapWithoutInspection
              */
             public static CommandSpec wrapWithoutInspection(Object userObject) {
                 return new CommandSpec(
@@ -11270,6 +11275,7 @@ public class CommandLine {
              *                   {@linkplain Option#converter() converters},
              *                   etc.,
              *                   that are registered declaratively with annotation attributes
+             * @return wrapWithoutInspection
              * @since 4.2
              */
             public static CommandSpec wrapWithoutInspection(
@@ -11288,6 +11294,7 @@ public class CommandLine {
              *                   Command}, {@link Option} and/or {@link Parameters} annotations.
              * @throws InitializationException if the specified
              *                                 object has no picocli annotations or has invalid annotations
+             * @return forAnnotatedObject
              */
             public static CommandSpec forAnnotatedObject(Object userObject) {
                 return forAnnotatedObject(userObject, new DefaultFactory());
@@ -11309,6 +11316,7 @@ public class CommandLine {
              *                   that are registered declaratively with annotation attributes
              * @throws InitializationException if the specified
              *                                 object has no picocli annotations or has invalid annotations
+             * @return forAnnotatedObject
              */
             public static CommandSpec forAnnotatedObject(
                     Object userObject, IFactory factory) {
@@ -11326,6 +11334,7 @@ public class CommandLine {
              *                   Command}, {@link Option} and/or {@link Parameters} annotations.
              * @throws InitializationException if
              *                                 the specified object has invalid annotations
+             * @return forAnnotatedObjectLenient
              */
             public static CommandSpec forAnnotatedObjectLenient(
                     Object userObject) {
@@ -11349,6 +11358,8 @@ public class CommandLine {
              *                   that are registered declaratively with annotation attributes
              * @throws InitializationException if
              *                                 the specified object has invalid annotations
+             *
+             * @return forAnnotatedObjectLenient
              */
             public static CommandSpec forAnnotatedObjectLenient(
                     Object userObject, IFactory factory) {
@@ -11360,7 +11371,7 @@ public class CommandLine {
                     ArgSpec arg, Map<T, OptionSpec> map) {
                 int result = 0;
                 for (Iterator<Map.Entry<T, OptionSpec>> iterator =
-                     map.entrySet().iterator(); iterator.hasNext(); ) {
+                     map.entrySet().iterator(); iterator.hasNext();) {
                     Map.Entry<?, OptionSpec> entry = iterator.next();
                     if (entry.getValue() == arg) {
                         iterator.remove();
@@ -11484,6 +11495,7 @@ public class CommandLine {
             /**
              * Returns the user object associated with this command.
              *
+             * @return userObject
              * @see CommandLine#getCommand()
              */
             public Object userObject() {
@@ -11493,6 +11505,8 @@ public class CommandLine {
             /**
              * Returns the CommandLine constructed
              * with this {@code CommandSpec} model.
+             *
+             * @return commandLine
              */
             public CommandLine commandLine() {
                 return commandLine;
@@ -11501,11 +11515,14 @@ public class CommandLine {
             /**
              * Sets the CommandLine constructed
              * with this {@code CommandSpec} model.
+             *
+             * @param commandLine1
+             * @return commandLine
              */
-            protected CommandSpec commandLine(CommandLine commandLine) {
-                this.commandLine = commandLine;
+            protected CommandSpec commandLine(CommandLine commandLine1) {
+                this.commandLine = commandLine1;
                 for (CommandSpec mixedInSpec : mixins.values()) {
-                    mixedInSpec.commandLine(commandLine);
+                    mixedInSpec.commandLine(commandLine1);
                 }
                 for (CommandLine sub : commands.values()) {
                     sub.getCommandSpec().parent(this);
@@ -11515,6 +11532,8 @@ public class CommandLine {
 
             /**
              * Returns the parser specification for this command.
+             *
+             * @return parser
              */
             public ParserSpec parser() {
                 return parser;
@@ -11523,6 +11542,9 @@ public class CommandLine {
             /**
              * Initializes the parser specification for this command
              * from the specified settings and returns this commandSpec.
+             *
+             * @param settings
+             * @return parser
              */
             public CommandSpec parser(ParserSpec settings) {
                 parser.initFrom(settings);
@@ -11531,6 +11553,8 @@ public class CommandLine {
 
             /**
              * Returns the usage help message specification for this command.
+             *
+             * @return usageMessage
              */
             public UsageMessageSpec usageMessage() {
                 return usageMessage;
@@ -11539,6 +11563,9 @@ public class CommandLine {
             /**
              * Initializes the usageMessage specification for this
              * command from the specified settings and returns this commandSpec.
+             *
+             * @param settings
+             * @return usageMessage
              */
             public CommandSpec usageMessage(UsageMessageSpec settings) {
                 usageMessage.initFrom(settings, this);
@@ -11548,6 +11575,7 @@ public class CommandLine {
             /**
              * Returns whether the subcommands are case-insensitive.
              *
+             * @return subcommandsCaseInsensitive
              * @since 4.3
              */
             public boolean subcommandsCaseInsensitive() {
@@ -11557,6 +11585,8 @@ public class CommandLine {
             /**
              * Sets the case-insensitivity of subcommands.
              *
+             * @param caseInsensitiveSubcommands
+             * @return subcommandsCaseInsensitive
              * @since 4.3
              */
             public CommandSpec subcommandsCaseInsensitive(
@@ -11575,6 +11605,7 @@ public class CommandLine {
             /**
              * Returns whether the options are case-insensitive.
              *
+             * @return
              * @since 4.3
              */
             public boolean optionsCaseInsensitive() {
@@ -11591,6 +11622,8 @@ public class CommandLine {
              * version of the default transformer. To ensure your custom
              * transformer is used, install it last, after changing case sensitivity.
              *
+             * @param caseInsensitiveOptions
+             * @return optionsCaseInsensitive
              * @since 4.3
              */
             public CommandSpec optionsCaseInsensitive(
@@ -11706,6 +11739,8 @@ public class CommandLine {
 
             /**
              * Returns a read-only view of the subcommand map.
+             *
+             * @return subcommands
              */
             public Map<String, CommandLine> subcommands() {
                 return Collections.unmodifiableMap(commands);
@@ -11744,7 +11779,7 @@ public class CommandLine {
              * If the specified subcommand does not have a ResourceBundle
              * set, it is initialized to the ResourceBundle of this command spec.
              *
-             * @param name       subcommand name - the preferred
+             * @param name1       subcommand name - the preferred
              *                   subcommand name to register the subcommand under.
              *                   If {@code
              *                   null}, the {@linkplain CommandSpec#name(
@@ -11764,15 +11799,14 @@ public class CommandLine {
              *                                 of the specified
              *                                 subcommand was already used by another subcommand.
              */
-            public CommandSpec addSubcommand(
-                    String name, CommandSpec subcommand) {
-                return addSubcommand(name, new CommandLine(subcommand));
+            public CommandSpec addSubcommand(String name1, CommandSpec subcommand) {
+                return addSubcommand(name1, new CommandLine(subcommand));
             }
 
             private String validateSubcommandName(
-                    String name, CommandSpec subSpec) {
-                if (name != null) {
-                    return name;
+                    String name1, CommandSpec subSpec) {
+                if (name1 != null) {
+                    return name1;
                 }
                 if (
                         subSpec.name != null
@@ -11798,11 +11832,8 @@ public class CommandLine {
                                 && resourceBundleBaseName() == null) {
                     setBundle(bundleBaseName, rb);
                 }
-                for (
-                        CommandLine sub : commands.values()) { // percolate down the hierarchy
-                    sub.getCommandSpec(
-                    ).initCommandHierarchyWithResourceBundle(bundleBaseName,
-                            rb);
+                for (CommandLine sub : commands.values()) { // percolate down the hierarchy
+                    sub.getCommandSpec().initCommandHierarchyWithResourceBundle(bundleBaseName, rb);
                 }
             }
 
@@ -11811,7 +11842,7 @@ public class CommandLine {
              * If the specified subcommand does not have a ResourceBundle
              * set, it is initialized to the ResourceBundle of this command spec.
              *
-             * @param name           subcommand name - the preferred
+             * @param name1           subcommand name - the preferred
              *                       subcommand name to register the subcommand under.
              *                       If {@code null},
              *                       the {@linkplain CommandLine#getCommandName(
@@ -11832,11 +11863,11 @@ public class CommandLine {
              *                                 subcommand was already used by another subcommand.
              */
             public CommandSpec addSubcommand(
-                    String name, CommandLine subCommandLine) {
+                    String name1, CommandLine subCommandLine) {
                 CommandSpec subSpec = subCommandLine.getCommandSpec();
                 String actualName =
                         validateSubcommandName(
-                                interpolator.interpolateCommandName(name),
+                                interpolator.interpolateCommandName(name1),
                                 subSpec);
                 Tracer t = CommandLine.tracer();
                 if (t.isDebug()) {
@@ -11848,8 +11879,8 @@ public class CommandLine {
                 String previousName = commands.getCaseSensitiveKey(actualName);
                 CommandLine previous = commands.put(actualName, subCommandLine);
                 if (previous != null && previous != subCommandLine) {
-                    throw new DuplicateNameException(
-                            "Another subcommand named '" + previousName + "' already exists for command '" + this.name() + "'");
+                    throw new DuplicateNameException("Another subcommand named '" + previousName
+                            + "' already exists for command '" + this.name() + "'");
                 }
                 if (subSpec.name == null) {
                     subSpec.name(actualName);
@@ -11878,8 +11909,10 @@ public class CommandLine {
 
                 for (ArgSpec arg : args()) {
                     if (arg.scopeType() == ScopeType.INHERIT) {
-                        subSpec.add(
-                                arg.isOption() ? OptionSpec.builder((OptionSpec) arg).inherited(true).build() : PositionalParamSpec.builder((PositionalParamSpec) arg).inherited(true).build());
+                        subSpec.add(arg.isOption()
+                                ? OptionSpec.builder((OptionSpec) arg).inherited(true).build()
+                                : PositionalParamSpec.builder((PositionalParamSpec) arg)
+                                .inherited(true).build());
                     }
                 }
                 return this;
@@ -11887,7 +11920,7 @@ public class CommandLine {
 
             private void addAlias(
                     String alias,
-                    String name,
+                    String name1,
                     CommandLine subCommandLine,
                     Tracer t) {
                 CommandSpec subSpec = subCommandLine.getCommandSpec();
@@ -11902,8 +11935,8 @@ public class CommandLine {
                                 interpolator.interpolate(alias),
                                 subCommandLine);
                 if (previous != null && previous != subCommandLine) {
-                    throw new DuplicateNameException(
-                            "Alias '" + alias + "' for subcommand '" + name + "' is already used by another subcommand of '" + name() + "'");
+                    throw new DuplicateNameException("Alias '" + alias + "' for subcommand '" + name1
+                            + "' is already used by another subcommand of '" + name() + "'");
                 }
             }
 
@@ -11927,19 +11960,19 @@ public class CommandLine {
              * or {@code null} of the specified
              * name was not associated with a subcommand.
              *
-             * @param name name or alias of the subcommand to remove; may be
+             * @param name1 name or alias of the subcommand to remove; may be
              *             {@link #isAbbreviatedSubcommandsAllowed(
              *) abbreviated} or {@link #isSubcommandsCaseInsensitive() case-insensitive}
              * @return the removed {@code CommandLine} instance or {@code null}
              * @since 4.6
              */
-            public CommandLine removeSubcommand(String name) {
-                String actualName = name;
+            public CommandLine removeSubcommand(String name1) {
+                String actualName = name1;
                 if (parser().abbreviatedSubcommandsAllowed()) {
                     actualName =
                             AbbreviationMatcher.match(
                                     commands,
-                                    name,
+                                    name1,
                                     subcommandsCaseInsensitive(),
                                     commandLine).getFullName();
                 }
@@ -11961,7 +11994,7 @@ public class CommandLine {
                             "Removed %d subcommand entries %s for key '%s' from '%s'",
                             removedNames.size(),
                             removedNames,
-                            name,
+                            name1,
                             this.qualifiedName());
                 }
                 return result;
@@ -11971,6 +12004,7 @@ public class CommandLine {
              * Returns whether method commands should be added as
              * subcommands. True by default. Used by the annotation processor.
              *
+             * @return isAddMethodSubcommands
              * @since 4.0
              */
             public boolean isAddMethodSubcommands() {
@@ -11982,6 +12016,8 @@ public class CommandLine {
              * Sets whether method commands should be added as subcommands.
              * True by default. Used by the annotation processor.
              *
+             * @param addMethodSubcommands
+             * @return setAddMethodSubcommands
              * @since 4.0
              */
             public CommandSpec setAddMethodSubcommands(
@@ -11993,10 +12029,7 @@ public class CommandLine {
             static List<CommandLine> createMethodSubcommands(
                     Class<?> cls, IFactory factory, boolean includeInherited) {
                 List<CommandLine> result = new ArrayList<CommandLine>();
-                for (
-                        Method method : getCommandMethods(cls,
-                        null,
-                        includeInherited)) {
+                for (Method method : getCommandMethods(cls, null, includeInherited)) {
                     result.add(new CommandLine(method, factory));
                 }
                 return result;
@@ -12406,18 +12439,18 @@ public class CommandLine {
                         String[] names =
                                 interpolator.interpolate(
                                         ((OptionSpec) arg).names());
-                        for (String name : names) {
-                            ArgGroupSpec other = added.get(name);
+                        for (String name3 : names) {
+                            ArgGroupSpec other = added.get(name3);
                             if (other == null) {
                                 continue;
                             }
                             if (other == group) {
                                 throw DuplicateOptionAnnotationsException.create(
-                                        name, arg, options1.get(name));
+                                        name3, arg, options1.get(name3));
                             } else {
                                 throw new DuplicateNameException(
-                                        "An option cannot be in multiple groups but " + name + " is in "
-                                                + group.synopsisUnit() + " and " + added.get(name).synopsisUnit()
+                                        "An option cannot be in multiple groups but " + name3 + " is in "
+                                                + group.synopsisUnit() + " and " + added.get(name3).synopsisUnit()
                                                 + ". Refactor to avoid this. For example, "
                                                 + "(-a | (-a -b)) can be rewritten as (-a [-b]), "
                                                 + "and (-a -b | -a -c) can be rewritten as (-a (-b | -c)).");
@@ -12529,9 +12562,7 @@ public class CommandLine {
                 //  mixin.usageMessage().messages().resourceBundleBaseName(), );
                 initFrom(mixin);
 
-                for (
-                        Map.Entry<String,
-                                CommandLine> entry : mixin.subcommands().entrySet()) {
+                for (Map.Entry<String, CommandLine> entry : mixin.subcommands().entrySet()) {
                     addSubcommand(entry.getKey(), entry.getValue());
                 }
                 Set<OptionSpec> options1 =
