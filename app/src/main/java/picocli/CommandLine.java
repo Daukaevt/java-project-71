@@ -9997,17 +9997,17 @@ public class CommandLine {
          * @deprecated use {@link #min()} instead
          */
         @Deprecated
-        public final int min;
+        private final int min;
         /**
          * @deprecated use {@link #max()} instead
          */
         @Deprecated
-        public final int max;
+        private final int max;
         /**
          * @deprecated use {@link #isVariable()} instead
          */
         @Deprecated
-        public final boolean isVariable;
+        private final boolean isVariable;
         private final boolean isUnspecified;
         private final String originalValue;
         private final boolean relative;
@@ -10191,8 +10191,8 @@ public class CommandLine {
             if (info.isMultiValue()) {
                 return Range.valueOf("0..1").unspecified(true);
             }
-            return Range.valueOf(
-                    "1").unspecified(true);// for single-valued fields (incl. boolean positional parameters)
+            return Range.valueOf("1").unspecified(true); // for single-valued fields
+            // (incl. boolean positional parameters)
         }
 
         /**
@@ -10260,10 +10260,11 @@ public class CommandLine {
             boolean unspecified =
                     range.length(
                     ) == 0 || range.startsWith(".."); // || range.endsWith("..");
-            int min, max;
+            int min;
+            int max;
             boolean variable;
-            int dots;
-            if ((dots = range.indexOf("..")) >= 0) {
+            int dots = range.indexOf("..");
+            if (dots >= 0) {
                 min = parseInt(range.substring(0, dots), 0);
                 max = parseInt(range.substring(dots + 2), Integer.MAX_VALUE);
                 variable = max == Integer.MAX_VALUE;
@@ -10349,6 +10350,7 @@ public class CommandLine {
          * Returns {@code true} if this Range is a default
          * value, {@code false} if the user specified this value.
          *
+         * @return isUnspecified
          * @since 4.0
          */
         public boolean isUnspecified() {
@@ -10361,6 +10363,7 @@ public class CommandLine {
          * {@code false} if this Range does not
          * contain any variables or relative indices.
          *
+         * @return isUnresolved
          * @since 4.0
          */
         public boolean isUnresolved() {
@@ -10372,6 +10375,7 @@ public class CommandLine {
          * a relative index like {@code "1+"}, or
          * {@code false} if this Range does not contain any relative indices.
          *
+         * @return isRelative
          * @since 4.3
          */
         public boolean isRelative() {
@@ -10393,6 +10397,11 @@ public class CommandLine {
             return anchor;
         } // not public (yet): TBD if we need a minAnchor and maxAnchor in the future
 
+        /**
+         * isRelativeToAnchor.
+         *
+         * @return isRelativeToAnchor
+         */
         boolean isRelativeToAnchor() {
             return anchor != Integer.MAX_VALUE && isRelative();
         }
@@ -10401,6 +10410,7 @@ public class CommandLine {
          * Returns the original String value
          * that this range was constructed with.
          *
+         * @return originalValue
          * @since 4.3
          */
         public String originalValue() {
@@ -10410,6 +10420,7 @@ public class CommandLine {
         /**
          * Returns the lower bound of this range (inclusive).
          *
+         * @return min
          * @since 4.0
          */
         public int min() {
@@ -10421,6 +10432,7 @@ public class CommandLine {
          * inclusive),
          * or {@code Integer.MAX_VALUE} if this range has {@linkplain #isVariable() no upper bound}.
          *
+         * @return max
          * @since 4.0
          */
         public int max() {
@@ -10430,6 +10442,7 @@ public class CommandLine {
         /**
          * Returns {@code true} if this range has no fixed upper bound.
          *
+         * @return isVariable
          * @since 4.0
          */
         public boolean isVariable() {
@@ -10448,6 +10461,12 @@ public class CommandLine {
             return min <= value && max >= value;
         }
 
+        /**
+         * equals.
+         *
+         * @param object
+         * @return equals
+         */
         public boolean equals(Object object) {
             if (!(object instanceof Range)) {
                 return false;
@@ -10458,10 +10477,21 @@ public class CommandLine {
                     && other.isVariable == this.isVariable;
         }
 
+        /**
+         * hashCode.
+         *
+         * @return hashCode
+         */
         public int hashCode() {
-            return ((17 * 37 + max) * 37 + min) * 37 + (isVariable ? 1 : 0);
+            return ((SEVENTHEEN * THIRTHY_SEVEN + max) * THIRTHY_SEVEN + min) * THIRTHY_SEVEN
+                    + (isVariable ? 1 : 0);
         }
 
+        /**
+         * toString.
+         *
+         * @return toString
+         */
         public String toString() {
             if (isUnresolved()) {
                 return originalValue;
@@ -10478,6 +10508,8 @@ public class CommandLine {
         /**
          * Returns equivalent of {@code format(
          * "%s (%s)", originalValue, toString())}.
+         *
+         * @return internalToString
          */
         String internalToString() {
             if (isUnresolved()) {
@@ -10487,6 +10519,12 @@ public class CommandLine {
             ) ? originalValue + " (" + toString() + ")" : toString();
         }
 
+        /**
+         * compareTo.
+         *
+         * @param other the object to be compared.
+         * @return compareTo
+         */
         public int compareTo(Range other) {
             if (
                     originalValue != null
@@ -10494,9 +10532,10 @@ public class CommandLine {
                             && originalValue.equals(other.originalValue)) {
                 return 0; // try to keep stable sort for relative indexes
             }
-            int result =
-                    (
-                            anchor() < other.anchor()) ? -1 : ((anchor() == other.anchor()) ? 0 : 1); // don't subtract; prevent overflow
+
+            // don't subtract; prevent overflow
+            int result = (anchor() < other.anchor()) ? -1 : ((anchor() == other.anchor()) ? 0 : 1);
+
             if (result == 0) {
                 result = (max < other.max) ? -1 : ((max == other.max) ? 0 : 1);
             }
@@ -10510,11 +10549,19 @@ public class CommandLine {
 
         /**
          * Returns true for these ranges: 0 and 0..1.
+         *
+         * @return isValidForInteractiveArgs
          */
         boolean isValidForInteractiveArgs() {
             return (min == 0 && (max == 0 || max == 1));
         }
 
+        /**
+         * overlaps.
+         *
+         * @param index
+         * @return overlaps
+         */
         boolean overlaps(Range index) {
             return contains(
                     index.min) || contains(index.max) || index.contains(min) || index.contains(max);
@@ -10581,7 +10628,10 @@ public class CommandLine {
              * @throws PicocliException if a problem
              *                          occurred while obtaining the current value
              * @throws Exception        internally, picocli call sites will catch
-             *                          any exceptions thrown from here and rethrow them wrapped in a PicocliException
+             * any exceptions thrown from here and rethrow them wrapped in a PicocliException
+             *
+             * @param <T>
+             * @return get
              */
             <T> T get() throws Exception;
         }
@@ -10632,6 +10682,8 @@ public class CommandLine {
              * For argument groups, this attribute is only
              * honored for groups that have a {@link ArgGroup#heading(
              *) heading} (or a {@link ArgGroup#headingKey() headingKey} with a non-{@code null} value).
+             *
+             * @return order
              */
             int order();
         }
@@ -10649,6 +10701,8 @@ public class CommandLine {
             /**
              * Returns {@code true} if {@link #getType(
              *)} is {@code boolean} or {@code java.lang.Boolean}.
+             *
+             * @return isBoolean
              */
             boolean isBoolean();
 
@@ -10658,13 +10712,15 @@ public class CommandLine {
              * Note that from picocli 4.7, {@code
              * char[]} arrays are considered single values (
              * similar to String) and are not treated as arrays.
+             *
+             * @return isMultiValue
              */
             boolean isMultiValue();
 
             /**
-             * Returns {@code true} if {@link #getType(
-             *)} is {@code java.util.Optional}
+             * Returns {@code true} if {@link #getType()} is {@code java.util.Optional}.
              *
+             * @return isOptional
              * @since 4.6
              */
             boolean isOptional();
@@ -10674,6 +10730,8 @@ public class CommandLine {
              * Note that from picocli 4.7, {@code
              * char[]} arrays are considered single values (
              * similar to String) and are not treated as arrays.
+             *
+             * @return isArray
              */
             boolean isArray();
 
@@ -10683,6 +10741,8 @@ public class CommandLine {
 
             /**
              * Returns {@code true} if {@link #getType()} is an enum.
+             *
+             * @return isEnum
              */
             boolean isEnum();
 
@@ -10696,12 +10756,16 @@ public class CommandLine {
              * Returns type information of components
              * or elements of a {@link #isMultiValue(
              *) multivalue} type.
+             *
+             * @return getAuxiliaryTypeInfos
              */
             List<ITypeInfo> getAuxiliaryTypeInfos();
 
             /**
              * Returns the names of the type arguments if this is a generic type. For
              * example, returns {@code ["java.lang.String"]} if this type is {@code List<String>}.
+             *
+             * @return getActualGenericTypeArguments
              */
             List<String> getActualGenericTypeArguments();
 
@@ -10830,17 +10894,20 @@ public class CommandLine {
              * or {@code null} if this extension is not supported.
              *
              * @param cls class of the desired extension
+             * @param <T>
+             * @return getExtension
              */
             <T> T getExtension(Class<T> cls);
         }
 
-        enum InitialValueState {CACHED, POSTPONED, UNAVAILABLE}
+        enum InitialValueState { CACHED, POSTPONED, UNAVAILABLE }
 
         /**
          * This class provides a case-aware Linked HashMap.
          * Supports both case-sensitive and case-insensitive modes.
          *
          * @param <V> type of the value
+         * @param <K> type of the key
          */
         static class CaseAwareLinkedMap<K, V> extends AbstractMap<K, V> {
             class CaseAwareKeySet extends AbstractSet<K> {
@@ -10871,7 +10938,7 @@ public class CommandLine {
              * Constructs an empty {@code CaseAwareLinkedMap}
              * instance with {@link java.util.Locale#ENGLISH}.
              */
-            public CaseAwareLinkedMap() {
+            CaseAwareLinkedMap() {
                 this(ENGLISH);
             }
 
@@ -10881,7 +10948,7 @@ public class CommandLine {
              *
              * @param locale the locale to convert character cases
              */
-            public CaseAwareLinkedMap(Locale locale) {
+            CaseAwareLinkedMap(Locale locale) {
                 this.locale = locale;
             }
 
@@ -10893,7 +10960,7 @@ public class CommandLine {
              *            and locale are to be placed in this map
              * @throws NullPointerException if the specified map is null
              */
-            public CaseAwareLinkedMap(
+            CaseAwareLinkedMap(
                     CaseAwareLinkedMap<? extends K, ? extends V> map) {
                 this.targetMap.putAll(map.targetMap);
                 this.keyMap.putAll(map.keyMap);
@@ -10920,6 +10987,8 @@ public class CommandLine {
 
             /**
              * Returns the case-insensitivity of the map.
+             *
+             * @return isCaseInsensitive
              */
             public boolean isCaseInsensitive() {
                 return caseInsensitive;
@@ -10927,6 +10996,8 @@ public class CommandLine {
 
             /**
              * Sets the case-insensitivity of the map.
+             *
+             * @param caseInsensitive
              */
             public void setCaseInsensitive(boolean caseInsensitive) {
                 if (!isCaseInsensitive() && caseInsensitive) {
@@ -10948,6 +11019,8 @@ public class CommandLine {
 
             /**
              * Returns the locale of the map.
+             *
+             * @return getLocale
              */
             public Locale getLocale() {
                 return locale;
@@ -10958,6 +11031,9 @@ public class CommandLine {
              * case-insensitive key if {@code isCaseSensitive(
              * )}.
              * Otherwise, the specified case-insensitive key is returned.
+             *
+             * @param caseInsensitiveKey
+             * @return getCaseSensitiveKey
              */
             public K getCaseSensitiveKey(K caseInsensitiveKey) {
                 if (caseInsensitiveKey != null && caseInsensitive) {
@@ -11605,7 +11681,7 @@ public class CommandLine {
             /**
              * Returns whether the options are case-insensitive.
              *
-             * @return
+             * @return optionsCaseInsensitive
              * @since 4.3
              */
             public boolean optionsCaseInsensitive() {
