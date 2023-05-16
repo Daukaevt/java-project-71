@@ -12006,6 +12006,7 @@ public class CommandLine {
              * Returns whether variables should be
              * interpolated in String values. True by default.
              *
+             * @return interpolateVariables
              * @since 4.0
              */
             public boolean interpolateVariables() {
@@ -12017,6 +12018,8 @@ public class CommandLine {
              * Sets whether variables should be
              * interpolated in String values. True by default.
              *
+             * @param interpolate
+             * @return interpolateVariables
              * @since 4.0
              */
             public CommandSpec interpolateVariables(Boolean interpolate) {
@@ -12054,10 +12057,7 @@ public class CommandLine {
                     throw new InitializationException(
                             "Cannot discover subcommand methods of this Command Method: " + userObject);
                 }
-                for (
-                        CommandLine sub : createMethodSubcommands(userObject.getType(),
-                        factory,
-                        true)) {
+                for (CommandLine sub : createMethodSubcommands(userObject.getType(), factory, true)) {
                     addSubcommand(sub.getCommandName(), sub);
                 }
                 isAddMethodSubcommands = true;
@@ -12067,6 +12067,8 @@ public class CommandLine {
             /**
              * Returns the parent command of this subcommand,
              * or {@code null} if this is a top-level command.
+             *
+             * @return parent
              */
             public CommandSpec parent() {
                 return parent;
@@ -12081,21 +12083,20 @@ public class CommandLine {
                                 "Only boolean options can be negatable, but "
                                         + option + " is of type " + option.typeInfo().getClassName());
                     }
-                    for (
-                            String name : interpolator.interpolate(option.names())) { // cannot be null or empty
+                    for (String name1 : interpolator.interpolate(option.names())) { // cannot be null or empty
                         String negatedName =
                                 negatableOptionTransformer(
-                                ).makeNegative(name, this);
-                        if (name.equals(negatedName)) {
+                                ).makeNegative(name1, this);
+                        if (name1.equals(negatedName)) {
                             tracer.debug(
                                     "Option %s is negatable, "
                                             + "but has no negative form.",
-                                    name);
+                                    name1);
                         } else {
                             tracer.debug(
                                     "Option %s is negatable, "
                                             + "registering negative name %s.",
-                                    name,
+                                    name1,
                                     negatedName);
                             String existingName =
                                     negatedOptionsByNameMap.getCaseSensitiveKey(
@@ -12131,6 +12132,7 @@ public class CommandLine {
              * Returns the root command: the top-level
              * command of the hierarchy, never {@code null}.
              *
+             * @return root
              * @since 4.3
              */
             public CommandSpec root() {
@@ -12144,11 +12146,12 @@ public class CommandLine {
             /**
              * Sets the parent command of this subcommand.
              *
+             * @param parent1
              * @return this CommandSpec for method chaining
              */
-            public CommandSpec parent(CommandSpec parent) {
-                this.parent = parent;
-                injectParentCommand(parent.userObject);
+            public CommandSpec parent(CommandSpec parent1) {
+                this.parent = parent1;
+                injectParentCommand(parent1.userObject);
                 return this;
             }
 
@@ -12179,15 +12182,14 @@ public class CommandLine {
              * @param option the option spec to add
              * @return this CommandSpec for method chaining
              * @throws DuplicateOptionAnnotationsException if any of the
-             *                                             names of the specified option is the same as the name of another option
+             * names of the specified option is the same as the name of another option
              */
             public CommandSpec addOption(OptionSpec option) {
                 Tracer tracer = CommandLine.tracer();
-                for (
-                        String name : interpolator.interpolate(option.names())) { // cannot be null or empty
+                for (String name1 : interpolator.interpolate(option.names())) { // cannot be null or empty
                     String existingName =
-                            optionsByNameMap.getCaseSensitiveKey(name);
-                    OptionSpec existing = optionsByNameMap.put(name, option);
+                            optionsByNameMap.getCaseSensitiveKey(name1);
+                    OptionSpec existing = optionsByNameMap.put(name1, option);
                     if (
                             existing != null) { /* was:
      && !existing.equals(option)) {*/ // since 4.0 ArgGroups: an option cannot be in multiple groups
@@ -12196,15 +12198,15 @@ public class CommandLine {
                     }
                     // #1022 checks if negated options exist with the same name
                     String existingNegatedName =
-                            negatedOptionsByNameMap.getCaseSensitiveKey(name);
+                            negatedOptionsByNameMap.getCaseSensitiveKey(name1);
                     OptionSpec existingNegated =
-                            negatedOptionsByNameMap.get(name);
+                            negatedOptionsByNameMap.get(name1);
                     if (existingNegated != null && existingNegated != option) {
                         throw DuplicateOptionAnnotationsException.create(
                                 existingNegatedName, option, existingNegated);
                     }
-                    if (name.length() == 2 && name.startsWith("-")) {
-                        posixOptionsByKeyMap.put(name.charAt(1), option);
+                    if (name1.length() == 2 && name1.startsWith("-")) {
+                        posixOptionsByKeyMap.put(name1.charAt(1), option);
                     }
                 }
                 options.add(option);
@@ -12254,7 +12256,8 @@ public class CommandLine {
                 if (positional.scopeType() == ScopeType.INHERIT) {
                     Set<CommandLine> subCmds =
                             new HashSet<CommandLine>(
-                                    subcommands().values());// subcommands may be registered multiple times with different aliases
+                                    subcommands().values()); // subcommands may be registered multiple
+                    // times with different aliases
                     for (CommandLine sub : subCmds) {
                         sub.getCommandSpec(
                         ).addPositional(PositionalParamSpec.builder(positional).inherited(true).build());
@@ -12307,8 +12310,8 @@ public class CommandLine {
                     Set<PositionalParamSpec> groupPositionals) {
                 Assert.notNull(group, "group");
                 if (group.parentGroup() != null) {
-                    throw new InitializationException(
-                            "Groups that are part of another group should not be added to a command. Add only the top-level group.");
+                    throw new InitializationException("Groups that are part of another group"
+                            + " should not be added to a command. Add only the top-level group.");
                 }
                 check(group, flatten(groups, new HashSet<ArgGroupSpec>()));
                 this.groups.add(group);
@@ -12339,7 +12342,8 @@ public class CommandLine {
 
             /**
              * (
-             * INCUBATING) Removes the specified option spec or positional parameter spec from the list of configured arguments to expect.
+             * INCUBATING) Removes the specified option spec or positional parameter spec
+             * from the list of configured arguments to expect.
              *
              * @param arg the option spec or positional parameter spec to remove
              * @return this CommandSpec for method chaining
@@ -12395,21 +12399,21 @@ public class CommandLine {
                             ArgGroupSpec> added,
                     Set<OptionSpec> groupOptions,
                     Set<PositionalParamSpec> groupPositionals) {
-                Map<String, OptionSpec> options =
+                Map<String, OptionSpec> options1 =
                         new HashMap<String, OptionSpec>();
                 for (ArgSpec arg : group.args()) {
                     if (arg.isOption()) {
-                        String[] names =
+                        String[] names1 =
                                 interpolator.interpolate(
                                         ((OptionSpec) arg).names());
-                        for (String name : names) {
+                        for (String name : names1) {
                             ArgGroupSpec other = added.get(name);
                             if (other == null) {
                                 continue;
                             }
                             if (other == group) {
                                 throw DuplicateOptionAnnotationsException.create(
-                                        name, arg, options.get(name));
+                                        name, arg, options1.get(name));
                             } else {
                                 throw new DuplicateNameException(
                                         "An option cannot be in multiple groups but " + name + " is in "
@@ -12419,11 +12423,11 @@ public class CommandLine {
                                                 + "and (-a -b | -a -c) can be rewritten as (-a (-b | -c)).");
                             }
                         }
-                        for (String name : names) {
+                        for (String name : names1) {
                             added.put(name, group);
                         }
-                        for (String name : names) {
-                            options.put(name, (OptionSpec) arg);
+                        for (String name : names1) {
+                            options1.put(name, (OptionSpec) arg);
                         }
                         groupOptions.add((OptionSpec) arg);
                     } else {
@@ -12437,9 +12441,8 @@ public class CommandLine {
                 }
             }
 
-            private Set<ArgGroupSpec> flatten(
-                    Collection<ArgGroupSpec> groups, Set<ArgGroupSpec> result) {
-                for (ArgGroupSpec group : groups) {
+            private Set<ArgGroupSpec> flatten(Collection<ArgGroupSpec> groups1, Set<ArgGroupSpec> result) {
+                for (ArgGroupSpec group : groups1) {
                     flatten(group, result);
                 }
                 return result;
@@ -12475,8 +12478,8 @@ public class CommandLine {
 
             private void check(ArgGroupSpec group, Set<ArgGroupSpec> existing) {
                 if (existing.contains(group)) {
-                    throw new InitializationException(
-                            "The specified group " + group.synopsisUnit() + " has already been added to the " + qualifiedName() + " command.");
+                    throw new InitializationException("The specified group " + group.synopsisUnit()
+                            + " has already been added to the " + qualifiedName() + " command.");
                 }
                 for (ArgGroupSpec sub : group.subgroups()) {
                     check(sub, existing);
@@ -12487,7 +12490,7 @@ public class CommandLine {
              * Adds the specified mixin {@code CommandSpec}
              * object to the map of mixins for this command.
              *
-             * @param name             the name
+             * @param name1             the name
              *                         that can be used to later retrieve the mixin
              * @param mixin            the mixin whose options and
              *                         positional parameters and other attributes to add to this command
@@ -12498,12 +12501,12 @@ public class CommandLine {
              * @since 4.1
              */
             public CommandSpec addMixin(
-                    String name,
+                    String name1,
                     CommandSpec mixin,
                     IAnnotatedElement annotatedElement) {
-                CommandSpec result = addMixin(name, mixin);
+                CommandSpec result = addMixin(name1, mixin);
                 mixinAnnotatedElements.put(
-                        interpolator.interpolate(name), annotatedElement);
+                        interpolator.interpolate(name1), annotatedElement);
                 return result;
             }
 
@@ -12511,14 +12514,14 @@ public class CommandLine {
              * Adds the specified mixin {@code CommandSpec}
              * object to the map of mixins for this command.
              *
-             * @param name  the name that
+             * @param name1  the name that
              *              can be used to later retrieve the mixin
              * @param mixin the mixin whose options and positional
              *              parameters and other attributes to add to this command
              * @return this CommandSpec for method chaining
              */
-            public CommandSpec addMixin(String name, CommandSpec mixin) {
-                mixins.put(interpolator.interpolate(name), mixin);
+            public CommandSpec addMixin(String name1, CommandSpec mixin) {
+                mixins.put(interpolator.interpolate(name1), mixin);
 
                 initName(interpolator.interpolateCommandName(mixin.name()));
                 initAliases(mixin.aliases()); // should we?
@@ -12531,7 +12534,7 @@ public class CommandLine {
                                 CommandLine> entry : mixin.subcommands().entrySet()) {
                     addSubcommand(entry.getKey(), entry.getValue());
                 }
-                Set<OptionSpec> options =
+                Set<OptionSpec> options1 =
                         new LinkedHashSet<OptionSpec>(mixin.options());
                 Set<PositionalParamSpec> positionals =
                         new LinkedHashSet<PositionalParamSpec>(
@@ -12541,10 +12544,10 @@ public class CommandLine {
                     Set<PositionalParamSpec> groupPositionals =
                             new HashSet<PositionalParamSpec>();
                     addArgGroup(argGroupSpec, groupOptions, groupPositionals);
-                    options.removeAll(groupOptions);
+                    options1.removeAll(groupOptions);
                     positionals.removeAll(groupPositionals);
                 }
-                for (OptionSpec optionSpec : options) {
+                for (OptionSpec optionSpec : options1) {
                     addOption(optionSpec);
                 }
                 for (PositionalParamSpec paramSpec : positionals) {
@@ -12555,10 +12558,8 @@ public class CommandLine {
 
             void injectParentCommand(CommandUserObject commandUserObject) {
                 try {
-                    for (
-                            IAnnotatedElement injectionTarget : parentCommandElements()) {
-                        injectionTarget.setter(
-                        ).set(commandUserObject.getInstance());
+                    for (IAnnotatedElement injectionTarget : parentCommandElements()) {
+                        injectionTarget.setter().set(commandUserObject.getInstance());
                     }
                 } catch (Exception ex) {
                     throw new InitializationException(
@@ -12586,6 +12587,7 @@ public class CommandLine {
              * Adds the specified {@code {@literal @}Spec}-annotated
              * program element to the list of elements for this command.
              *
+             * @param spec
              * @return this CommandSpec for method chaining
              * @since 4.0
              */
@@ -12598,6 +12600,7 @@ public class CommandLine {
              * Adds the specified {@code {@literal @}ParentCommand}-annotated
              * program element to the list of elements for this command.
              *
+             * @param spec
              * @return this CommandSpec for method chaining
              * @since 4.0
              */
@@ -12713,6 +12716,8 @@ public class CommandLine {
              * UnmatchedArgumentsBindings} configured for this command;
              * each {@code UnmatchedArgsBinding} captures the arguments
              * that could not be matched to any options or positional parameters.
+             *
+             * @return unmatchedArgsBindings
              */
             public List<UnmatchedArgsBinding> unmatchedArgsBindings() {
                 return Collections.unmodifiableList(unmatchedArgs);
@@ -12722,6 +12727,7 @@ public class CommandLine {
              * Returns the list of program elements annotated
              * with {@code {@literal @}Spec} configured for this command.
              *
+             * @return specElements
              * @since 4.0
              */
             public List<IAnnotatedElement> specElements() {
@@ -12732,6 +12738,7 @@ public class CommandLine {
              * Returns the list of program elements annotated with
              * {@code {@literal @}ParentCommand} configured for this command.
              *
+             * @return parentCommandElements
              * @since 4.0
              */
             public List<IAnnotatedElement> parentCommandElements() {
@@ -12745,6 +12752,7 @@ public class CommandLine {
              * default, initialized from {@link Command#name(
              *)} if defined.
              *
+             * @return name
              * @see #qualifiedName()
              */
             public String name() {
@@ -12760,12 +12768,12 @@ public class CommandLine {
                         ) ? 0 : 2;
                 for (int i = 0; i < methodParams.length; i++) {
                     if (methodParams[i].isAnnotationPresent(Mixin.class)) {
-                        String name =
+                        String name1 =
                                 methodParams[i].getAnnotation(
                                         Mixin.class).name();
                         CommandSpec mixin =
                                 mixins.get(
-                                        empty(name) ? methodParams[i].name : name);
+                                        empty(name1) ? methodParams[i].name : name1);
                         values[i] = mixin.userObject.getInstance();
                         argIndex += mixin.args.size();
                     } else if (
@@ -12789,6 +12797,7 @@ public class CommandLine {
             /**
              * Returns the alias command names of this subcommand.
              *
+             * @return aliases
              * @since 3.1
              */
             public String[] aliases() {
@@ -12799,6 +12808,7 @@ public class CommandLine {
              * Returns all names of this command, including {@link #name(
              *)} and {@link #aliases()}.
              *
+             * @return names
              * @since 3.9
              */
             public Set<String> names() {
@@ -12920,6 +12930,7 @@ public class CommandLine {
              * by default, may be set programmatically or via the {@link Command#exitCodeOnSuccess(
              *) exitCodeOnSuccess} annotation.
              *
+             * @return exitCodeOnSuccess
              * @see #execute(String...)
              * @since 4.0
              */
@@ -12928,10 +12939,12 @@ public class CommandLine {
             }
 
             /**
-             * Returns exit code for successful termination after printing usage help on user request. {@value picocli.CommandLine.ExitCode#OK}
+             * Returns exit code for successful termination after printing usage help on user request.
+             * {@value picocli.CommandLine.ExitCode#OK}
              * by default, may be set programmatically or via the {@link Command#exitCodeOnVersionHelp(
              *) exitCodeOnVersionHelp} annotation.
              *
+             * @return exitCodeOnUsageHelp
              * @see #execute(String...)
              * @since 4.0
              */
@@ -12940,10 +12953,12 @@ public class CommandLine {
             }
 
             /**
-             * Returns exit code for successful termination after printing version help on user request. {@value picocli.CommandLine.ExitCode#OK}
+             * Returns exit code for successful termination after printing version help on user request.
+             * {@value picocli.CommandLine.ExitCode#OK}
              * by default, may be set programmatically or via the {@link Command#exitCodeOnUsageHelp(
              *) exitCodeOnUsageHelp} annotation.
              *
+             * @return exitCodeOnVersionHelp
              * @see #execute(String...)
              * @since 4.0
              */
@@ -12956,6 +12971,7 @@ public class CommandLine {
              * by default, may be set programmatically or via the {@link Command#exitCodeOnInvalidInput(
              *) exitCodeOnInvalidInput} annotation.
              *
+             * @return exitCodeOnInvalidInput
              * @see #execute(String...)
              * @since 4.0
              */
@@ -12970,6 +12986,7 @@ public class CommandLine {
              * set programmatically or via the {@link Command#exitCodeOnExecutionException(
              *) exitCodeOnExecutionException} annotation.
              *
+             * @return exitCodeOnExecutionException
              * @see #execute(String...)
              * @since 4.0
              */
@@ -12982,6 +12999,7 @@ public class CommandLine {
              * to create the negative form of {@linkplain Option#negatable(
              *) negatable} options.
              *
+             * @return negatableOptionTransformer
              * @see Option#negatable()
              * @since 4.0
              */
@@ -12992,6 +13010,8 @@ public class CommandLine {
             /**
              * Returns {@code true} if the standard help options
              * have been mixed in with this command, {@code false} otherwise.
+             *
+             * @return mixinStandardHelpOptions
              */
             public boolean mixinStandardHelpOptions() {
                 return mixins.containsKey(AutoHelpMixin.KEY);
@@ -13254,6 +13274,7 @@ public class CommandLine {
             /**
              * Returns the model transformer for this CommandSpec instance.
              *
+             * @return modelTransformer
              * @since 4.6
              */
             public IModelTransformer modelTransformer() {
@@ -13353,10 +13374,8 @@ public class CommandLine {
                     }
                     // #1331 if inherit(ed) we also add to subcommands
                     if (scopeType() == ScopeType.INHERIT || inherited()) {
-                        for (
-                                CommandLine sub : new HashSet<CommandLine>(subcommands().values())) {
-                            sub.getCommandSpec(
-                            ).mixinStandardHelpOptions(newValue);
+                        for (CommandLine sub : new HashSet<CommandLine>(subcommands().values())) {
+                            sub.getCommandSpec().mixinStandardHelpOptions(newValue);
                         }
                     }
                 } else {
