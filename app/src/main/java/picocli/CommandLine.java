@@ -12403,10 +12403,10 @@ public class CommandLine {
                         new HashMap<String, OptionSpec>();
                 for (ArgSpec arg : group.args()) {
                     if (arg.isOption()) {
-                        String[] names1 =
+                        String[] names =
                                 interpolator.interpolate(
                                         ((OptionSpec) arg).names());
-                        for (String name : names1) {
+                        for (String name : names) {
                             ArgGroupSpec other = added.get(name);
                             if (other == null) {
                                 continue;
@@ -12423,11 +12423,11 @@ public class CommandLine {
                                                 + "and (-a -b | -a -c) can be rewritten as (-a (-b | -c)).");
                             }
                         }
-                        for (String name : names1) {
-                            added.put(name, group);
+                        for (String name2 : names) {
+                            added.put(name2, group);
                         }
-                        for (String name : names1) {
-                            options1.put(name, (OptionSpec) arg);
+                        for (String name1 : names) {
+                            options1.put(name1, (OptionSpec) arg);
                         }
                         groupOptions.add((OptionSpec) arg);
                     } else {
