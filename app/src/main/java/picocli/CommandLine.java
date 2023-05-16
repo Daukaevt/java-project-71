@@ -250,6 +250,7 @@ public class CommandLine {
     public static final int FIVE = 5;
     public static final int SIX = 6;
     public static final int EIGHT = 8;
+    public static final int NINE = 9;
     public static final int TEN = 10;
     public static final int TWELVE = 12;
     public static final int SIXTHEEN  = 16;
@@ -13002,6 +13003,7 @@ public class CommandLine {
              * occur multiple times and may be followed
              * by sibling commands instead of just child commands.
              *
+             * @return subcommandsRepeatable
              * @see Command#subcommandsRepeatable()
              * @since 4.2
              */
@@ -13013,6 +13015,8 @@ public class CommandLine {
             /**
              * Returns a string representation of this
              * command, used in error messages and trace messages.
+             *
+             * @return toString
              */
             public String toString() {
                 return toString == null ? "command '" + name
@@ -13023,10 +13027,11 @@ public class CommandLine {
              * Sets the String to use as the program
              * name in the synopsis line of the help message.
              *
+             * @param name1
              * @return this CommandSpec for method chaining
              */
-            public CommandSpec name(String name) {
-                this.name = name;
+            public CommandSpec name(String name1) {
+                this.name = name1;
                 return this;
             }
 
@@ -13034,14 +13039,15 @@ public class CommandLine {
              * Sets the alternative names by which
              * this subcommand is recognized on the command line.
              *
+             * @param aliases1
              * @return this CommandSpec for method chaining
              * @since 3.1
              */
-            public CommandSpec aliases(String... aliases) {
+            public CommandSpec aliases(String... aliases1) {
                 Set<String> previousAliasSet = this.aliases;
                 this.aliases =
                         new LinkedHashSet<String>(
-                                Arrays.asList(aliases == null ? new String[0] : aliases));
+                                Arrays.asList(aliases1 == null ? new String[0] : aliases1));
                 if (parent != null) {
                     //remove & add aliases
                     Set<String> addedAliasSet =
@@ -13072,14 +13078,14 @@ public class CommandLine {
             /**
              * Sets default value provider for this command.
              *
-             * @param defaultValueProvider the default
+             * @param defaultValueProvider1 the default
              *                             value provider to use, or {@code null}.
              * @return this CommandSpec for method chaining
              * @since 3.6
              */
             public CommandSpec defaultValueProvider(
-                    IDefaultValueProvider defaultValueProvider) {
-                this.defaultValueProvider = defaultValueProvider;
+                    IDefaultValueProvider defaultValueProvider1) {
+                this.defaultValueProvider = defaultValueProvider1;
                 return this;
             }
 
@@ -13089,10 +13095,11 @@ public class CommandLine {
              * {@linkplain OptionSpec#versionHelp(
              *) option} to request version help. Only used if no {@link #versionProvider() versionProvider} is set.
              *
+             * @param version1
              * @return this CommandSpec for method chaining
              */
-            public CommandSpec version(String... version) {
-                this.version = version;
+            public CommandSpec version(String... version1) {
+                this.version = version1;
                 return this;
             }
 
@@ -13101,14 +13108,14 @@ public class CommandLine {
              * command, to generate the {@link #version(
              *)} strings.
              *
-             * @param versionProvider the version provider to use to generate
+             * @param versionProvider1 the version provider to use to generate
              *                        the version strings, or {@code null} if the {@linkplain #version(
              *String...) version literals} should be used.
              * @return this CommandSpec for method chaining
              */
             public CommandSpec versionProvider(
-                    IVersionProvider versionProvider) {
-                this.versionProvider = versionProvider;
+                    IVersionProvider versionProvider1) {
+                this.versionProvider = versionProvider1;
                 return this;
             }
 
@@ -13116,6 +13123,7 @@ public class CommandLine {
              * Sets whether this is a help command and
              * required parameter checking should be suspended.
              *
+             * @param newValue
              * @return this CommandSpec for method chaining
              * @see Command#helpCommand()
              */
@@ -13128,6 +13136,8 @@ public class CommandLine {
              * Sets exit code for successful termination.
              * {@value picocli.CommandLine.ExitCode#OK} by default.
              *
+             * @param newValue
+             * @return exitCodeOnSuccess
              * @see #execute(String...)
              * @since 4.0
              */
@@ -13140,6 +13150,8 @@ public class CommandLine {
              * Sets exit code for successful termination after printing usage
              * help on user request. {@value picocli.CommandLine.ExitCode#OK} by default.
              *
+             * @param newValue
+             * @return exitCodeOnUsageHelp
              * @see #execute(String...)
              * @since 4.0
              */
@@ -13152,6 +13164,8 @@ public class CommandLine {
              * Sets exit code for successful termination after printing version
              * help on user request. {@value picocli.CommandLine.ExitCode#OK} by default.
              *
+             * @param newValue
+             * @return exitCodeOnVersionHelp
              * @see #execute(String...)
              * @since 4.0
              */
@@ -13164,6 +13178,8 @@ public class CommandLine {
              * Sets exit code for command line usage error.
              * {@value picocli.CommandLine.ExitCode#USAGE} by default.
              *
+             * @param newValue
+             * @return exitCodeOnInvalidInput
              * @see #execute(String...)
              * @since 4.0
              */
@@ -13177,6 +13193,8 @@ public class CommandLine {
              * invoking the Runnable, Callable or Method user object of a command.
              * {@value picocli.CommandLine.ExitCode#SOFTWARE} by default.
              *
+             * @param newValue
+             * @return exitCodeOnExecutionException
              * @see #execute(String...)
              * @since 4.0
              */
@@ -13188,6 +13206,7 @@ public class CommandLine {
             /**
              * Returns whether this command is inherited from a parent command.
              *
+             * @return inherited
              * @see Command#scope()
              * @since 4.6
              */
@@ -13212,18 +13231,21 @@ public class CommandLine {
              * applies: only this command, or also all sub (
              * and sub-sub) commands, and returns this builder.
              *
+             * @param scopeType1
+             * @return scopeType
              * @since 4.6
              */
-            public CommandSpec scopeType(ScopeType scopeType) {
+            public CommandSpec scopeType(ScopeType scopeType1) {
                 if (
                         this.scopeType == ScopeType.INHERIT
-                                && scopeType != ScopeType.INHERIT
+                                && scopeType1 != ScopeType.INHERIT
                                 && !subcommands().isEmpty()) {
                     throw new IllegalStateException(
-                            "Cannot un-inherit: subcommands have already been initialized with values from this command");
+                            "Cannot un-inherit: subcommands have already been initialized"
+                                    + " with values from this command");
                 }
-                this.scopeType = scopeType;
-                if (scopeType == ScopeType.INHERIT) {
+                this.scopeType = scopeType1;
+                if (scopeType1 == ScopeType.INHERIT) {
                     updatedSubcommandsToInheritFrom(this);
                 }
                 return this;
@@ -13241,17 +13263,20 @@ public class CommandLine {
             /**
              * Sets the model transformer for this CommandSpec instance.
              *
+             * @return modelTransformer
+             * @param modelTransformer1
              * @since 4.6
              */
             public CommandSpec modelTransformer(
-                    IModelTransformer modelTransformer) {
-                this.modelTransformer = modelTransformer;
+                    IModelTransformer modelTransformer1) {
+                this.modelTransformer = modelTransformer1;
                 return this;
             }
 
             /**
              * Returns the preprocessor for this CommandSpec instance.
              *
+             * @return preprocessor
              * @since 4.6
              */
             public IParameterPreprocessor preprocessor() {
@@ -13261,12 +13286,14 @@ public class CommandLine {
             /**
              * Sets the preprocessor for this CommandSpec instance.
              *
+             * @param preprocessor1
+             * @return preprocessor
              * @since 4.6
              */
             public CommandSpec preprocessor(
-                    IParameterPreprocessor preprocessor) {
+                    IParameterPreprocessor preprocessor1) {
                 this.preprocessor =
-                        Assert.notNull(preprocessor, "preprocessor");
+                        Assert.notNull(preprocessor1, "preprocessor");
                 return this;
             }
 
@@ -13281,6 +13308,8 @@ public class CommandLine {
              * version of the default transformer. To ensure your custom
              * transformer is used, install it last, after changing case sensitivity.
              *
+             * @param newValue
+             * @return negatableOptionTransformer
              * @see Option#negatable()
              * @since 4.0
              */
@@ -13300,6 +13329,7 @@ public class CommandLine {
              * Sets whether the standard help
              * options should be mixed in with this command.
              *
+             * @param newValue
              * @return this CommandSpec for method chaining
              * @see Command#mixinStandardHelpOptions()
              */
@@ -13334,13 +13364,12 @@ public class CommandLine {
                     if (helpMixin != null) {
                         options.removeAll(helpMixin.options);
                         for (OptionSpec option : helpMixin.options()) {
-                            for (
-                                    String name : interpolator.interpolate(option.names())) {
-                                optionsByNameMap.remove(name);
+                            for (String name1 : interpolator.interpolate(option.names())) {
+                                optionsByNameMap.remove(name1);
                                 if (
-                                        name.length() == 2
-                                                && name.startsWith("-")) {
-                                    posixOptionsByKeyMap.remove(name.charAt(1));
+                                        name1.length() == 2
+                                                && name1.startsWith("-")) {
+                                    posixOptionsByKeyMap.remove(name1.charAt(1));
                                 }
                             }
                         }
@@ -13357,12 +13386,14 @@ public class CommandLine {
              * occur multiple times and may be followed
              * by sibling commands instead of just child commands.
              *
+             * @param subcommandsRepeatable1
+             * @return subcommandsRepeatable
              * @see Command#subcommandsRepeatable()
              * @since 4.2
              */
             public CommandSpec subcommandsRepeatable(
-                    boolean subcommandsRepeatable) {
-                this.subcommandsRepeatable = subcommandsRepeatable;
+                    boolean subcommandsRepeatable1) {
+                this.subcommandsRepeatable = subcommandsRepeatable1;
                 return this;
             }
 
@@ -13421,9 +13452,9 @@ public class CommandLine {
                 }
             }
 
-            void initAliases(String[] aliases) {
-                if (aliases != null) {
-                    this.aliases.addAll(Arrays.asList(aliases));
+            void initAliases(String[] aliases1) {
+                if (aliases1 != null) {
+                    this.aliases.addAll(Arrays.asList(aliases1));
                 }
             }
 
@@ -13624,15 +13655,18 @@ public class CommandLine {
                 }
             }
 
-            void updateScopeType(ScopeType scopeType) {
+            void updateScopeType(ScopeType scopeType1) {
                 if (this.scopeType == null) {
-                    scopeType(scopeType);
+                    scopeType(scopeType1);
                 }
             }
 
             /**
              * Returns the option with the specified short name, or {@code
              * null} if no option with that name is defined for this command.
+             *
+             * @param shortName
+             * @return findOption
              */
             public OptionSpec findOption(char shortName) {
                 return findOption(shortName, options());
@@ -13642,21 +13676,23 @@ public class CommandLine {
              * Returns the option with the specified name, or {@code
              * null} if no option with that name is defined for this command.
              *
-             * @param name used to search the options.
+             * @param name2 used to search the options.
              *             May include option name prefix characters or not.
+             *
+             * @return findOption
              */
-            public OptionSpec findOption(String name) {
-                return findOption(name, options());
+            public OptionSpec findOption(String name2) {
+                return findOption(name2, options());
             }
 
             List<String> findVisibleOptionNamesWithPrefix(String prefix) {
                 List<String> result = new ArrayList<String>();
                 for (OptionSpec option : options()) {
-                    for (String name : option.names()) {
+                    for (String name1 : option.names()) {
                         if (
                                 !option.hidden()
-                                        && stripPrefix(name).startsWith(prefix)) {
-                            result.add(name);
+                                        && stripPrefix(name1).startsWith(prefix)) {
+                            result.add(name1);
                         }
                     }
                 }
@@ -13671,7 +13707,8 @@ public class CommandLine {
                 if (arg.length() == 1) {
                     if (tracer != null && tracer.isDebug()) {
                         tracer.debug(
-                                "Single-character arguments that don't match known options are considered positional parameters",
+                                "Single-character arguments that don't match known options"
+                                        + " are considered positional parameters",
                                 arg);
                     }
                     return false;
@@ -13710,8 +13747,8 @@ public class CommandLine {
                     }
                 }
                 boolean result =
-                        count > 0 && count * 10 >= optionsMap(
-                        ).size() * 9; // at least one prefix char in common with 9 out of 10 options
+                        count > 0 && count * TEN >= optionsMap(
+                        ).size() * NINE; // at least one prefix char in common with 9 out of 10 options
                 if (tracer != null && tracer.isDebug()) {
                     tracer.debug(
                             "'%s' %s an option: %d matching prefix chars out of %d option names",
@@ -13785,7 +13822,8 @@ public class CommandLine {
          * help -> help.synopsisHeading());      //e.g. Usage:
          * sectionMap.put(
          * SECTION_KEY_SYNOPSIS,
-         * help -> help.synopsis(help.synopsisHeadingLength())); //e.g. <cmd> [OPTIONS] <subcmd> [COMMAND-OPTIONS] [ARGUMENTS]
+         * help -> help.synopsis(help.synopsisHeadingLength()));
+         * //e.g. <cmd> [OPTIONS] <subcmd> [COMMAND-OPTIONS] [ARGUMENTS]
          * sectionMap.put(
          * SECTION_KEY_DESCRIPTION_HEADING,
          * help -> help.descriptionHeading());   //e.g. %nDescription:%n%n
@@ -13827,8 +13865,8 @@ public class CommandLine {
         public static class UsageMessageSpec {
 
             /**
-             * {@linkplain #sectionKeys(
-                    ) Section key} to {@linkplain #sectionMap() control} the {@linkplain IHelpSectionRenderer section renderer} for the Header Heading section.
+             * {@linkplain #sectionKeys() Section key} to {@linkplain #sectionMap() control}
+             * the {@linkplain IHelpSectionRenderer section renderer} for the Header Heading section.
              * The default renderer for this
              * section calls {@link Help#headerHeading(
                     Object...)}.
@@ -13839,8 +13877,8 @@ public class CommandLine {
                     "headerHeading";
 
             /**
-             * {@linkplain #sectionKeys(
-                    ) Section key} to {@linkplain #sectionMap() control} the {@linkplain IHelpSectionRenderer section renderer} for the Header section.
+             * {@linkplain #sectionKeys() Section key} to {@linkplain #sectionMap() control}
+             * the {@linkplain IHelpSectionRenderer section renderer} for the Header section.
              * The default renderer for this section calls {@link Help#header(
                     Object...)}.
              *
@@ -13849,8 +13887,8 @@ public class CommandLine {
             public static final String SECTION_KEY_HEADER = "header";
 
             /**
-             * {@linkplain #sectionKeys(
-                    ) Section key} to {@linkplain #sectionMap() control} the {@linkplain IHelpSectionRenderer section renderer} for the Synopsis Heading section.
+             * {@linkplain #sectionKeys() Section key} to {@linkplain #sectionMap() control}
+             * the {@linkplain IHelpSectionRenderer section renderer} for the Synopsis Heading section.
              * The default renderer for this
              * section calls {@link Help#synopsisHeading(
                     Object...)}.
@@ -13861,8 +13899,8 @@ public class CommandLine {
                     "synopsisHeading";
 
             /**
-             * {@linkplain #sectionKeys(
-                    ) Section key} to {@linkplain #sectionMap() control} the {@linkplain IHelpSectionRenderer section renderer} for the Synopsis section.
+             * {@linkplain #sectionKeys() Section key} to {@linkplain #sectionMap() control}
+             * the {@linkplain IHelpSectionRenderer section renderer} for the Synopsis section.
              * The default renderer for this section calls {@link Help#synopsis(
                     int)}.
              *
@@ -13871,8 +13909,8 @@ public class CommandLine {
             public static final String SECTION_KEY_SYNOPSIS = "synopsis";
 
             /**
-             * {@linkplain #sectionKeys(
-                    ) Section key} to {@linkplain #sectionMap() control} the {@linkplain IHelpSectionRenderer section renderer} for the Description Heading section.
+             * {@linkplain #sectionKeys() Section key} to {@linkplain #sectionMap() control}
+             * the {@linkplain IHelpSectionRenderer section renderer} for the Description Heading section.
              * The default renderer for this section
              * calls {@link Help#descriptionHeading(
                     Object...)}.
@@ -13883,8 +13921,8 @@ public class CommandLine {
                     "descriptionHeading";
 
             /**
-             * {@linkplain #sectionKeys(
-                    ) Section key} to {@linkplain #sectionMap() control} the {@linkplain IHelpSectionRenderer section renderer} for the Description section.
+             * {@linkplain #sectionKeys() Section key} to {@linkplain #sectionMap() control}
+             * the {@linkplain IHelpSectionRenderer section renderer} for the Description section.
              * The default renderer for this
              * section calls {@link Help#description(
                     Object...)}.
@@ -13894,8 +13932,8 @@ public class CommandLine {
             public static final String SECTION_KEY_DESCRIPTION = "description";
 
             /**
-             * {@linkplain #sectionKeys(
-                    ) Section key} to {@linkplain #sectionMap() control} the {@linkplain IHelpSectionRenderer section renderer} for the Parameter List Heading section.
+             * {@linkplain #sectionKeys() Section key} to {@linkplain #sectionMap() control}
+             * the {@linkplain IHelpSectionRenderer section renderer} for the Parameter List Heading section.
              * The default renderer for this section
              * calls {@link Help#parameterListHeading(
                     Object...)}.
@@ -13906,8 +13944,8 @@ public class CommandLine {
                     "parameterListHeading";
 
             /**
-             * {@linkplain #sectionKeys(
-                    ) Section key} to {@linkplain #sectionMap() control} the {@linkplain IHelpSectionRenderer section renderer} for the @-file parameter list section.
+             * {@linkplain #sectionKeys() Section key} to {@linkplain #sectionMap() control}
+             * the {@linkplain IHelpSectionRenderer section renderer} for the @-file parameter list section.
              * The default renderer for this section
              * calls {@link Help#atFileParameterList(
                     )}.
@@ -13918,8 +13956,8 @@ public class CommandLine {
                     "atFileParameterList";
 
             /**
-             * {@linkplain #sectionKeys(
-                    ) Section key} to {@linkplain #sectionMap() control} the {@linkplain IHelpSectionRenderer section renderer} for the Parameter List section.
+             * {@linkplain #sectionKeys() Section key} to {@linkplain #sectionMap() control}
+             * the {@linkplain IHelpSectionRenderer section renderer} for the Parameter List section.
              * The default renderer for this
              * section calls {@link Help#parameterList(
                     )}.
@@ -13930,8 +13968,8 @@ public class CommandLine {
                     "parameterList";
 
             /**
-             * {@linkplain #sectionKeys(
-                    ) Section key} to {@linkplain #sectionMap() control} the {@linkplain IHelpSectionRenderer section renderer} for the Option List Heading section.
+             * {@linkplain #sectionKeys() Section key} to {@linkplain #sectionMap() control}
+             * the {@linkplain IHelpSectionRenderer section renderer} for the Option List Heading section.
              * The default renderer for this
              * section calls {@link Help#optionListHeading(
                     Object...)}.
@@ -13942,8 +13980,8 @@ public class CommandLine {
                     "optionListHeading";
 
             /**
-             * {@linkplain #sectionKeys(
-                    ) Section key} to {@linkplain #sectionMap() control} the {@linkplain IHelpSectionRenderer section renderer} for the Option List section.
+             * {@linkplain #sectionKeys() Section key} to {@linkplain #sectionMap() control}
+             * the {@linkplain IHelpSectionRenderer section renderer} for the Option List section.
              * The default renderer for this
              * section calls {@link Help#optionList(
                     )}.
@@ -13953,8 +13991,8 @@ public class CommandLine {
             public static final String SECTION_KEY_OPTION_LIST = "optionList";
 
             /**
-             * {@linkplain #sectionKeys(
-                    ) Section key} to {@linkplain #sectionMap() control} the {@linkplain IHelpSectionRenderer section renderer} for the {@code --} End of Options list section.
+             * {@linkplain #sectionKeys() Section key} to {@linkplain #sectionMap() control}
+             * the {@linkplain IHelpSectionRenderer section renderer} for the {@code --} End of Options list section.
              * The default renderer for this
              * section calls {@link Help#endOfOptionsList(
                     )}.
@@ -13965,8 +14003,8 @@ public class CommandLine {
                     "endOfOptionsList";
 
             /**
-             * {@linkplain #sectionKeys(
-                    ) Section key} to {@linkplain #sectionMap() control} the {@linkplain IHelpSectionRenderer section renderer} for the Subcommand List Heading section.
+             * {@linkplain #sectionKeys() Section key} to {@linkplain #sectionMap() control}
+             * the {@linkplain IHelpSectionRenderer section renderer} for the Subcommand List Heading section.
              * The default renderer for this section
              * calls {@link Help#commandListHeading(
                     Object...)}.
@@ -13977,8 +14015,8 @@ public class CommandLine {
                     "commandListHeading";
 
             /**
-             * {@linkplain #sectionKeys(
-                    ) Section key} to {@linkplain #sectionMap() control} the {@linkplain IHelpSectionRenderer section renderer} for the Subcommand List section.
+             * {@linkplain #sectionKeys() Section key} to {@linkplain #sectionMap() control}
+             * the {@linkplain IHelpSectionRenderer section renderer} for the Subcommand List section.
              * The default renderer for this
              * section calls {@link Help#commandList(
                     )}.
@@ -13988,8 +14026,8 @@ public class CommandLine {
             public static final String SECTION_KEY_COMMAND_LIST = "commandList";
 
             /**
-             * {@linkplain #sectionKeys(
-                    ) Section key} to {@linkplain #sectionMap() control} the {@linkplain IHelpSectionRenderer section renderer} for the Exit Code List Heading section.
+             * {@linkplain #sectionKeys() Section key} to {@linkplain #sectionMap() control}
+             * the {@linkplain IHelpSectionRenderer section renderer} for the Exit Code List Heading section.
              * The default renderer for this section
              * calls {@link Help#exitCodeListHeading(
                     Object...)}.
@@ -14047,8 +14085,7 @@ public class CommandLine {
              * synopsis heading: <code>{@value}</code>.
              */
             private final String defaultSynopsisHeading = "Usage: ";
-            private final double DEFAULT_SYNOPSIS_AUTO_INDENT_THRESHOLD =
-                    0.5;
+            private final double defaultSynopsisAutoIndentThreshold = 0.5;
             /**
              * Constant String holding the default
              * synopsis subcommands: <code>{@value}</code>.
@@ -14890,7 +14927,7 @@ public class CommandLine {
              */
             public double synopsisAutoIndentThreshold() {
                 return synopsisAutoIndentThreshold == null
-                        ? DEFAULT_SYNOPSIS_AUTO_INDENT_THRESHOLD
+                        ? defaultSynopsisAutoIndentThreshold
                         : synopsisAutoIndentThreshold;
             }
 
