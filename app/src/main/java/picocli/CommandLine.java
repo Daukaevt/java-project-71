@@ -7031,7 +7031,7 @@ public class CommandLine {
      */
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.TYPE, ElementType.LOCAL_VARIABLE, ElementType.FIELD,
-            ElementType.PACKAGE, ElementType.METHOD})
+                ElementType.PACKAGE, ElementType.METHOD})
     public @interface Command {
         /**
          * Program name to show in the synopsis.
