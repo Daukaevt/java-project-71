@@ -8161,21 +8161,20 @@ public class CommandLine {
          *                                                              <td>separator</td><td>'' (
          *                                       empty string): attached without separator,
          *                                       ' ' (space): not attached,
-         *                                       (any other string): option name was attached to option param with specified separator</td>
+         * (any other string): option name was attached to option param with specified separator</td>
          *                                                              <td>java.lang.String</td>
          *                                                            </tr>
          *                                                            <tr>
          *                                                              <td>negated</td>
          *                                                              <td>{@code true}: the option
-         *                                       or positional parameter is a {@linkplain Option#negatable(
-         *) negated} option/parameter,
-         *                                       {@code false}: the option or positional parameter is not a negated option/parameter</td>
+         * or positional parameter is a {@linkplain Option#negatable() negated} option/parameter,
+         * {@code false}: the option or positional parameter is not a negated option/parameter</td>
          *                                                              <td>java.lang.Boolean</td>
          *                                                            </tr>
          *                                                            <tr>
          *                                                              <td>unquoted</td>
-         *                                                              <td>{@code true}: quotes surrounding the value have already been
-         *                                       stripped off, {@code false}: quotes surrounding the value have not yet been stripped off</td>
+         * <td>{@code true}: quotes surrounding the value have already been
+         * stripped off, {@code false}: quotes surrounding the value have not yet been stripped off</td>
          *                                                              <td>java.lang.Boolean</td>
          *                                                            </tr>
          *                                                            <tr>
@@ -8265,7 +8264,7 @@ public class CommandLine {
     public interface IHelpFactory {
         /**
          * Returns a {@code Help} instance to
-         * assist in rendering the usage help message
+         * assist in rendering the usage help message.
          *
          * @param commandSpec the command to create usage help for
          * @param colorScheme the color scheme to use when rendering usage help
@@ -8498,7 +8497,9 @@ public class CommandLine {
      * See the javadoc of the {@link #execute(
      *String...) execute} method for details.</p>
      * <h3>Standard Exit Codes</h3>
-     * <p>There are a few conventions, but there is <a href="https://stackoverflow.com/questions/1101957/are-there-any-standard-exit-status-codes-in-linux/40484670#40484670">no
+     * <p>There are a few conventions, but there is
+     * <a href="https://stackoverflow.com/questions/1101957
+     * /are-there-any-standard-exit-status-codes-in-linux/40484670#40484670">no
      * standard</a>. The specific set of codes returned
      * is unique to the program that sets it.
      * Typically an exit code of zero indicates success, any non-zero exit
@@ -8530,8 +8531,8 @@ public class CommandLine {
          */
         public static final int OK = 0;
         /**
-         * Return value from the {@link #execute(
-         *String...) execute} method signifying internal software error: an exception occurred when invoking the Runnable,
+         * Return value from the {@link #execute(String...) execute} method signifying internal
+         * software error: an exception occurred when invoking the Runnable,
          * Callable or Method user object of a command. <p>The value of this constant is {@value}.</p>
          */
         public static final int SOFTWARE = 1;
@@ -8575,7 +8576,7 @@ public class CommandLine {
      * @deprecated see {@link #execute(String...)}
      */
     @Deprecated
-    public static abstract class AbstractHandler<R,
+    public abstract static class AbstractHandler<R,
             T extends AbstractHandler<R,
                     T>> {
         private Help.ColorScheme colorScheme =
@@ -8595,6 +8596,8 @@ public class CommandLine {
          * when the user requests
          * help with a {@code --help} or similar option, the usage help message is printed
          * to the standard output stream so that it can be easily searched and paged.</p>
+         *
+         * @return out
          */
         public PrintStream out() {
             return out;
@@ -8608,6 +8611,8 @@ public class CommandLine {
          * implementations should use this stream to print error
          * messages (
          * which may include a usage help message) when an unexpected error occurs.</p>
+         *
+         * @return err
          */
         public PrintStream err() {
             return err;
@@ -8619,6 +8624,7 @@ public class CommandLine {
          *CommandLine.Help.Ansi)} was called with a different setting.
          *
          * @deprecated use {@link #colorScheme()} instead
+         * @return ansi
          */
         @Deprecated
         public Help.Ansi ansi() {
@@ -8630,6 +8636,7 @@ public class CommandLine {
          * to {@code Help#defaultColorScheme(
          * Help.Ansi.AUTO)}.
          *
+         * @return colorScheme
          * @since 4.0
          */
         public Help.ColorScheme colorScheme() {
@@ -8642,6 +8649,7 @@ public class CommandLine {
          * the default) if the handler should
          * not call {@link System#exit(int)} after processing completes.
          *
+         * @return exitCode
          * @see #andExit(int)
          */
         public Integer exitCode() {
@@ -8653,6 +8661,8 @@ public class CommandLine {
          *int)}, or {@code false} (the default) if
          * the handler should not call {@link System#exit(
          *int)} after processing completes.
+         *
+         * @return hasExitCode
          */
         public boolean hasExitCode() {
             return exitCode != null;
@@ -8664,6 +8674,9 @@ public class CommandLine {
          * or otherwise, if an exit code {@linkplain #andExit(
          *int) was set}, calls {@code System.exit} with the configured
          * exit code to terminate the currently running Java virtual machine.
+         *
+         * @param result
+         * @return returnResultOrExit
          */
         protected R returnResultOrExit(R result) {
             if (hasExitCode()) {
@@ -8680,6 +8693,9 @@ public class CommandLine {
          * to the diagnostic error stream and
          * calls {@code System.exit} with the configured
          * exit code to terminate the currently running Java virtual machine.
+         *
+         * @param ex
+         * @return throwOrExit
          */
         protected R throwOrExit(ExecutionException ex) {
             if (hasExitCode()) {
@@ -8692,38 +8708,46 @@ public class CommandLine {
 
         /**
          * Calls {@code System.exit(int)} with the specified exit code.
+         *
+         * @param exitCode1
          */
-        protected void exit(int exitCode) {
-            System.exit(exitCode);
+        protected void exit(int exitCode1) {
+            System.exit(exitCode1);
         }
 
         /**
          * Returns {@code this} to allow method chaining
          * when calling the setters for a fluent API.
+         *
+         * @return  self
          */
         protected abstract T self();
 
         /**
          * Sets the stream to print command output to.
          *
-         * @deprecated use {@link CommandLine#setOut(
-         *PrintWriter)} and {@link CommandLine#execute(String...)} instead
+         * @deprecated use {@link CommandLine#setOut(PrintWriter)}
+         * and {@link CommandLine#execute(String...)} instead
+         * @param out1
+         * @return useOut
          */
         @Deprecated
-        public T useOut(PrintStream out) {
-            this.out = Assert.notNull(out, "out");
+        public T useOut(PrintStream out1) {
+            this.out = Assert.notNull(out1, "out");
             return self();
         }
 
         /**
          * Sets the stream to print diagnostic messages to.
          *
-         * @deprecated use {@link CommandLine#setErr(
-         *PrintWriter)} and {@link CommandLine#execute(String...)} instead
+         * @deprecated use {@link CommandLine#setErr(PrintWriter)}
+         * and {@link CommandLine#execute(String...)} instead
+         * @param err1
+         * @return useErr
          */
         @Deprecated
-        public T useErr(PrintStream err) {
-            this.err = Assert.notNull(err, "err");
+        public T useErr(PrintStream err1) {
+            this.err = Assert.notNull(err1, "err");
             return self();
         }
 
@@ -8732,8 +8756,10 @@ public class CommandLine {
          * resets the color scheme to the default.
          *
          * @see #ansi()
-         * @deprecated use {@link CommandLine#setColorScheme(
-         *Help.ColorScheme)} and {@link CommandLine#execute(String...)} instead
+         * @deprecated use {@link CommandLine#setColorScheme(Help.ColorScheme)}
+         * and {@link CommandLine#execute(String...)} instead
+         * @param ansi
+         * @return useAnsi
          */
         @Deprecated
         public T useAnsi(Help.Ansi ansi) {
@@ -8749,10 +8775,12 @@ public class CommandLine {
          * @deprecated use {@link CommandLine#execute(
          *String...)} instead,
          * and call {@code System.exit()} in the application.
+         * @param exitCode1
+         * @return andExit
          */
         @Deprecated
-        public T andExit(int exitCode) {
-            this.exitCode = exitCode;
+        public T andExit(int exitCode1) {
+            this.exitCode = exitCode1;
             return self();
         }
     }
@@ -8771,6 +8799,7 @@ public class CommandLine {
      * <p>{@code ExecutionExceptions} that occurred while executing the {@code
      * Runnable} or {@code Callable} command are simply rethrown and not handled.</p>
      *
+     * @param <R>
      * @since 2.0
      * @deprecated see {@link #execute(
      *String...)},
@@ -8780,6 +8809,18 @@ public class CommandLine {
     public static class DefaultExceptionHandler<R> extends AbstractHandler<R,
             DefaultExceptionHandler<R>> implements IExceptionHandler,
             IExceptionHandler2<R> {
+        /**
+         * handleException.
+         *
+         * @param ex   the ParameterException describing the problem
+         *             that occurred while parsing the command line arguments,
+         *             and the CommandLine representing
+         *             the command or subcommand whose input was invalid
+         * @param out  the {@code PrintStream} to print help to if requested
+         * @param ansi for printing help messages using ANSI styles and colors
+         * @param args the command line arguments that could not be parsed
+         * @return handleException
+         */
         public List<Object> handleException(
                 ParameterException ex,
                 PrintStream out,
@@ -8845,6 +8886,11 @@ public class CommandLine {
             return throwOrExit(ex);
         }
 
+        /**
+         * self.
+         *
+         * @return self.
+         */
         @Override
         protected DefaultExceptionHandler<R> self() {
             return this;
@@ -8856,9 +8902,9 @@ public class CommandLine {
      * exception messages from stack traces by intercepting write method.
      */
     static class ColoredStackTraceWriter extends StringWriter {
-        Help.ColorScheme colorScheme;
+        private Help.ColorScheme colorScheme;
 
-        public ColoredStackTraceWriter(Help.ColorScheme colorScheme) {
+        ColoredStackTraceWriter(Help.ColorScheme colorScheme) {
             this.colorScheme = colorScheme;
         }
 
@@ -8897,7 +8943,8 @@ public class CommandLine {
      * Command line parse result handler that returns a value.
      * This handler prints help if requested, and otherwise calls
      * {@link #handle(
-     *CommandLine.ParseResult)} with the parse result. Facilitates implementation of the {@link IParseResultHandler2} interface.
+     *CommandLine.ParseResult)} with the parse result. Facilitates implementation of the
+     *  {@link IParseResultHandler2} interface.
      * <p>Note that {@code AbstractParseResultHandler} is a generic
      * type. This, along with the abstract {@code self} method,
      * allows method chaining to work properly in subclasses, without
@@ -8918,6 +8965,8 @@ public class CommandLine {
      * {@link #getExecutionStrategy()},
      * {@link #getParameterExceptionHandler()},
      * {@link #getExecutionExceptionHandler()}
+     *
+     * @param <R>
      */
     @Deprecated
     public abstract static class AbstractParseResultHandler<R> extends AbstractHandler<R,
@@ -8955,6 +9004,14 @@ public class CommandLine {
             return returnResultOrExit(handle(parseResult));
         }
 
+        /**
+         * execute.
+         *
+         * @param parseResult the parse result from which to
+         *                    select one or more {@code CommandSpec} instances to execute.
+         * @return execute
+         * @throws ExecutionException
+         */
         public int execute(ParseResult parseResult) throws ExecutionException {
             Integer helpExitCode = executeHelpRequest(parseResult);
             if (helpExitCode != null) {
@@ -9047,6 +9104,7 @@ public class CommandLine {
          *
          * @param parseResult
          * @return extractExitCodeGenerators
+         *
          */
         protected List<IExitCodeGenerator> extractExitCodeGenerators(
                 ParseResult parseResult) {
