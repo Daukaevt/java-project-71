@@ -5077,6 +5077,9 @@ public class CommandLine {
     /**
      * Return the unquoted value if the value contains
      * no nested quotes, otherwise, return the value as is.
+     *
+     * @param value
+     * @return smartUnquoteIfEnabled
      */
     String smartUnquoteIfEnabled(String value) {
         if (value == null || !commandSpec.parser().trimQuotes()) {
@@ -5142,6 +5145,9 @@ public class CommandLine {
         /**
          * Returns whether messages at the specified {@code other}
          * trace level would be printed for the current trace level.
+         *
+         * @param other
+         * @return isEnabled
          */
         public boolean isEnabled(TraceLevel other) {
             return ordinal() >= other.ordinal();
@@ -5366,8 +5372,10 @@ public class CommandLine {
          *                            exception was thrown during parsing and passed to the {@link IExceptionHandler2}
          * @throws ExecutionException if a problem
          *                            occurred while processing the parse results; use
-         *                            {@link ExecutionException#getCommandLine(
-         *)} to get the command or subcommand where processing failed
+         * {@link ExecutionException#getCommandLine()} to get the command
+         * or subcommand where processing failed
+         *
+         * @return handleParseResult
          */
         R handleParseResult(ParseResult parseResult) throws ExecutionException;
     }
@@ -5375,8 +5383,8 @@ public class CommandLine {
     /**
      * Implementations are responsible for "executing"
      * the user input and returning an exit code.
-     * The {@link #execute(
-     *String...)} method delegates to a {@linkplain #setExecutionStrategy(IExecutionStrategy) configured} execution strategy.
+     * The {@link #execute(String...)} method delegates to a
+     * {@linkplain #setExecutionStrategy(IExecutionStrategy) configured} execution strategy.
      * <p><b>Implementation Requirements:</b></p>
      * <p>Implementers responsibilities are:</p>
      * <ul>
@@ -5417,7 +5425,7 @@ public class CommandLine {
          *                            user object threw a ParameterException to signify invalid user input.
          * @throws ExecutionException if any problem occurred
          *                            while executing the command. Any exceptions (
-         *                            other than ParameterException) should be wrapped in a ExecutionException and not thrown as is.
+         * other than ParameterException) should be wrapped in a ExecutionException and not thrown as is.
          */
         int execute(
                 ParseResult parseResult) throws ExecutionException,
@@ -5679,7 +5687,7 @@ public class CommandLine {
          * @see Option#mapFallbackValue()
          * @since 4.6
          */
-        public static final String NULL_VALUE = Model.ArgSpec.NULL_VALUE;
+        String NULL_VALUE = Model.ArgSpec.NULL_VALUE;
 
         /**
          * One or more option names. At least one option name is required.
@@ -6428,15 +6436,6 @@ public class CommandLine {
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER})
     public @interface Parameters {
-        /**
-         * Special value that can be used in some
-         * annotation attributes to designate {@code null}.
-         *
-         * @see Parameters#defaultValue()
-         * @see Parameters#mapFallbackValue()
-         * @since 4.6
-         */
-        final String NULL_VALUE = Model.ArgSpec.NULL_VALUE;
 
         /**
          * Specify an index (
@@ -6650,7 +6649,7 @@ public class CommandLine {
          * Returns the default value of this positional
          * parameter, before splitting and type conversion.
          * <p>To get a {@code null} default value, omit specifying a default
-         * value or use the special value {@link Parameters#NULL_VALUE} -
+         * value or use the special value  -
          * for positional parameters of type {@code Optional<T>}
          * that will result in the {@code Optional.empty(
          * )}
