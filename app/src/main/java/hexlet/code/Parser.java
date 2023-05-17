@@ -72,7 +72,7 @@ public class Parser {
         for (Object o : jsonArray) {
             ObjectMapper mapper = new ObjectMapper();
             Map contentMapping;
-                contentMapping = mapper.readValue(String.valueOf(o), Map.class);
+            contentMapping = mapper.readValue(String.valueOf(o), Map.class);
             for (Object key : contentMapping.keySet()) {
                 dataMap.put(key, contentMapping.get(key));
             }
@@ -83,15 +83,15 @@ public class Parser {
     public static Map parseJsonObject(final String contentFile1) throws ParseException {
         JSONObject jsonObject;
         JSONParser jsonParser = new JSONParser();
-            jsonObject = (JSONObject) jsonParser.parse(contentFile1);
-            return jsonObject;
+        jsonObject = (JSONObject) jsonParser.parse(contentFile1);
+        return jsonObject;
     }
     public static String convertYamlToJsonData(final String yaml) throws JsonProcessingException {
         ObjectMapper yamlReader = new ObjectMapper(new YAMLFactory());
         Object obj;
-            obj = yamlReader.readValue(yaml, Object.class);
+        obj = yamlReader.readValue(yaml, Object.class);
         ObjectMapper jsonWriter = new ObjectMapper();
-            return jsonWriter.writeValueAsString(obj);
+        return jsonWriter.writeValueAsString(obj);
     }
 
     public static HashMap replaceNull(
@@ -115,8 +115,8 @@ public class Parser {
                 hashMap.put(key, list);
             } else if (hasBraces.find()) {
                 ObjectMapper mapper = new ObjectMapper();
-                    Map map = mapper.readValue(value, Map.class);
-                    hashMap.put(key, map);
+                Map map = mapper.readValue(value, Map.class);
+                hashMap.put(key, map);
             } else {
                 hashMap.put(key, parseFileContent.get(key));
             }
