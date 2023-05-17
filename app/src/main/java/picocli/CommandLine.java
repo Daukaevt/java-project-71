@@ -3999,8 +3999,8 @@ public class CommandLine {
      * </p><p>
      * This method returns an exit code that applications
      * can use to call {@code System.exit}.
-     * (
-     The return value of the {@code Callable} or {@code Method} can still be obtained via {@link #getExecutionResult() getExecutionResult}.)
+     * (The return value of the {@code Callable} or {@code Method} can still be obtained via
+     * {@link #getExecutionResult() getExecutionResult}.)
      * If the user object {@code Callable} or {@code
      * Method} returns an {@code int} or {@code Integer},
      * this will be used as the exit code. Additionally, if the user object
@@ -4041,8 +4041,8 @@ public class CommandLine {
      * </p><p>
      * If an {@code IExitCodeExceptionMapper} is not set, by default
      * this method will return the {@code @Command} annotation's
-     * {@link Command#exitCodeOnInvalidInput(
-            ) exitCodeOnInvalidInput} or {@link Command#exitCodeOnExecutionException() exitCodeOnExecutionException} value,
+     * {@link Command#exitCodeOnInvalidInput() exitCodeOnInvalidInput}
+     * or {@link Command#exitCodeOnExecutionException() exitCodeOnExecutionException} value,
      respectively.
      * </p><p><b>Example Usage:</b></p>
      * <pre>
@@ -4146,15 +4146,21 @@ public class CommandLine {
     }
 
     /**
+     * parseWithHandler.
+     *
+     * @param handler
+     * @param args
+     * @param out1
+     * @return parseWithHandler
      * @since 2.0
      * @deprecated use {@link #execute(
      *String...)} and {@link #getExecutionResult()} instead
      */
     @Deprecated
     public List<Object> parseWithHandler(
-            IParseResultHandler handler, PrintStream out, String... args) {
+            IParseResultHandler handler, PrintStream out1, String... args) {
         return parseWithHandlers(
-                handler, out, Help.Ansi.AUTO, defaultExceptionHandler(), args);
+                handler, out1, Help.Ansi.AUTO, defaultExceptionHandler(), args);
     }
 
     /**
@@ -4226,6 +4232,14 @@ public class CommandLine {
     }
 
     /**
+     * parseWithHandlers.
+     *
+     * @param ansi
+     * @param out1
+     * @param args
+     * @param handler
+     * @param exceptionHandler
+     * @return parseWithHandlers
      * @since 2.0
      * @deprecated use {@link #execute(
      *String...)} and {@link #getExecutionResult()} instead
@@ -4233,16 +4247,16 @@ public class CommandLine {
     @Deprecated
     public List<Object> parseWithHandlers(
             IParseResultHandler handler,
-            PrintStream out,
+            PrintStream out1,
             Help.Ansi ansi,
             IExceptionHandler exceptionHandler,
             String... args) {
         clearExecutionResults();
         try {
             List<CommandLine> result = parse(args);
-            return handler.handleParseResult(result, out, ansi);
+            return handler.handleParseResult(result, out1, ansi);
         } catch (ParameterException ex) {
-            return exceptionHandler.handleException(ex, out, ansi, args);
+            return exceptionHandler.handleException(ex, out1, ansi, args);
         }
     }
 
@@ -4340,11 +4354,11 @@ public class CommandLine {
      *PrintStream,
      * Help.ColorScheme)} with the {@linkplain #getColorScheme() configured} color scheme.
      *
-     * @param out the printStream to print to
+     * @param out1 the printStream to print to
      * @see #usage(PrintStream, Help.ColorScheme)
      */
-    public void usage(PrintStream out) {
-        usage(out, getColorScheme());
+    public void usage(PrintStream out1) {
+        usage(out1, getColorScheme());
     }
 
     /**
@@ -4366,13 +4380,13 @@ public class CommandLine {
      * Help.ColorScheme)} with the
      * {@linkplain Help#defaultColorScheme(CommandLine.Help.Ansi) default color scheme}.
      *
-     * @param out  the printStream to print to
+     * @param out1  the printStream to print to
      * @param ansi whether the usage message
      *             should include ANSI escape codes or not
      * @see #usage(PrintStream, Help.ColorScheme)
      */
-    public void usage(PrintStream out, Help.Ansi ansi) {
-        usage(out, Help.defaultColorScheme(ansi));
+    public void usage(PrintStream out1, Help.Ansi ansi) {
+        usage(out1, Help.defaultColorScheme(ansi));
     }
 
     /**
@@ -4380,6 +4394,8 @@ public class CommandLine {
      *PrintStream,
      * Help.Ansi)} but with the specified {@code PrintWriter} instead of a {@code PrintStream}.
      *
+     * @param writer
+     * @param ansi
      * @since 3.0
      */
     public void usage(PrintWriter writer, Help.Ansi ansi) {
@@ -4415,18 +4431,18 @@ public class CommandLine {
      * for ultimate control over which aspects
      * of an Option or Field are displayed where.</p>
      *
-     * @param out         the {@code PrintStream}
+     * @param out1         the {@code PrintStream}
      *                    to print the usage help message to
-     * @param colorScheme the {@code ColorScheme} defining the styles
+     * @param colorScheme1 the {@code ColorScheme} defining the styles
      *                    for options, parameters and commands when ANSI is enabled
      * @see Model.UsageMessageSpec
      */
-    public void usage(PrintStream out, Help.ColorScheme colorScheme) {
-        out.print(
+    public void usage(PrintStream out1, Help.ColorScheme colorScheme1) {
+        out1.print(
                 usage(new StringBuilder(),
                         getHelpFactory().create(getCommandSpec(),
-                                colorScheme)));
-        out.flush();
+                                colorScheme1)));
+        out1.flush();
     }
 
     /**
@@ -4435,13 +4451,15 @@ public class CommandLine {
      * Help.ColorScheme)},
      * but with the specified {@code PrintWriter} instead of a {@code PrintStream}.
      *
+     * @param writer
+     * @param colorScheme1
      * @since 3.0
      */
-    public void usage(PrintWriter writer, Help.ColorScheme colorScheme) {
+    public void usage(PrintWriter writer, Help.ColorScheme colorScheme1) {
         writer.print(
                 usage(new StringBuilder(),
                         getHelpFactory().create(getCommandSpec(),
-                                colorScheme)));
+                                colorScheme1)));
         writer.flush();
     }
 
@@ -4450,6 +4468,7 @@ public class CommandLine {
      *PrintStream)},
      * but returns the usage help message as a String instead of printing it to the {@code PrintStream}.
      *
+     * @return getUsageMessage
      * @since 3.2
      */
     public String getUsageMessage() {
@@ -4462,6 +4481,8 @@ public class CommandLine {
      * Help.Ansi)},
      * but returns the usage help message as a String instead of printing it to the {@code PrintStream}.
      *
+     * @param ansi
+     * @return getUsageMessage
      * @since 3.2
      */
     public String getUsageMessage(Help.Ansi ansi) {
@@ -4477,13 +4498,15 @@ public class CommandLine {
      * Help.ColorScheme)},
      * but returns the usage help message as a String instead of printing it to the {@code PrintStream}.
      *
+     * @param colorScheme1
+     * @return getUsageMessage
      * @since 3.2
      */
-    public String getUsageMessage(Help.ColorScheme colorScheme) {
+    public String getUsageMessage(Help.ColorScheme colorScheme1) {
         return usage(
                 new StringBuilder(),
                 getHelpFactory().create(getCommandSpec(),
-                        colorScheme)).toString();
+                        colorScheme1)).toString();
     }
 
     private StringBuilder usage(StringBuilder sb, Help help) {
@@ -4501,12 +4524,12 @@ public class CommandLine {
      *PrintStream,
      * Help.Ansi)} with the ANSI setting of the {@linkplain #getColorScheme() configured} color scheme.
      *
-     * @param out the printStream to print to
+     * @param out1 the printStream to print to
      * @see #printVersionHelp(PrintStream, Help.Ansi)
      * @since 0.9.8
      */
-    public void printVersionHelp(PrintStream out) {
-        printVersionHelp(out, getColorScheme().ansi());
+    public void printVersionHelp(PrintStream out1) {
+        printVersionHelp(out1, getColorScheme().ansi());
     }
 
     /**
@@ -4517,7 +4540,7 @@ public class CommandLine {
      * <a href="https://picocli.info/#_usage_help_with_styles_and_colors">markup
      * for colors and style</a>.
      *
-     * @param out  the printStream to print to
+     * @param out1  the printStream to print to
      * @param ansi whether the usage message
      *             should include ANSI escape codes or not
      * @see Command#version()
@@ -4525,11 +4548,11 @@ public class CommandLine {
      * @see #isVersionHelpRequested()
      * @since 0.9.8
      */
-    public void printVersionHelp(PrintStream out, Help.Ansi ansi) {
+    public void printVersionHelp(PrintStream out1, Help.Ansi ansi) {
         for (String versionInfo : getCommandSpec().version()) {
-            out.println(ansi.new Text(versionInfo, getColorScheme()));
+            out1.println(ansi.new Text(versionInfo, getColorScheme()));
         }
-        out.flush();
+        out1.flush();
     }
 
     /**
@@ -4543,7 +4566,7 @@ public class CommandLine {
      * <a href="https://picocli.info/#_usage_help_with_styles_and_colors">markup
      * for colors and style</a>.
      *
-     * @param out    the printStream to print to
+     * @param out1    the printStream to print to
      * @param ansi   whether the usage message
      *               should include ANSI escape codes or not
      * @param params Arguments referenced by
@@ -4554,14 +4577,14 @@ public class CommandLine {
      * @since 1.0.0
      */
     public void printVersionHelp(
-            PrintStream out, Help.Ansi ansi, Object... params) {
+            PrintStream out1, Help.Ansi ansi, Object... params) {
         for (String versionInfo : getCommandSpec().version()) {
-            out.println(
+            out1.println(
                     ansi.new Text(format(versionInfo,
                             params),
                             getColorScheme()));
         }
-        out.flush();
+        out1.flush();
     }
 
     /**
@@ -4570,11 +4593,11 @@ public class CommandLine {
      * Help.Ansi,
      * Object...)} with the ANSI setting of the {@linkplain #getColorScheme() configured} color scheme.
      *
-     * @param out the PrintWriter to print to
+     * @param out1 the PrintWriter to print to
      * @since 4.0
      */
-    public void printVersionHelp(PrintWriter out) {
-        printVersionHelp(out, getColorScheme().ansi());
+    public void printVersionHelp(PrintWriter out1) {
+        printVersionHelp(out1, getColorScheme().ansi());
     }
 
     /**
@@ -4588,7 +4611,7 @@ public class CommandLine {
      * <a href="https://picocli.info/#_usage_help_with_styles_and_colors">markup
      * for colors and style</a>.
      *
-     * @param out    the PrintWriter to print to
+     * @param out1    the PrintWriter to print to
      * @param ansi   whether the usage message
      *               should include ANSI escape codes or not
      * @param params Arguments referenced by
@@ -4599,14 +4622,14 @@ public class CommandLine {
      * @since 4.0
      */
     public void printVersionHelp(
-            PrintWriter out, Help.Ansi ansi, Object... params) {
+            PrintWriter out1, Help.Ansi ansi, Object... params) {
         for (String versionInfo : getCommandSpec().version()) {
-            out.println(
+            out1.println(
                     ansi.new Text(format(versionInfo,
                             params),
                             getColorScheme()));
         }
-        out.flush();
+        out1.flush();
     }
 
     /**
@@ -4721,6 +4744,7 @@ public class CommandLine {
      * Returns the ResourceBundle of this command
      * or {@code null} if no resource bundle is set.
      *
+     * @return getResourceBundle
      * @see Command#resourceBundle()
      * @see CommandSpec#resourceBundle()
      * @since 3.6
@@ -4755,6 +4779,7 @@ public class CommandLine {
     /**
      * Returns the maximum width of the usage help message. The default is 80.
      *
+     * @return getUsageHelpWidth
      * @see Model.UsageMessageSpec#width()
      */
     public int getUsageHelpWidth() {
@@ -4794,6 +4819,7 @@ public class CommandLine {
      * the description column, and cause the description
      * to be displayed on the next line.
      *
+     * @return getUsageHelpLongOptionsMaxWidth
      * @see Model.UsageMessageSpec#longOptionsMaxWidth()
      * @since 4.2
      */
@@ -4842,6 +4868,7 @@ public class CommandLine {
      *) numeric value}.
      * This feature requires Java 7 or greater. The default is {@code false}.
      *
+     * @return isUsageHelpAutoWidth
      * @see Model.UsageMessageSpec#autoWidth()
      * @since 4.0
      */
@@ -6795,7 +6822,7 @@ public class CommandLine {
          * For example, {@code key} instead of {@code key=value}.
          * <p>The value specified in this annotation is the
          * value that is put into the Map for the user-specified key.
-         * Use the special value {@link Parameters#NULL_VALUE}
+         * Use the special value
          * to specify {@code null} -
          * for maps of type {@code Map<K, Optional<V>>}
          * that will result in {@code Optional.empty(
