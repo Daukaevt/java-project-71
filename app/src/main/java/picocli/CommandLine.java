@@ -249,6 +249,7 @@ public class CommandLine {
     public static final int FOUR = 4;
     public static final int FIVE = 5;
     public static final int SIX = 6;
+    public static final int SEVEN = 7;
     public static final int EIGHT = 8;
     public static final int NINE = 9;
     public static final int TEN = 10;
@@ -9041,6 +9042,12 @@ public class CommandLine {
         protected abstract R handle(
                 ParseResult parseResult) throws ExecutionException;
 
+        /**
+         * extractExitCodeGenerators.
+         *
+         * @param parseResult
+         * @return extractExitCodeGenerators
+         */
         protected List<IExitCodeGenerator> extractExitCodeGenerators(
                 ParseResult parseResult) {
             return Collections.emptyList();
@@ -9136,6 +9143,12 @@ public class CommandLine {
                     new ArrayList<Object>()); // first
         }
 
+        /**
+         * extractExitCodeGenerators.
+         *
+         * @param parseResult
+         * @return extractExitCodeGenerators
+         */
         protected List<IExitCodeGenerator> extractExitCodeGenerators(
                 ParseResult parseResult) {
             if (
@@ -9146,6 +9159,11 @@ public class CommandLine {
             return Collections.emptyList();
         }
 
+        /**
+         * self.
+         *
+         * @return self
+         */
         @Override
         protected RunFirst self() {
             return this;
@@ -9317,6 +9335,12 @@ public class CommandLine {
                     parseResult.asCommandLineList());
         }
 
+        /**
+         * extractExitCodeGenerators.
+         *
+         * @param parseResult
+         * @return extractExitCodeGenerators
+         */
         protected List<IExitCodeGenerator> extractExitCodeGenerators(
                 ParseResult parseResult) {
             List<CommandLine> parsedCommands = parseResult.asCommandLineList();
@@ -9333,6 +9357,11 @@ public class CommandLine {
             return result;
         }
 
+        /**
+         * self.
+         *
+         * @return self
+         */
         @Override
         protected RunLast self() {
             return this;
@@ -9443,6 +9472,12 @@ public class CommandLine {
             return result;
         }
 
+        /**
+         * extractExitCodeGenerators.
+         *
+         * @param parseResult
+         * @return extractExitCodeGenerators
+         */
         protected List<IExitCodeGenerator> extractExitCodeGenerators(
                 ParseResult parseResult) {
             return recursivelyExtractExitCodeGenerators(
@@ -9463,6 +9498,11 @@ public class CommandLine {
             return result;
         }
 
+        /**
+         * self.
+         *
+         * @return self
+         */
         @Override
         protected RunAll self() {
             return this;
@@ -9498,6 +9538,8 @@ public class CommandLine {
          * Always throws UnsupportedOperationException.
          *
          * @throws UnsupportedOperationException always
+         * @param value
+         * @return convert
          */
         public Object convert(String value) throws Exception {
             throw new UnsupportedOperationException(
@@ -9571,7 +9613,7 @@ public class CommandLine {
         }
 
         public int hashCode() {
-            return NoOpParameterPreprocessor.class.hashCode() + 7;
+            return NoOpParameterPreprocessor.class.hashCode() + SEVEN;
         }
     }
 
@@ -9604,8 +9646,8 @@ public class CommandLine {
      * @since 4.0
      */
     public static class RegexTransformer implements INegatableOptionTransformer {
-        final Map<Pattern, String> replacements;
-        final Map<Pattern, String> synopsis;
+        private final Map<Pattern, String> replacements;
+        private final Map<Pattern, String> synopsis;
 
         RegexTransformer(RegexTransformer.Builder builder) {
             replacements =
@@ -9657,6 +9699,8 @@ public class CommandLine {
          * to <code>-XX:+Inline</code></td>
          *   </tr>
          * </table>
+         *
+         * @return createDefault
          */
         public static RegexTransformer createDefault() {
             CommandLine.RegexTransformer transformer =
@@ -9713,6 +9757,8 @@ public class CommandLine {
          * to <code>-XX:+Inline</code></td>
          *   </tr>
          * </table>
+         *
+         * @return createCaseInsensitive
          */
         public static RegexTransformer createCaseInsensitive() {
             CommandLine.RegexTransformer transformer =
@@ -9755,6 +9801,11 @@ public class CommandLine {
             return optionName;
         }
 
+        /**
+         * toString.
+         *
+         * @return toString
+         */
         public String toString() {
             return getClass(
             ).getName() + "[replacements=" + replacements + ", synopsis="
@@ -9767,9 +9818,9 @@ public class CommandLine {
          * @since 4.0
          */
         public static class Builder {
-            Map<Pattern, String> replacements =
+            private Map<Pattern, String> replacements =
                     new LinkedHashMap<Pattern, String>();
-            Map<Pattern, String> synopsis =
+            private Map<Pattern, String> synopsis =
                     new LinkedHashMap<Pattern, String>();
 
             /**
@@ -9781,6 +9832,8 @@ public class CommandLine {
             /**
              * Constructs a builder populated with
              * the values from the specified RegexTransformer.
+             *
+             * @param old
              */
             public Builder(RegexTransformer old) {
                 replacements.putAll(old.replacements);
@@ -9844,8 +9897,7 @@ public class CommandLine {
              * @return this {@code RegexTransformer} for method chaining
              */
             public RegexTransformer.Builder removePattern(String regex) {
-                for (Iterator<Pattern> iter =
-                     replacements.keySet().iterator(); iter.hasNext(); ) {
+                for (Iterator<Pattern> iter = replacements.keySet().iterator(); iter.hasNext();) {
                     Pattern pattern = iter.next();
                     if (pattern.toString().equals(regex)) {
                         iter.remove();
@@ -9855,6 +9907,11 @@ public class CommandLine {
                 return this;
             }
 
+            /**
+             * build.
+             *
+             * @return build
+             */
             public RegexTransformer build() {
                 return new RegexTransformer(this);
             }
@@ -9869,7 +9926,7 @@ public class CommandLine {
     }
 
     private static class DefaultFactory implements IFactory {
-        static Class<?> GROOVY_CLOSURE_CLASS = loadClosureClass();
+        private static Class<?> groovyClosureClass = loadClosureClass();
 
         private static Class<?> loadClosureClass() {
             if (Boolean.getBoolean("picocli.disable.closures")) {
@@ -9932,8 +9989,8 @@ public class CommandLine {
         @SuppressWarnings("unchecked")
         public <T> T create(Class<T> cls) throws Exception {
             if (
-                    GROOVY_CLOSURE_CLASS != null
-                            && GROOVY_CLOSURE_CLASS.isAssignableFrom(cls)) {
+                    groovyClosureClass != null
+                            && groovyClosureClass.isAssignableFrom(cls)) {
                 Callable<?> callable =
                         Callable.class.cast(
                                 cls.getConstructor(Object.class,
