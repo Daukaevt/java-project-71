@@ -7030,12 +7030,8 @@ public class CommandLine {
      * </ul>
      */
     @Retention(RetentionPolicy.RUNTIME)
-    @Target(
-            {ElementType.TYPE,
-                    ElementType.LOCAL_VARIABLE,
-                    ElementType.FIELD,
-                    ElementType.PACKAGE,
-                    ElementType.METHOD})
+    @Target({ElementType.TYPE, ElementType.LOCAL_VARIABLE, ElementType.FIELD,
+            ElementType.PACKAGE, ElementType.METHOD})
     public @interface Command {
         /**
          * Program name to show in the synopsis.
@@ -7091,9 +7087,10 @@ public class CommandLine {
          * <ul>
          *   <li>{@link HelpCommand} - a {@code help} subcommand
          * that prints help on the following or preceding command</li>
-         *   <li>{@link AutoComplete.GenerateCompletion} - a {@code generate-completion} subcommand that prints a Bash/ZSH completion
-         * script for its parent command, so that clients can install autocompletion in one line by running {@code source <(
-        parent-command generate-completion)} in the shell</li>
+         *   <li>{@link AutoComplete.GenerateCompletion} - a {@code generate-completion} subcommand
+         *   that prints a Bash/ZSH completion
+         * script for its parent command, so that clients can install autocompletion in one line
+         * by running {@code source <(parent-command generate-completion)} in the shell</li>
          * </ul>
          *
          * @return the declaratively registered subcommands
@@ -7110,12 +7107,13 @@ public class CommandLine {
          * occur multiple times and may be followed by sibling
          * commands instead of only by child commands of the subcommand.
          *
+         * @return subcommandsRepeatable
          * @since 4.2
          */
         boolean subcommandsRepeatable() default false;
 
         /**
-         * Specify whether methods annotated with {@code
+         * Specify whether methods annotated with {@code.
          *
          * @return whether methods annotated with {@code
          * @Command} should be registered as subcommands of their
@@ -7302,6 +7300,7 @@ public class CommandLine {
          * command has no {@linkplain #subcommands(
          *) subcommands}.
          *
+         * @return synopsisSubcommandLabel
          * @since 4.0
          */
         String synopsisSubcommandLabel() default "[COMMAND]";
@@ -7425,6 +7424,7 @@ public class CommandLine {
          * (
          * The entry is not shown if {@linkplain CommandLine#isExpandAtFiles() expanding parameter files} is disabled.)
          *
+         * @return showAtFileInUsageHelp
          * @since 4.2
          */
         boolean showAtFileInUsageHelp() default false;
@@ -7433,6 +7433,7 @@ public class CommandLine {
          * Specify {@code true} to show a {@code [--]} "End of options" entry
          * in the synopsis and option list of the usage help message.
          *
+         * @return showEndOfOptionsDelimiterInUsageHelp
          * @since 4.3
          */
         boolean showEndOfOptionsDelimiterInUsageHelp() default false;
@@ -7499,6 +7500,7 @@ public class CommandLine {
          * Set the {@link Model.UsageMessageSpec#width(
          *int) usage help message width}. The default is 80.
          *
+         * @return usageHelpWidth
          * @see Model.UsageMessageSpec#width()
          * @since 3.7
          */
@@ -7514,6 +7516,7 @@ public class CommandLine {
          *) numeric value}.
          * This feature requires Java 7 or greater. The default is {@code false}
          *
+         * @return usageHelpAutoWidth
          * @see Model.UsageMessageSpec#autoWidth()
          * @since 4.0
          */
@@ -7523,6 +7526,7 @@ public class CommandLine {
          * Exit code for successful termination. {@value
          * picocli.CommandLine.ExitCode#OK} by default.
          *
+         * @return xitCodeOnSuccess
          * @see #execute(String...)
          * @since 4.0
          */
@@ -7532,6 +7536,7 @@ public class CommandLine {
          * Exit code for successful termination after printing usage help
          * on user request. {@value picocli.CommandLine.ExitCode#OK} by default.
          *
+         * @return exitCodeOnUsageHelp
          * @see #execute(String...)
          * @since 4.0
          */
@@ -7541,6 +7546,7 @@ public class CommandLine {
          * Exit code for successful termination after printing version help
          * on user request. {@value picocli.CommandLine.ExitCode#OK} by default.
          *
+         * @return exitCodeOnVersionHelp
          * @see #execute(String...)
          * @since 4.0
          */
@@ -7550,6 +7556,7 @@ public class CommandLine {
          * Exit code for command line usage error. {@value
          * picocli.CommandLine.ExitCode#USAGE} by default.
          *
+         * @return exitCodeOnInvalidInput
          * @see #execute(String...)
          * @since 4.0
          */
@@ -7560,6 +7567,7 @@ public class CommandLine {
          * the Runnable, Callable or Method user object of a command.
          * {@value picocli.CommandLine.ExitCode#SOFTWARE} by default.
          *
+         * @return exitCodeOnExecutionException
          * @see #execute(String...)
          * @since 4.0
          */
@@ -7570,6 +7578,7 @@ public class CommandLine {
          * may contain {@code "%n"} line separators. {@code ""} (
          * empty string) by default.
          *
+         * @return exitCodeListHeading
          * @see Help#exitCodeListHeading(Object...)
          * @since 4.0
          */
@@ -7590,6 +7599,7 @@ public class CommandLine {
          * an exception occurred while executing the business logic."})
          * </pre>
          *
+         * @return exitCodeList
          * @since 4.0
          */
         String[] exitCodeList() default {};
@@ -7598,6 +7608,7 @@ public class CommandLine {
          * Returns whether subcommands inherit
          * their attributes from this parent command.
          *
+         * @return scope
          * @since 4.6
          */
         ScopeType scope() default ScopeType.LOCAL;
@@ -7605,6 +7616,7 @@ public class CommandLine {
         /**
          * Returns the model transformer for this command.
          *
+         * @return modelTransformer
          * @since 4.6
          */
         Class<? extends IModelTransformer> modelTransformer(
@@ -7613,6 +7625,7 @@ public class CommandLine {
         /**
          * Returns the preprocessor for this command.
          *
+         * @return preprocessor
          * @see IParameterPreprocessor
          * @since 4.6
          */
@@ -7655,8 +7668,9 @@ public class CommandLine {
      * "1"}), or repeating groups ({@code multiplicity=
      * "0..*"} or {@code multiplicity=
      * "1..*"}).
-     * For a group of mutually exclusive arguments, making the group required means that one of the arguments in the
-     * group must appear on the command line, or a {@link MissingParameterException MissingParameterException} is thrown.
+     * For a group of mutually exclusive arguments, making the group required means that one of the arguments
+     * in the group must appear on the command line,
+     * or a {@link MissingParameterException MissingParameterException} is thrown.
      * For a group of co-occurring arguments, all arguments
      * in the group must appear on the command line.
      * </p>
@@ -7699,6 +7713,8 @@ public class CommandLine {
                 ) heading} nor a {@link #headingKey() headingKey} are specified,
          * this group is used for validation only
          * and does not change the usage help message.
+         *
+         * @return eading
          */
         String heading() default "__no_heading__";
 
@@ -7709,6 +7725,8 @@ public class CommandLine {
          *) heading} nor a {@link #headingKey() headingKey} are specified,
          * this group is used for validation only
          * and does not change the usage help message.
+         *
+         * @return headingKey
          */
         String headingKey() default "__no_heading_key__";
 
@@ -7718,6 +7736,8 @@ public class CommandLine {
          * If {@code false}, this is a co-occurring
          * group. Ignored if {@link #validate(
          *)} is {@code false}.
+         *
+         * @return exclusive
          */
         boolean exclusive() default true;
 
@@ -7733,6 +7753,8 @@ public class CommandLine {
          * For a group of co-occurring arguments, making the group required
          * means that all arguments in the group must appear on the command line.
          * Ignored if {@link #validate()} is {@code false}.
+         *
+         * @return multiplicity
          */
         String multiplicity() default "0..1";
 
@@ -7743,9 +7765,10 @@ public class CommandLine {
          * no more than one elements of the group is specified on the command line;
          * for a co-ocurring group validation means verifying that
          * all elements of the group are specified on the command line.
-         * Set {@link #validate() validate=
-        false} for groups whose purpose is only to customize the usage help message.
+         * Set {@link #validate() validate=false} for groups whose purpose is only
+         * to customize the usage help message.
          *
+         * @return validate
          * @see #multiplicity()
          * @see #heading()
          */
@@ -7759,6 +7782,8 @@ public class CommandLine {
          * This attribute is only honored
          * for groups that have a {@link #heading(
          *) heading} (or a {@link #headingKey() headingKey} with a non-{@code null} resource bundle value).
+         *
+         * @return order
          */
         int order() default -1;
     }
@@ -7859,7 +7884,7 @@ public class CommandLine {
 
     /**
      * Provides a way to modify how the command model is built.
-     * This is useful for applications that need to modify the
+     * This is useful for appl1ications that need to modify the
      * model dynamically depending on the runtime environment.
      * <p>
      * Commands may configure a model transformer using the
@@ -7888,6 +7913,7 @@ public class CommandLine {
          * constructed, and before any command line arguments are parsed.
          * </p>
          *
+         * @param commandSpec
          * @return the CommandSpec to use instead of the specified one
          */
         CommandSpec transform(CommandSpec commandSpec);
