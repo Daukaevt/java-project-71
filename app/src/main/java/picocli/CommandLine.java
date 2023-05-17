@@ -6436,7 +6436,7 @@ public class CommandLine {
          * @see Parameters#mapFallbackValue()
          * @since 4.6
          */
-        public final String NULL_VALUE = Model.ArgSpec.NULL_VALUE;
+        final String NULL_VALUE = Model.ArgSpec.NULL_VALUE;
 
         /**
          * Specify an index (
