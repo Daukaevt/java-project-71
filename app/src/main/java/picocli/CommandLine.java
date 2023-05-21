@@ -36146,6 +36146,7 @@ InitialValueState.CACHED;*/
          * @param argDescription
          * @return index
          */
+        @SuppressWarnings("checkstyle:parameternumber")
         private int consumeOneArgument(
                 final Model.ArgSpec argSpec,
                 final LookBehind lookBehind,
