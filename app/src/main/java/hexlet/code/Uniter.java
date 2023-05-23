@@ -12,22 +12,22 @@ public class Uniter {
     ) {
         TreeMap<String, Wrapper> unitMap = new TreeMap<>();
         for (Object key: parseJson1.keySet()) {
-            if (parseJson2.containsKey(key)) {
+            if (parseJson2.containsKey(String.valueOf(key))) {
                 unitMap.put(key.toString(), new Wrapper(
-                        (parseJson1.get(key).toString()),
-                        (parseJson2.get(key).toString())));
+                        (parseJson1.get(String.valueOf(key)).toString()),
+                        (parseJson2.get(String.valueOf(key)).toString())));
             } else {
                 unitMap.put(key.toString(), new Wrapper(
-                        (parseJson1.get(key).toString()),
+                        (parseJson1.get(String.valueOf(key)).toString()),
                         ("-absent-")
                 ));
             }
         }
         for (Object key: parseJson2.keySet()) {
-            if (!parseJson1.containsKey(key)) {
+            if (!parseJson1.containsKey(String.valueOf(key))) {
                 unitMap.put(key.toString(), new Wrapper(
                         ("-absent-"),
-                        (parseJson2.get(key).toString())
+                        (parseJson2.get(String.valueOf(key)).toString())
                 ));
             }
         }
