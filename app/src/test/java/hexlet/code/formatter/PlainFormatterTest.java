@@ -19,7 +19,7 @@ class PlainFormatterTest {
         testMap = new TreeMap<>();
         testMap.put("testKey1", new Wrapper("value1", "value2"));
         testMap.put("testKey2", new Wrapper("-absent-", "value22"));
-        testMap.put("testKey3", new Wrapper( "value13", "-absent-"));
+        testMap.put("testKey3", new Wrapper("value13", "-absent-"));
         expected = "Property 'testKey1' was updated. From 'value1' to 'value2'\n"
                 + "Property 'testKey2' was added with value: 'value22'\n"
                 + "Property 'testKey3' was removed";
