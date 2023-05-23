@@ -106,12 +106,10 @@ public class Parser {
             Matcher hasBraces = braces.matcher(value);
             Matcher hasSquareBrackets = squareBrackets.matcher(value);
             if (hasSquareBrackets.find()) {
-                value = value.replaceAll("^\\[", "")
-                        .replaceAll("]$", "");
+                value = value.replaceAll("^\\[", "").replaceAll("]$", "");
                 Stream<String> stream = Arrays.stream(value.split(","));
                 List<String> list = stream.collect(Collectors.toList());
-                list.replaceAll(s -> s.replaceAll("\"", "")
-                        .replaceAll("\"", ""));
+                list.replaceAll(s -> s.replaceAll("\"", "").replaceAll("\"", ""));
                 hashMap.put(key, list);
             } else if (hasBraces.find()) {
                 ObjectMapper mapper = new ObjectMapper();
