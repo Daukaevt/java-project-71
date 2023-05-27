@@ -1,13 +1,37 @@
+------------------------
+About:
 
-The program compares two configuration files.
 
-The result of file comparison can be displayed in different formats.
+	The program compares two configuration files.
 
-The diff is built based on how the files have changed relative to each other, the keys are displayed in alphabetical order. Below is an example of what should be the result of this step:
+	The result of file comparison can be displayed in different formats.
 
-asciinema link:
-https://asciinema.org/a/wy6Sif66IPMaML0Bzl6e2uz9Q
+	The diff is built based on how the files have changed relative to each other, the keys are displayed in alphabetical order. Below is an example of what should be the result of this step:
 
+	asciinema link:
+		https://asciinema.org/a/wy6Sif66IPMaML0Bzl6e2uz9Q
+
+-------------------------
+System requirements:
+
+
+	JDK 17
+
+-------------------------
+SETUP:
+
+
+	make run-dist
+		runs test distributive.
+
+	./app/build/install/app/bin/app file1.json file2.json
+		another way to run test distributive.
+
+	make gendiff-h
+		help.
+
+
+-------------------------
 ### Hexlet tests and linter status:
 [![Actions Status](https://github.com/Daukaevt/java-project-71/workflows/hexlet-check/badge.svg)](https://github.com/Daukaevt/java-project-71/actions)
 
