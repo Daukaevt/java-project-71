@@ -31,4 +31,13 @@ jobs:
          with:
            coverageCommand: make report
            coverageLocations: ${{github.workspace}}/app/build/reports/jacoco/test/jacocoTestReport.xml:jacoco
-
+env:
+  global:
+    - CC_TEST_REPORTER_ID=<9058a4aaa026cb52ef0529463eb597ba72881f72fc244efe80ecb95b5493881a>before_script:
+  - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+  - chmod +x ./cc-test-reporter
+  - ./cc-test-reporter before-buildscript:
+  - make lint
+  - make test-coverageafter_script:
+  - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT notifications:
+  email: false
