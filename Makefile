@@ -1,5 +1,5 @@
 run-dist:
-	./app/build/install/app/bin/app file1.json file2.json
+	./app/build/install/app/bin/app /home/timur/IdeaProjects/java-project-71/app/src/test/resources/file1.json /home/timur/IdeaProjects/java-project-71/app/src/test/resources/file2.json
 
 
 gendiff-h:
