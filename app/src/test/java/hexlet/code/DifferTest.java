@@ -93,7 +93,7 @@ class DifferTest {
     @Test
     void isNotExist() throws Exception {
         assertEquals("File does not exist", Differ.generate(
-                "/home/timur/IdeaProjects/java-project-71/app/src/test/resources/file1.json",
+                "/home/timur/IdeaProjects/java-project-71/app/src/test/resources/file1new.json",
                 "not exist file"));
     }
 
