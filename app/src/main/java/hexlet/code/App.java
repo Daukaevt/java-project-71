@@ -37,9 +37,10 @@ public class App implements Callable {
     @Option(
             names = {"-f", "--format"},
             description = "output format [default: stylish]",
-            paramLabel = "format"
+            paramLabel = "format",
+            defaultValue = "stylish"
     )
-    private String format = "stylish";
+    private String format;
 
     @Option(
             names = { "-h", "--help" },
