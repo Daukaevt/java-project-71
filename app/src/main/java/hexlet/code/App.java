@@ -14,7 +14,10 @@ import java.util.concurrent.Callable;
         version = "1.0 beta",
         description = "Compares two configuration files and shows a difference."
 )
-public class App implements Callable {
+public class App implements Callable <Integer> {
+    private static final int SUCCESS_EXIT_CODE = 0;
+    private static final int ERROR_EXIT_CODE = 1;
+
     @Parameters(
             paramLabel = "filepath1",
             index = "0",
@@ -54,11 +57,15 @@ public class App implements Callable {
     public static void main(String[] args) {
         new CommandLine(new App()).execute(args);
     }
-    public final Object call() throws Exception {
-        String content;
-        content = Differ.generate(filePath1, filePath2, format);
-        System.out.println(content);
-        return content;
+    public final Integer call() {
+        try {
+            String formattedDiff = Differ.generate(filePath1, filePath2, format);
+            System.out.println(formattedDiff);
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+            return ERROR_EXIT_CODE;
+        }
+        return SUCCESS_EXIT_CODE;
     }
 }
 
