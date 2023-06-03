@@ -10,7 +10,7 @@ class ReaderTest {
 
     private final String testFilePath1
             = "/home/timur/IdeaProjects/java-project-71/app/src/test/resources/nestedFile1.json";
-    private final String fileContent = Reader.readFile(testFilePath1);
+    private final String fileContent = Reader.read(testFilePath1);
 
     @Test
     void readFile() {
@@ -32,6 +32,6 @@ class ReaderTest {
 
     @Test
     void readFileThrowException() {
-        assertThrows(RuntimeException.class, () -> Reader.readFile("wrongPath"));
+        assertThrows(RuntimeException.class, () -> Reader.read("wrongPath"));
     }
 }
