@@ -28,11 +28,11 @@ public class Differ {
             return "File does not exist";
         }
         Map<String, Object> parseJson1 =
-                Parser.parse(Reader.readFile(path1.toAbsolutePath().toString()),
+                Parser.parse(Reader.read(path1.toAbsolutePath().toString()),
                         getDataFormat(String.valueOf(path1)));
 
         Map<String, Object> parseJson2 =
-                Parser.parse(Reader.readFile(path2.toAbsolutePath().toString()),
+                Parser.parse(Reader.read(path2.toAbsolutePath().toString()),
                         getDataFormat(String.valueOf(path2)));
         TreeMap<String, Wrapper> unitMap = Uniter.unite(parseJson1, parseJson2);
         return ContentFormatter.makeFormat(unitMap, format);
