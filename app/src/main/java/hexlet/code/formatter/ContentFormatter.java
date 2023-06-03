@@ -10,7 +10,7 @@ public class ContentFormatter {
     public static String makeFormat(
             final TreeMap<String, Wrapper> unitMap,
             final String format
-    ) {
+    ) throws Exception {
         switch (format) {
             case ("plain") -> {
                 return PlainFormatter.plainFormat(unitMap);
@@ -18,8 +18,11 @@ public class ContentFormatter {
             case ("json") -> {
                 return JsonFormatter.jsonFormat(unitMap);
             }
-            default -> {
+            case ("stylish") -> {
                 return StylishFormatter.stylishFormat(unitMap);
+            }
+            default -> {
+                throw new Exception("Incorrect style format.");
             }
         }
     }
