@@ -1,27 +1,20 @@
 package hexlet.code;
 
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class Reader {
-    public static String readFile(final String filePath) {
+    public static String read(final String filePath) {
         String content = null;
-        try (BufferedReader br =
-                     new BufferedReader(new FileReader(String.valueOf(filePath)))) {
-            StringBuilder sb = new StringBuilder();
-            String line = br.readLine();
-            while (line != null) {
-                sb.append(line);
-                sb.append(System.lineSeparator());
-                line = br.readLine();
-                content = sb.toString();
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        try {
+            content = Files.readString(Path.of(filePath));
         }
-        return !(content == null)
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+        return  !(content == null)
                 ? content.replaceAll("\n$", "")
                 : "";
     }
