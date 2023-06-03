@@ -21,17 +21,27 @@ public class Differ {
     public static String generate(
             final String filePath1, final String filePath2, final String format
     ) throws Exception {
+
         Path path1 = Paths.get(filePath1).normalize();
         Path path2 = Paths.get(filePath2).normalize();
         if (!Files.exists(path1) || !Files.exists(path2)) {
             return "File does not exist";
         }
         Map<String, Object> parseJson1 =
-                Parser.parse(Reader.readFile(path1.toAbsolutePath().toString()));
+                Parser.parse(Reader.readFile(path1.toAbsolutePath().toString()),
+                        getDataFormat(String.valueOf(path1)));
 
         Map<String, Object> parseJson2 =
-                Parser.parse(Reader.readFile(path2.toAbsolutePath().toString()));
+                Parser.parse(Reader.readFile(path2.toAbsolutePath().toString()),
+                        getDataFormat(String.valueOf(path2)));
         TreeMap<String, Wrapper> unitMap = Uniter.unite(parseJson1, parseJson2);
         return ContentFormatter.makeFormat(unitMap, format);
+    }
+    // Формат данных берём на основе расширения файла, отрезая точку от строки.
+    private static String getDataFormat(String filePath) {
+        int index = filePath.lastIndexOf('.');
+        return index > 0
+                ? filePath.substring(index + 1)
+                : "";
     }
 }
