@@ -10,8 +10,7 @@ public class Reader {
         String content = null;
         try {
             content = Files.readString(Path.of(filePath));
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return  !(content == null)
