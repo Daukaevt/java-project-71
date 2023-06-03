@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 
+import static hexlet.code.Differ.getDataFormat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -21,6 +22,8 @@ class ParserTest {
     private String jsonArray;
     private String wrongArray;
     private HashMap<String, Object> expectedData;
+
+    private String filePath;
 
     @BeforeEach
     void setUp() {
@@ -38,8 +41,9 @@ class ParserTest {
                                    "id":"1946-04-14T00:00:01",
                                    "title":"hello"
                                  }""".indent(1);
-        jsonContent = Reader.readFile("/home/timur/IdeaProjects"
-                + "/java-project-71/app/src/test/resources/nestedFile1.json");
+        filePath = "/home/timur/IdeaProjects"
+                + "/java-project-71/app/src/test/resources/nestedFile1.json";
+        jsonContent = Reader.readFile(filePath);
         expectedData = new HashMap<>();
         expectedData.put("profile", "{name=typicode}");
         expectedData.put("posts", "[{id:1, title:hello}]");
@@ -49,11 +53,11 @@ class ParserTest {
     @Test
     void parse() throws JsonProcessingException, ParseException {
         assertEquals(String.valueOf(expectedData),
-                String.valueOf(Parser.parse(jsonContent)));
+                String.valueOf(Parser.parse(jsonContent, getDataFormat(filePath))));
         String wrong = Reader.readFile(
                "/home/timur/IdeaProjects/java-project-71/app/src/test/resources/text.txt");
         assertEquals("{newKey=Some text...}",
-                String.valueOf(Parser.parse(wrong)));
+                String.valueOf(Parser.parse(wrong, getDataFormat(filePath))));
     }
 
     @Test
@@ -61,7 +65,8 @@ class ParserTest {
         HashMap<Object, Object> expectedYaml = new HashMap<>();
         expectedYaml.put("martin", "{skill=Elite, name=Martin D'vloper, job=Developer}");
         assertEquals(String.valueOf(expectedYaml), String.valueOf(Parser.parse("---\n"
-                + "martin: {name: Martin D'vloper, job: Developer, skill: Elite}")));
+                + "martin: {name: Martin D'vloper, job: Developer, skill: Elite}",
+                getDataFormat(filePath))));
     }
     @Test
     void isJSONValid() {
