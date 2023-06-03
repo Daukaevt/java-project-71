@@ -37,8 +37,7 @@ public class Differ {
         TreeMap<String, Wrapper> unitMap = Uniter.unite(parseJson1, parseJson2);
         return ContentFormatter.makeFormat(unitMap, format);
     }
-    // Формат данных берём на основе расширения файла, отрезая точку от строки.
-    private static String getDataFormat(String filePath) {
+    static String getDataFormat(String filePath) {
         int index = filePath.lastIndexOf('.');
         return index > 0
                 ? filePath.substring(index + 1)
