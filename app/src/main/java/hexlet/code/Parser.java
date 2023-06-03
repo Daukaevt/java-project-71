@@ -28,17 +28,17 @@ public class Parser {
         HashMap<Object, Object> unstructuredData = new HashMap<>();
         unstructuredData.put("newKey", content);
         switch (dataFormat) {
-            case "json": {
+            case "json" -> {
                 if (validJSON) {
                     return replaceNull(getJson(content));
                 } else {
                     return unstructuredData;
                 }
             }
-            case "yml": {
+            case "yml" -> {
                 return replaceNull(getJson(convertYamlToJsonData(content)));
             }
-            default: {
+            default -> {
                 return unstructuredData;
             }
         }
