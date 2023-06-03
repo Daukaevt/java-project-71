@@ -35,7 +35,7 @@ public class Parser {
                     return unstructuredData;
                 }
             }
-            case "yaml": {
+            case "yml": {
                 return replaceNull(getJson(convertYamlToJsonData(content)));
             }
             default: {
