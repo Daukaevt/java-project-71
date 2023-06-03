@@ -20,24 +20,31 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Parser {
-    public static Map parse(final String content) throws JsonProcessingException, ParseException {
+    public static Map parse(final String content, String dataFormat) throws JsonProcessingException, ParseException {
         if (content.isEmpty()) {
             return new HashMap<String, String>();
         }
         boolean validJSON = isJSONValid(content);
-        Map parseJsonToMap;
-        if (validJSON) {
-            parseJsonToMap = getJson(content);
-        } else {
-            try {
-                parseJsonToMap = getJson(convertYamlToJsonData(content));
-            } catch (Exception e) {
-                HashMap<Object, Object> unstructuredData = new HashMap<>();
-                unstructuredData.put("newKey", content);
+        HashMap<Object, Object> unstructuredData = new HashMap<>();
+        unstructuredData.put("newKey", content);
+        switch (dataFormat) {
+            case "json": {
+                if (validJSON) {
+                    return replaceNull(getJson(content));
+                } else {
+                    return unstructuredData;
+                }
+            }
+            case "yaml":
+                try {
+                    return replaceNull(getJson(convertYamlToJsonData(content)));
+                } catch (Exception e) {
+                    return unstructuredData;
+                }
+            default: {
                 return unstructuredData;
             }
         }
-        return replaceNull(parseJsonToMap);
     }
 
     public static boolean isJSONValid(final String jsonInString) {
