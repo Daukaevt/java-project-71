@@ -22,7 +22,7 @@ public class ContentFormatter {
                 return StylishFormatter.stylishFormat(unitMap);
             }
             default -> {
-                throw new Exception("Incorrect style format.");
+                throw new Exception("Unknown format: " + format);
             }
         }
     }
