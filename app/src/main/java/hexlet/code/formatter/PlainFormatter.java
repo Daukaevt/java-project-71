@@ -18,14 +18,10 @@ public class PlainFormatter {
                 stringBuilder.append("Property '").append(key)
                         .append("' was added with value: ")
                         .append(getSingleQuotes3(value2)).append("\n");
-                return;
-            }
-            if (value2.equals("-absent-")) {
+            } else if (value2.equals("-absent-")) {
                 stringBuilder.append("Property '").append(key)
                         .append("' was removed").append("\n");
-                return;
-            }
-            if (!value1.equals(value2)) {
+            } else if (!value1.equals(value2)) {
                 stringBuilder.append("Property '").append(key)
                         .append("' was updated. From ")
                         .append(getSingleQuotes3(value1)).append(" to ")
