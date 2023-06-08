@@ -10,14 +10,8 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class Parser {
     public static Map parse(final String content, String dataFormat) throws JsonProcessingException, ParseException {
@@ -30,13 +24,13 @@ public class Parser {
         switch (dataFormat) {
             case "json" -> {
                 if (validJSON) {
-                    return replaceNull(getJson(content));
+                   return replaceContentToNotNullStringValue(getJson(content));
                 } else {
                     return unstructuredData;
                 }
             }
             case "yml" -> {
-                return replaceNull(getJson(convertYamlToJsonData(content)));
+                return replaceContentToNotNullStringValue(getJson(convertYamlToJsonData(content)));
             }
             default -> {
                 return unstructuredData;
@@ -78,7 +72,7 @@ public class Parser {
             Map contentMapping;
             contentMapping = mapper.readValue(String.valueOf(o), Map.class);
             for (Object key : contentMapping.keySet()) {
-                dataMap.put(key, contentMapping.get(key));
+                dataMap.put(String.valueOf(key), String.valueOf(contentMapping.get(key)));
             }
         }
         return dataMap;
@@ -97,32 +91,13 @@ public class Parser {
         ObjectMapper jsonWriter = new ObjectMapper();
         return jsonWriter.writeValueAsString(obj);
     }
-
-    public static HashMap replaceNull(
-            final Map parseFileContent) throws JsonProcessingException {
-        HashMap hashMap = new HashMap();
-        Pattern braces = Pattern.compile("\\{.*}");
-        Pattern squareBrackets = Pattern.compile("\\[.*]");
-        for (Object key : parseFileContent.keySet()) {
-            String value;
-            parseFileContent.putIfAbsent(key, "null");
-            value = parseFileContent.get(key).toString();
-            Matcher hasBraces = braces.matcher(value);
-            Matcher hasSquareBrackets = squareBrackets.matcher(value);
-            if (hasSquareBrackets.find()) {
-                value = value.replaceAll("^\\[", "").replaceAll("]$", "");
-                Stream<String> stream = Arrays.stream(value.split(","));
-                List<String> list = stream.collect(Collectors.toList());
-                list.replaceAll(s -> s.replaceAll("\"", "").replaceAll("\"", ""));
-                hashMap.put(key, list);
-            } else if (hasBraces.find()) {
-                ObjectMapper mapper = new ObjectMapper();
-                Map map = mapper.readValue(value, Map.class);
-                hashMap.put(key, map);
-            } else {
-                hashMap.put(key, parseFileContent.get(key));
-            }
+    public static HashMap replaceContentToNotNullStringValue(Map parseFileContent) {
+        HashMap notNullFileContent = new HashMap();
+        for (Object key: parseFileContent.keySet()) {
+            String notNullKey = String.valueOf(key);
+            String notNullContent = String.valueOf(parseFileContent.get(key));
+                notNullFileContent.put(notNullKey, notNullContent);
         }
-        return hashMap;
+        return notNullFileContent;
     }
 }
