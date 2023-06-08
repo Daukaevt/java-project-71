@@ -96,7 +96,7 @@ public class Parser {
         for (Object key: parseFileContent.keySet()) {
             String notNullKey = String.valueOf(key);
             String notNullContent = String.valueOf(parseFileContent.get(key));
-                notNullFileContent.put(notNullKey, notNullContent);
+            notNullFileContent.put(notNullKey, notNullContent.replaceAll("\"",""));
         }
         return notNullFileContent;
     }
