@@ -31,6 +31,18 @@ public class Uniter {
                 ));
             }
         }
-        return unitMap;
+
+        return addWhiteSpaces(unitMap);
+    }
+    public static TreeMap addWhiteSpaces(TreeMap<String, Wrapper> unitMap) {
+        TreeMap<String, Wrapper> whiteSpacedUnitMap = new TreeMap<>();
+        for (String key: unitMap.keySet()) {
+            Wrapper values = unitMap.get(key);
+            whiteSpacedUnitMap.put(key, new Wrapper(
+                    String.valueOf(values.getValue1()).replace(",", ", "),
+                    String.valueOf(values.getValue2()).replace(",", ", ")
+            ));
+        }
+        return whiteSpacedUnitMap;
     }
 }
