@@ -43,7 +43,7 @@ class ParserTest {
                                  }""".indent(1);
         filePath = "/home/timur/IdeaProjects"
                 + "/java-project-71/app/src/test/resources/nestedFile1.json";
-        jsonContent = Reader.readFile(filePath);
+        jsonContent = Reader.read(filePath);
         expectedData = new HashMap<>();
         expectedData.put("profile", "{name=typicode}");
         expectedData.put("posts", "[{id:1, title:hello}]");
@@ -54,7 +54,7 @@ class ParserTest {
     void parse() throws JsonProcessingException, ParseException {
         assertEquals(String.valueOf(expectedData),
                 String.valueOf(Parser.parse(jsonContent, getDataFormat(filePath))));
-        String wrong = Reader.readFile(
+        String wrong = Reader.read(
                "/home/timur/IdeaProjects/java-project-71/app/src/test/resources/text.txt");
         assertEquals("{newKey=Some text...}",
                 String.valueOf(Parser.parse(wrong, getDataFormat(filePath))));
@@ -80,7 +80,7 @@ class ParserTest {
 
     @Test
     void getJson() throws JsonProcessingException, ParseException {
-        String jsonArrayData = Reader.readFile(
+        String jsonArrayData = Reader.read(
                 "/home/timur/IdeaProjects/java-project-71/app/src/test/resources/array.json");
         HashMap<Object, Object> expectedJsonData = new HashMap<>();
         expectedJsonData.put("id", 1);
@@ -128,8 +128,8 @@ class ParserTest {
     }
 
     @Test
-    void replaceNull() throws ParseException, JsonProcessingException {
+    void replaceNull() throws ParseException {
         assertEquals(String.valueOf(expectedData),
-                String.valueOf(Parser.replaceNull(Parser.parseJsonObject(jsonContent))));
+                String.valueOf(Parser.replaceContentToNotNullStringValue(Parser.parseJsonObject(jsonContent))));
     }
 }
