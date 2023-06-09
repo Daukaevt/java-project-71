@@ -1,5 +1,6 @@
 package hexlet.code;
 
+import com.google.common.base.Splitter;
 import hexlet.code.utils.Wrapper;
 
 import java.util.Map;
@@ -38,11 +39,19 @@ public class Uniter {
         TreeMap<String, Wrapper> whiteSpacedUnitMap = new TreeMap<>();
         for (String key: unitMap.keySet()) {
             Wrapper values = unitMap.get(key);
-            whiteSpacedUnitMap.put(key, new Wrapper(
-                    String.valueOf(values.getValue1()).replace(",", ", "),
-                    String.valueOf(values.getValue2()).replace(",", ", ")
+            whiteSpacedUnitMap.put(key, new Wrapper(checkingingValue(values.getValue1()), checkingingValue(values.getValue2())
             ));
         }
         return whiteSpacedUnitMap;
     }
+
+    private static String checkingingValue(String values) {
+        if (values.startsWith("{") || values.startsWith("[")) {
+            String result = String.valueOf(Splitter.on(",")
+                    .withKeyValueSeparator(":")
+                    .split(values));
+            return result.substring(1, result.length()-1);
+        } else return values;
+    }
+
 }
