@@ -37,8 +37,10 @@ public class Uniter {
         TreeMap<String, Wrapper> whiteSpacedUnitMap = new TreeMap<>();
         for (String key: unitMap.keySet()) {
             Wrapper values = unitMap.get(key);
-            whiteSpacedUnitMap.put(key,
-                    new Wrapper(nestedData(values.getValue1()), nestedData(values.getValue2())));
+            if (values != null) {
+                whiteSpacedUnitMap.put(key,
+                        new Wrapper(nestedData(values.getValue1()), nestedData(values.getValue2())));
+            }
         }
         return whiteSpacedUnitMap;
     }
