@@ -39,13 +39,14 @@ public class Uniter {
         TreeMap<String, Wrapper> whiteSpacedUnitMap = new TreeMap<>();
         for (String key: unitMap.keySet()) {
             Wrapper values = unitMap.get(key);
-            whiteSpacedUnitMap.put(key, new Wrapper(checkingingValue(values.getValue1()), checkingingValue(values.getValue2())
+            whiteSpacedUnitMap.put(key, new Wrapper(checkingValue(values.getValue1()), checkingValue(values.getValue2())
             ));
         }
         return whiteSpacedUnitMap;
     }
 
-    private static String checkingingValue(String values) {
+    @SuppressWarnings("UnstableApiUsage")
+    private static String checkingValue(String values) {
         if (values.startsWith("{") || values.startsWith("[")) {
             String result = String.valueOf(Splitter.on(",")
                     .withKeyValueSeparator(":")
