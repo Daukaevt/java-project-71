@@ -1,6 +1,6 @@
 package hexlet.code;
 
-import com.google.common.base.Splitter;
+
 import hexlet.code.utils.Wrapper;
 
 import java.util.HashMap;
@@ -21,8 +21,7 @@ public class Uniter {
             } else {
                 unitMap.put(key.toString(), new Wrapper(
                         (parseJson1.get(String.valueOf(key)).toString()),
-                        ("-absent-")
-                ));
+                        ("-absent-")));
             }
         }
         for (Object key: parseJson2.keySet()) {
@@ -38,21 +37,34 @@ public class Uniter {
         TreeMap<String, Wrapper> whiteSpacedUnitMap = new TreeMap<>();
         for (String key: unitMap.keySet()) {
             Wrapper values = unitMap.get(key);
-            whiteSpacedUnitMap.put(key, new Wrapper(checkingValue(values.getValue1()), checkingValue(values.getValue2())
-            ));
+            whiteSpacedUnitMap.put(key,
+                    new Wrapper(nestedData(values.getValue1()), nestedData(values.getValue2())));
         }
         return whiteSpacedUnitMap;
     }
-
-    @SuppressWarnings("UnstableApiUsage")
-    private static String checkingValue(String values) {
-        if (values.startsWith("{") || values.startsWith("[")) {
-            Splitter.MapSplitter mapSplitter = Splitter.on(",").withKeyValueSeparator(":");
-            Map<String, String> result = mapSplitter.split(values);
-            Map<String, String> adjustedMap = new HashMap<>(result);
-            adjustedMap.replaceAll ((k,v) -> v != null ? v : null);
-            var length = result.toString().length() - 1;
-            return result.toString().substring(1, length);
+    static String nestedData(String values) {
+        if (values.startsWith("{") || values.endsWith("}")) {
+            return mappingValue(values);
+        } else if (values.startsWith("[") || values.endsWith("]")) {
+            return "[" + mappingValue(values.substring(1, values.length() - 1)) + "]";
         } else return values;
+    }
+
+    private static String mappingValue(String values) {
+        HashMap tempValuesMap = new HashMap();
+        String tempValues = values.substring(1, values.length() - 1);
+        String[] splitedLines = tempValues.split(",");
+        for (String splitedLine : splitedLines) {
+            String[] keyValuePares = splitedLine.split(":");
+            String tempKey = keyValuePares[0];
+            String tempValue = keyValuePares[1];
+            if (tempValue == null) {
+                tempValue = "null";
+            } else if (tempKey == null) {
+                tempKey = "null";
+            }
+            tempValuesMap.put(tempKey, tempValue);
+        }
+        return String.valueOf(tempValuesMap);
     }
 }
