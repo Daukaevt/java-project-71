@@ -28,11 +28,9 @@ public class Uniter {
             if (!parseJson1.containsKey(String.valueOf(key))) {
                 unitMap.put(key.toString(), new Wrapper(
                         ("-absent-"),
-                        (parseJson2.get(String.valueOf(key)).toString())
-                ));
+                        (parseJson2.get(String.valueOf(key)).toString())));
             }
         }
-
         return addWhiteSpaces(unitMap);
     }
     public static TreeMap addWhiteSpaces(TreeMap<String, Wrapper> unitMap) {
@@ -48,11 +46,10 @@ public class Uniter {
     @SuppressWarnings("UnstableApiUsage")
     private static String checkingValue(String values) {
         if (values.startsWith("{") || values.startsWith("[")) {
-            String result = String.valueOf(Splitter.on(",")
-                    .withKeyValueSeparator(":")
-                    .split(values));
-            return result.substring(1, result.length()-1);
+            Splitter.MapSplitter mapSplitter = Splitter.on(",").withKeyValueSeparator(":");
+            Map<String, String> result = mapSplitter.split(values);
+            var length = result.toString().length() - 1;
+            return result.toString().substring(1, length);
         } else return values;
     }
-
 }
