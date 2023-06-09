@@ -3,6 +3,7 @@ package hexlet.code;
 import com.google.common.base.Splitter;
 import hexlet.code.utils.Wrapper;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -48,6 +49,8 @@ public class Uniter {
         if (values.startsWith("{") || values.startsWith("[")) {
             Splitter.MapSplitter mapSplitter = Splitter.on(",").withKeyValueSeparator(":");
             Map<String, String> result = mapSplitter.split(values);
+            Map<String, String> adjustedMap = new HashMap<>(result);
+            adjustedMap.replaceAll ((k,v) -> v != null ? v : null);
             var length = result.toString().length() - 1;
             return result.toString().substring(1, length);
         } else return values;
