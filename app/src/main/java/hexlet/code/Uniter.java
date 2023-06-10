@@ -3,6 +3,7 @@ package hexlet.code;
 
 import hexlet.code.utils.Wrapper;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -49,6 +50,9 @@ public class Uniter {
             return mappingValue(values);
         } else if (values.startsWith("[{") || values.endsWith("}]")) {
             return "[" + mappingValue(values.substring(1, values.length() - 1)) + "]";
+        } else if (values.startsWith("[") || values.endsWith("]")) {
+            var arrayData = Arrays.toString(values.split(","));
+           return arrayData.substring(1, arrayData.length() - 1);
         } else return values;
     }
 
