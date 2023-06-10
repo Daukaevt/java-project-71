@@ -54,7 +54,7 @@ public class Uniter {
 
     private static String mappingValue(String values) {
         HashMap tempValuesMap = new HashMap();
-        if (values.length() > 0) {
+        if (values.length() > 1) {
             String tempKey = null;
             String tempValue = null;
             String tempValues = values.substring(1, values.length() - 1);
