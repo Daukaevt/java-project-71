@@ -51,19 +51,21 @@ public class Uniter {
         } else if (values.startsWith("[{") || values.endsWith("}]")) {
             return "[" + mappingValue(values.substring(1, values.length() - 1)) + "]";
         } else if (values.startsWith("[") || values.endsWith("]")) {
-            var arrayData = Arrays.toString(values.split(","));
-           return arrayData.substring(1, arrayData.length() - 1);
-        } else return values;
+            String arrayData = Arrays.toString(values.split(","));
+            return arrayData.substring(1, arrayData.length() - 1);
+        } else {
+            return values;
+        }
     }
 
     private static String mappingValue(String values) {
         HashMap tempValuesMap = new HashMap();
-            String tempValues = values.substring(1, values.length() - 1);
-            String[] splitedLines = tempValues.split(",");
-            for (String splitedLine : splitedLines) {
-                String[] keyValuePares = splitedLine.split(":");
-                tempValuesMap.put(keyValuePares[0], keyValuePares[1]);
-            }
+        String tempValues = values.substring(1, values.length() - 1);
+        String[] splitedLines = tempValues.split(",");
+        for (String splitedLine : splitedLines) {
+            String[] keyValuePares = splitedLine.split(":");
+            tempValuesMap.put(keyValuePares[0], keyValuePares[1]);
+        }
         return String.valueOf(tempValuesMap);
     }
 }
