@@ -24,7 +24,7 @@ public class Parser {
         switch (dataFormat) {
             case "json" -> {
                 if (validJSON) {
-                   return replaceContentToNotNullStringValue(getJson(content));
+                    return replaceContentToNotNullStringValue(getJson(content));
                 } else {
                     return unstructuredData;
                 }
@@ -96,7 +96,7 @@ public class Parser {
         for (Object key: parseFileContent.keySet()) {
             String notNullKey = String.valueOf(key);
             String notNullContent = String.valueOf(parseFileContent.get(key));
-            notNullFileContent.put(notNullKey, notNullContent.replaceAll("\"",""));
+            notNullFileContent.put(notNullKey, notNullContent.replaceAll("\"", ""));
         }
         return notNullFileContent;
     }
