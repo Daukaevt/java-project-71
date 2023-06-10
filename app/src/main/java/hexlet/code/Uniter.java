@@ -47,8 +47,8 @@ public class Uniter {
     static String nestedData(String values) {
         if (values.startsWith("{") || values.endsWith("}")) {
             return mappingValue(values);
-        } else if (values.startsWith("[") || values.endsWith("]")) {
-            return "[" + mappingValue(values) + "]";
+        } else if (values.startsWith("[{") || values.endsWith("}]")) {
+            return "[" + mappingValue(values.substring(1, values.length() - 1)) + "]";
         } else return values;
     }
 
