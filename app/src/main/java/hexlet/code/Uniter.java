@@ -53,23 +53,26 @@ public class Uniter {
     }
 
     private static String mappingValue(String values) {
-        if (values.length() == 0) {
-            return values;
-        }
         HashMap tempValuesMap = new HashMap();
-        String tempValues = values.substring(1, values.length() - 1);
-        String[] splitedLines = tempValues.split(",");
-        for (String splitedLine : splitedLines) {
-            String[] keyValuePares = splitedLine.split(":");
-            String tempKey = keyValuePares[0];
-            String tempValue = keyValuePares[1];
-            if (tempValue == null) {
-                tempValue = "null";
-            } else if (tempKey == null) {
-                tempKey = "null";
+        if (values.length() > 0) {
+            String tempKey = null;
+            String tempValue = null;
+            String tempValues = values.substring(1, values.length() - 1);
+            String[] splitedLines = tempValues.split(",");
+            for (String splitedLine : splitedLines) {
+                String[] keyValuePares = splitedLine.split(":");
+                if (keyValuePares.length > 0) {
+                    tempKey = keyValuePares[0];
+                    tempValue = keyValuePares[1];
+                }
+                if (tempValue == null) {
+                    tempValue = "null";
+                } else if (tempKey == null) {
+                    tempKey = "null";
+                }
+                tempValuesMap.put(tempKey, tempValue);
             }
-            tempValuesMap.put(tempKey, tempValue);
-        }
+        } else return values;
         return String.valueOf(tempValuesMap);
     }
 }
