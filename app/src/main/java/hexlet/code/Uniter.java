@@ -53,6 +53,9 @@ public class Uniter {
     }
 
     private static String mappingValue(String values) {
+        if (values.length() == 0) {
+            return values;
+        }
         HashMap tempValuesMap = new HashMap();
         String tempValues = values.substring(1, values.length() - 1);
         String[] splitedLines = tempValues.split(",");
