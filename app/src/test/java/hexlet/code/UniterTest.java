@@ -10,16 +10,14 @@ import java.util.TreeMap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class UniterTest {
-    String expected;
-    HashMap<String, Object> firstData;
-    HashMap<String, Object> secondData;
-    TreeMap<String, Wrapper> unitedData;
+    private String expected;
+    private TreeMap<String, Wrapper> unitedData;
     @BeforeEach
-    void SetUp() {
+    void setUp() {
         expected = "-absent-";
-        firstData = new HashMap<>();
-        secondData = new HashMap<>();
-        firstData.put("profile", "{name=typicode}");
+        HashMap<String, Object> firstData = new HashMap<>();
+        HashMap<String, Object> secondData = new HashMap<>();
+        firstData.put("profile", "{name:typicode}");
         firstData.put("posts", "[{id:1,title:hello}]");
         firstData.put("field", "null");
         secondData.put("fieldNew", "valueNew");
@@ -36,6 +34,6 @@ class UniterTest {
         testTreeMap.put("posts", new Wrapper("[{id:1,title:hello}]", "some value"));
         TreeMap<String, Wrapper> whiteSpacedTreeMap = Uniter.addWhiteSpaces(testTreeMap);
         String str = whiteSpacedTreeMap.get("posts").getValue1();
-        assertEquals("[{id:1, title:hello}]", str);
+        assertEquals("[{id=1, title=hello}]", str);
     }
 }
