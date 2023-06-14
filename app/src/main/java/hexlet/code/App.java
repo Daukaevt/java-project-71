@@ -52,8 +52,6 @@ public class App implements Callable<Integer> {
     )
     private boolean helpRequested = false;
 
-    public App() {
-    }
     public static void main(String[] args) {
         new CommandLine(new App()).execute(args);
     }
