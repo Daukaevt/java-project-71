@@ -65,9 +65,10 @@ class ParserTest {
 
     @Test
     void parseYaml() throws JsonProcessingException, ParseException {
-        String testYml = "---\n" +
-                "martin: {name: Martin D'vloper, job: Developer, skill: Elite}\n" +
-                "fruits: ['Apple', 'Orange', 'Strawberry', 'Mango']";
+        String testYml = """
+                ---
+                martin: {name: Martin D'vloper, job: Developer, skill: Elite}
+                fruits: ['Apple', 'Orange', 'Strawberry', 'Mango']""";
         HashMap<Object, Object> expectedYml = new HashMap<>();
         expectedYml.put("martin", "{skill:Elite,name:Martin D'vloper,job:Developer}");
         expectedYml.put("fruits", "[Apple,Orange,Strawberry,Mango]");
@@ -97,8 +98,7 @@ class ParserTest {
     @Test
     void getJsonArray() throws JsonProcessingException {
         assertEquals(expected, String.valueOf(Parser.parseJsonArray(jsonArray)));
-        assertThrows(RuntimeException.class, () -> String.valueOf(
-                Parser.parseJsonArray(wrongArray)));
+        assertThrows(RuntimeException.class, () -> String.valueOf(Parser.parseJsonArray(wrongArray)));
     }
     @Test
     void getArrayDataMapTest() throws JsonProcessingException {
