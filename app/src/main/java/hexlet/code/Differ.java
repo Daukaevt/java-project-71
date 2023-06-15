@@ -31,7 +31,6 @@ public class Differ {
         Map<String, Object> parseJson1 =
                 Parser.parse(readContent(path1.toAbsolutePath().toString()),
                         getDataFormat(String.valueOf(path1)));
-
         Map<String, Object> parseJson2 =
                 Parser.parse(readContent(path2.toAbsolutePath().toString()),
                         getDataFormat(String.valueOf(path2)));
