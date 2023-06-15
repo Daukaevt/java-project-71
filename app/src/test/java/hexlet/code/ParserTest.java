@@ -8,6 +8,9 @@ import org.json.simple.parser.ParseException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 
 import static hexlet.code.Differ.getDataFormat;
@@ -26,7 +29,7 @@ class ParserTest {
     private String filePath;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws IOException {
         expected = "{id=1, title=hello}";
         jsonArray = """
                 [
@@ -43,30 +46,32 @@ class ParserTest {
                                  }""".indent(1);
         filePath = "/home/timur/IdeaProjects"
                 + "/java-project-71/app/src/test/resources/nestedFile1.json";
-        jsonContent = Reader.read(filePath);
+        jsonContent = Files.readString(Path.of(filePath));
         expectedData = new HashMap<>();
-        expectedData.put("profile", "{name=typicode}");
-        expectedData.put("posts", "[{id:1, title:hello}]");
+        expectedData.put("profile", "{name:typicode}");
+        expectedData.put("posts", "[{id:1,title:hello}]");
         expectedData.put("field", "null");
     }
 
     @Test
-    void parse() throws JsonProcessingException, ParseException {
+    void parse() throws IOException, ParseException {
         assertEquals(String.valueOf(expectedData),
                 String.valueOf(Parser.parse(jsonContent, getDataFormat(filePath))));
-        String wrong = Reader.read(
-               "/home/timur/IdeaProjects/java-project-71/app/src/test/resources/text.txt");
+        String wrong = Files.readString(Path.of(
+               "/home/timur/IdeaProjects/java-project-71/app/src/test/resources/text.txt"));
         assertEquals("{newKey=Some text...}",
-                String.valueOf(Parser.parse(wrong, getDataFormat(filePath))));
+                String.valueOf(Parser.parse(wrong, "json")));
     }
 
     @Test
     void parseYaml() throws JsonProcessingException, ParseException {
-        HashMap<Object, Object> expectedYaml = new HashMap<>();
-        expectedYaml.put("martin", "{skill=Elite, name=Martin D'vloper, job=Developer}");
-        assertEquals(String.valueOf(expectedYaml), String.valueOf(Parser.parse("---\n"
-                + "martin: {name: Martin D'vloper, job: Developer, skill: Elite}",
-                getDataFormat(filePath))));
+        String testYml = "---\n" +
+                "martin: {name: Martin D'vloper, job: Developer, skill: Elite}\n" +
+                "fruits: ['Apple', 'Orange', 'Strawberry', 'Mango']";
+        HashMap<Object, Object> expectedYml = new HashMap<>();
+        expectedYml.put("martin", "{skill:Elite,name:Martin D'vloper,job:Developer}");
+        expectedYml.put("fruits", "[Apple,Orange,Strawberry,Mango]");
+        assertEquals(String.valueOf(expectedYml), String.valueOf(Parser.parse(testYml, "yml")));
     }
     @Test
     void isJSONValid() {
@@ -79,13 +84,13 @@ class ParserTest {
     }
 
     @Test
-    void getJson() throws JsonProcessingException, ParseException {
-        String jsonArrayData = Reader.read(
-                "/home/timur/IdeaProjects/java-project-71/app/src/test/resources/array.json");
+    void getJson() throws IOException, ParseException {
+        String jsonArrayData = Files.readString(Path.of(
+                "/home/timur/IdeaProjects/java-project-71/app/src/test/resources/array.json"));
         HashMap<Object, Object> expectedJsonData = new HashMap<>();
         expectedJsonData.put("id", 1);
         expectedJsonData.put("title", "hello");
-        assertEquals(expectedJsonData, Parser.getJson(jsonArrayData));
+        assertEquals(String.valueOf(expectedJsonData), String.valueOf(Parser.getJson(jsonArrayData)));
 
     }
 
