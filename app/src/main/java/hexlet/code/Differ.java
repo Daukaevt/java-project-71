@@ -22,7 +22,6 @@ public class Differ {
     public static String generate(
             final String filePath1, final String filePath2, final String format
     ) throws Exception {
-
         Path path1 = Paths.get(filePath1).normalize();
         Path path2 = Paths.get(filePath2).normalize();
         if (!Files.exists(path1) || !Files.exists(path2)) {
@@ -37,11 +36,9 @@ public class Differ {
         TreeMap<String, Wrapper> unitMap = Uniter.unite(parseJson1, parseJson2);
         return ContentFormatter.makeFormat(unitMap, format);
     }
-
     private static String readContent(String filePath) throws IOException {
         return Files.readString(Path.of(filePath));
     }
-
     static String getDataFormat(String filePath) {
         int index = filePath.lastIndexOf('.');
         return index > 0
