@@ -4,7 +4,6 @@ package hexlet.code;
 import hexlet.code.utils.Wrapper;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -59,13 +58,6 @@ public class Uniter {
     }
 
     private static String mappingValue(String values) {
-        HashMap tempValuesMap = new HashMap();
-        String tempValues = values.substring(1, values.length() - 1);
-        String[] splitedLines = tempValues.split(",");
-        for (String splitedLine : splitedLines) {
-            String[] keyValuePares = splitedLine.split(":");
-            tempValuesMap.put(keyValuePares[0], keyValuePares[1]);
-        }
-        return String.valueOf(tempValuesMap);
+            return values;
     }
 }
