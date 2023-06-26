@@ -1,6 +1,7 @@
 package hexlet.code;
 
 
+import com.google.common.base.Splitter;
 import hexlet.code.utils.Wrapper;
 
 import java.util.Arrays;
@@ -58,6 +59,9 @@ public class Uniter {
     }
 
     private static String mappingValue(String values) {
-            return values;
+        Map<String, String> properties = Splitter.on(",")
+                .withKeyValueSeparator(":")
+                .split(values);
+        return String.valueOf(properties).replaceAll("^.|.$", "");
     }
 }
