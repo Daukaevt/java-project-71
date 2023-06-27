@@ -2,6 +2,7 @@ package hexlet.code;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.json.simple.JSONArray;
@@ -10,8 +11,10 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
+import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Parser {
     public static Map parse(final String content, String dataFormat) throws JsonProcessingException, ParseException {
@@ -37,6 +40,7 @@ public class Parser {
             }
         }
     }
+
 
     public static boolean isJSONValid(final String jsonInString) {
         try {
@@ -65,17 +69,10 @@ public class Parser {
         return getArrayDataMap(jsonArray);
     }
 
-    public static Map getArrayDataMap(JSONArray jsonArray) throws JsonProcessingException {
-        HashMap dataMap = new HashMap();
-        for (Object o : jsonArray) {
-            ObjectMapper mapper = new ObjectMapper();
-            Map contentMapping;
-            contentMapping = mapper.readValue(String.valueOf(o), Map.class);
-            for (Object key : contentMapping.keySet()) {
-                dataMap.put(String.valueOf(key), String.valueOf(contentMapping.get(key)));
-            }
-        }
-        return dataMap;
+    static Map getArrayDataMap(JSONArray jsonArray) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        TypeReference<HashMap<String,Object>> typeRef = new TypeReference<>() {};
+        return mapper.readValue(jsonArray.toJSONString().replaceAll("^.|.$", ""), typeRef);
     }
 
     public static Map parseJsonObject(final String contentFile1) throws ParseException {
@@ -91,13 +88,12 @@ public class Parser {
         ObjectMapper jsonWriter = new ObjectMapper();
         return jsonWriter.writeValueAsString(obj);
     }
-    public static HashMap replaceContentToNotNullStringValue(Map parseFileContent) {
-        HashMap notNullFileContent = new HashMap();
-        for (Object key: parseFileContent.keySet()) {
-            String notNullKey = String.valueOf(key);
-            String notNullContent = String.valueOf(parseFileContent.get(key));
-            notNullFileContent.put(notNullKey, notNullContent.replaceAll("\"", ""));
-        }
-        return notNullFileContent;
+
+    static Map replaceContentToNotNullStringValue(Map json) {
+        Map <String, String> jsonInputToMap = new HashMap<>(json);
+        return jsonInputToMap
+                .entrySet().stream()
+                .map(x -> new AbstractMap.SimpleEntry<String, String>(x.getKey(), String.valueOf(x.getValue())))
+                .collect(Collectors.toMap(x -> x.getKey(), x -> x.getValue()));
     }
 }
