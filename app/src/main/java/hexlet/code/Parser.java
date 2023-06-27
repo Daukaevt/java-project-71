@@ -27,21 +27,21 @@ public class Parser {
         switch (dataFormat) {
             case "json" -> {
                 if (validJSON) {
-                    return replaceContentToNotNullStringValue(getJson(content));
+                    Map unfilteredJsonData = replaceContentToNotNullStringValue(getJson(content));
+                    return remooveQuotes(unfilteredJsonData);
                 } else {
                     return unstructuredData;
                 }
             }
             case "yml" -> {
-                return replaceContentToNotNullStringValue(getJson(convertYamlToJsonData(content)));
+                Map unfilteredYamlToJsonData = replaceContentToNotNullStringValue(getJson(convertYamlToJsonData(content)));
+                return remooveQuotes(unfilteredYamlToJsonData);
             }
             default -> {
                 return unstructuredData;
             }
         }
     }
-
-
     public static boolean isJSONValid(final String jsonInString) {
         try {
             final ObjectMapper mapper = new ObjectMapper();
@@ -51,13 +51,11 @@ public class Parser {
             return false;
         }
     }
-
     public static Map getJson(String content) throws JsonProcessingException, ParseException {
         return content.startsWith("[")
                 ? parseJsonArray(content)
                 : parseJsonObject(content);
     }
-
     public static Map parseJsonArray(final String contentFile1) throws JsonProcessingException {
         JSONArray jsonArray;
         JSONParser jsonParser = new JSONParser();
@@ -68,7 +66,6 @@ public class Parser {
         }
         return getArrayDataMap(jsonArray);
     }
-
     static Map getArrayDataMap(JSONArray jsonArray) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         TypeReference<HashMap<String,Object>> typeRef = new TypeReference<>() {};
@@ -88,12 +85,19 @@ public class Parser {
         ObjectMapper jsonWriter = new ObjectMapper();
         return jsonWriter.writeValueAsString(obj);
     }
-
     static Map replaceContentToNotNullStringValue(Map json) {
         Map <String, String> jsonInputToMap = new HashMap<>(json);
         return jsonInputToMap
                 .entrySet().stream()
-                .map(x -> new AbstractMap.SimpleEntry<String, String>(x.getKey(), String.valueOf(x.getValue())))
-                .collect(Collectors.toMap(x -> x.getKey(), x -> x.getValue()));
+                .map(s -> new AbstractMap.SimpleEntry<>(s.getKey(),
+                        String.valueOf(s.getValue())))
+                .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
+    }
+    private static Map remooveQuotes(Map Data) {
+        Map <String, String> unfilteredMap = new HashMap<>(Data);
+        return unfilteredMap.entrySet().stream()
+                .map(x -> new AbstractMap.SimpleEntry<>(x.getKey(),
+                        x.getValue().replaceAll("\"", "")))
+                .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
     }
 }
