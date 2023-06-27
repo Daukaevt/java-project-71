@@ -28,14 +28,15 @@ public class Parser {
             case "json" -> {
                 if (validJSON) {
                     Map unfilteredJsonData = replaceContentToNotNullStringValue(getJson(content));
-                    return remooveQuotes(unfilteredJsonData);
+                    return removeQuotes(unfilteredJsonData);
                 } else {
                     return unstructuredData;
                 }
             }
             case "yml" -> {
-                Map unfilteredYamlToJsonData = replaceContentToNotNullStringValue(getJson(convertYamlToJsonData(content)));
-                return remooveQuotes(unfilteredYamlToJsonData);
+                Map unfilteredYamlToJsonData =
+                        replaceContentToNotNullStringValue(getJson(convertYamlToJsonData(content)));
+                return removeQuotes(unfilteredYamlToJsonData);
             }
             default -> {
                 return unstructuredData;
@@ -68,7 +69,7 @@ public class Parser {
     }
     static Map getArrayDataMap(JSONArray jsonArray) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
-        TypeReference<HashMap<String,Object>> typeRef = new TypeReference<>() {};
+        TypeReference<HashMap<String, Object>> typeRef = new TypeReference<>() { };
         return mapper.readValue(jsonArray.toJSONString().replaceAll("^.|.$", ""), typeRef);
     }
 
@@ -86,15 +87,15 @@ public class Parser {
         return jsonWriter.writeValueAsString(obj);
     }
     static Map replaceContentToNotNullStringValue(Map json) {
-        Map <String, String> jsonInputToMap = new HashMap<>(json);
+        Map<String, String> jsonInputToMap = new HashMap<>(json);
         return jsonInputToMap
                 .entrySet().stream()
                 .map(s -> new AbstractMap.SimpleEntry<>(s.getKey(),
                         String.valueOf(s.getValue())))
                 .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
     }
-    private static Map remooveQuotes(Map Data) {
-        Map <String, String> unfilteredMap = new HashMap<>(Data);
+    private static Map removeQuotes(Map data) {
+        Map<String, String> unfilteredMap = new HashMap<>(data);
         return unfilteredMap.entrySet().stream()
                 .map(x -> new AbstractMap.SimpleEntry<>(x.getKey(),
                         x.getValue().replaceAll("\"", "")))
