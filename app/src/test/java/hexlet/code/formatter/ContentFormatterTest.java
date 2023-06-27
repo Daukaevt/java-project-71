@@ -19,14 +19,14 @@ class ContentFormatterTest {
     }
 
     @Test
-    void makePlain() {
+    void makePlain() throws Exception {
         expected = "Property 'testKey' was updated. From 'value1' to 'value2'";
 
         assertEquals(expected, ContentFormatter.makeFormat(testMap, "plain"));
     }
 
     @Test
-    void makeJson() {
+    void makeJson() throws Exception {
         expected = """
                 {
                   "- testKey": "value2",
@@ -37,7 +37,7 @@ class ContentFormatterTest {
     }
 
     @Test
-    void makeStylish() {
+    void makeStylish() throws Exception {
         expected = """
                 {
                   - testKey: value1
