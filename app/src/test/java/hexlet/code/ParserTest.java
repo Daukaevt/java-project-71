@@ -48,8 +48,8 @@ class ParserTest {
                 + "/java-project-71/app/src/test/resources/nestedFile1.json";
         jsonContent = Files.readString(Path.of(filePath));
         expectedData = new HashMap<>();
-        expectedData.put("profile", "{\"name\":\"typicode\"}");
-        expectedData.put("posts", "[{\"id\":1,\"title\":\"hello\"}]");
+        expectedData.put("profile", "{name:typicode}");
+        expectedData.put("posts", "[{id:1,title:hello}]");
         expectedData.put("field", "null");
     }
 
@@ -70,8 +70,8 @@ class ParserTest {
                 martin: {name: Martin D'vloper, job: Developer, skill: Elite}
                 fruits: ['Apple', 'Orange', 'Strawberry', 'Mango']""";
         HashMap<Object, Object> expectedYml = new HashMap<>();
-        expectedYml.put("martin", "{\"skill\":\"Elite\",\"name\":\"Martin D'vloper\",\"job\":\"Developer\"}");
-        expectedYml.put("fruits", "[\"Apple\",\"Orange\",\"Strawberry\",\"Mango\"]");
+        expectedYml.put("martin", "{skill:Elite,name:Martin D'vloper,job:Developer}");
+        expectedYml.put("fruits", "[Apple,Orange,Strawberry,Mango]");
         assertEquals(String.valueOf(expectedYml), String.valueOf(Parser.parse(testYml, "yml")));
     }
     @Test
@@ -134,7 +134,7 @@ class ParserTest {
 
     @Test
     void replaceNull() throws ParseException {
-        assertEquals(String.valueOf(expectedData),
+        assertEquals("{field=null, profile={\"name\":\"typicode\"}, posts=[{\"id\":1,\"title\":\"hello\"}]}",
                 String.valueOf(Parser.replaceContentToNotNullStringValue(Parser.parseJsonObject(jsonContent))));
     }
 }
