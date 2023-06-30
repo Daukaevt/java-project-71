@@ -2,7 +2,6 @@ package hexlet.code.formatter;
 
 
 import com.google.common.base.Splitter;
-import com.google.gson.Gson;
 import hexlet.code.utils.Wrapper;
 
 import java.util.Arrays;
@@ -31,16 +30,16 @@ public class ContentFormatter {
         }
     }
     public static TreeMap addWhiteSpaces(TreeMap<String, Wrapper> unitMap) {
-    TreeMap<String, Wrapper> whiteSpacedUnitMap = new TreeMap<>();
-    for (String key: unitMap.keySet()) {
-        Wrapper values = unitMap.get(key);
-        if (values != null) {
-            whiteSpacedUnitMap.put(key,
-                    new Wrapper(nestedData(values.getValue1()), nestedData(values.getValue2())));
+        TreeMap<String, Wrapper> whiteSpacedUnitMap = new TreeMap<>();
+        for (String key: unitMap.keySet()) {
+            Wrapper values = unitMap.get(key);
+            if (values != null) {
+                whiteSpacedUnitMap.put(key,
+                        new Wrapper(nestedData(values.getValue1()), nestedData(values.getValue2())));
+            }
         }
+        return whiteSpacedUnitMap;
     }
-    return whiteSpacedUnitMap;
-}
     static String nestedData(String values) {
         if (values.startsWith("{") || values.endsWith("}")) {
             return mappingValue(values);
