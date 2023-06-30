@@ -36,6 +36,7 @@ public class Parser {
             case "yml" -> {
                 Map unfilteredYamlToJsonData =
                         replaceContentToNotNullStringValue(getJson(convertYamlToJsonData(content)));
+                Map<String, String> map = new HashMap<>(unfilteredYamlToJsonData);
                 return removeQuotes(unfilteredYamlToJsonData);
             }
             default -> {
@@ -43,6 +44,7 @@ public class Parser {
             }
         }
     }
+
     public static boolean isJSONValid(final String jsonInString) {
         try {
             final ObjectMapper mapper = new ObjectMapper();
