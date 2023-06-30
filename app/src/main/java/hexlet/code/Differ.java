@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 public class Differ {
     public static String generate(
@@ -33,8 +34,12 @@ public class Differ {
         Map<String, Object> parseJson2 =
                 Parser.parse(readContent(path2.toAbsolutePath().toString()),
                         getDataFormat(String.valueOf(path2)));
-        TreeMap<String, Wrapper> unitMap = Uniter.unite(parseJson1, parseJson2);
-        return ContentFormatter.makeFormat(unitMap, format);
+        Map<String, Wrapper> unitMap1 = Uniter.matrix(parseJson1, parseJson2);
+        var matrix = unitMap1.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey());
+        Map<String, Wrapper> matrixMapper = matrix.collect(Collectors.toMap(x -> x.getKey(), x -> x.getValue()));
+        TreeMap<String, Wrapper> sortedMatrixMapper = new TreeMap<>(matrixMapper);
+        return ContentFormatter.makeFormat(sortedMatrixMapper, format);
     }
     private static String readContent(String filePath) throws IOException {
         return Files.readString(Path.of(filePath));
