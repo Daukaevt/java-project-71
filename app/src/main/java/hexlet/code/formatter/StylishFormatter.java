@@ -2,7 +2,9 @@ package hexlet.code.formatter;
 
 import hexlet.code.utils.Wrapper;
 
+import java.util.Map;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 public class StylishFormatter {
     public static String stylishFormat(final TreeMap<String, Wrapper> unitMap) {
