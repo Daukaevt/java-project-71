@@ -14,10 +14,10 @@ public class Differ {
         return Differ.generate(firstFilePath, secondFilePath, "stylish");
     }
     public static String generate(String filePath1, String filePath2, String format) throws Exception {
-        Map firstContentMapper = Parser1.parse(
+        Map firstContentMapper = Parser.parse(
                 Files.readString(Paths.get(filePath1).toAbsolutePath()),
                 getDataFormat(filePath1));
-        Map secondContentMapper = Parser1.parse(
+        Map secondContentMapper = Parser.parse(
                 Files.readString(Paths.get(filePath2).toAbsolutePath()),
                 getDataFormat(filePath2));
         Map<String, Wrapper> matrix = Matrix.createMatrix(firstContentMapper, secondContentMapper);
