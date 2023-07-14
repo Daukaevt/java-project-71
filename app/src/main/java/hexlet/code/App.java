@@ -57,8 +57,7 @@ public class App implements Callable<Integer> {
     }
     public final Integer call() {
         try {
-            String formattedDiff = Differ.generate(filePath1, filePath2, format);
-            System.out.println(formattedDiff);
+            System.out.println(Differ.generate(filePath1, filePath2, format));
         } catch (Exception e) {
             System.err.println(e.getMessage());
             return ERROR_EXIT_CODE;
