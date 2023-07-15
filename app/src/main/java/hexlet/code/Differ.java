@@ -5,6 +5,7 @@ import hexlet.code.formatter.ContentFormatter;
 import hexlet.code.utils.Wrapper;
 
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
 import java.util.TreeMap;
@@ -14,18 +15,30 @@ public class Differ {
         return Differ.generate(firstFilePath, secondFilePath, "stylish");
     }
     public static String generate(String filePath1, String filePath2, String format) throws Exception {
-        Map firstContentMapper = Parser.parse(
-                Files.readString(Paths.get(filePath1).toAbsolutePath()),
-                getDataFormat(filePath1));
-        Map secondContentMapper = Parser.parse(
-                Files.readString(Paths.get(filePath2).toAbsolutePath()),
-                getDataFormat(filePath2));
+        Map firstContentMapper = null;
+        Map secondContentMapper = null;
+        if (isExist(filePath1)) {
+            firstContentMapper = Parser.parse(
+                    Files.readString(Paths.get(filePath1).toAbsolutePath()),
+                    getDataFormat(filePath1));
+        }
+        if (isExist(filePath2)) {
+            secondContentMapper = Parser.parse(
+                    Files.readString(Paths.get(filePath2).toAbsolutePath()),
+                    getDataFormat(filePath2));
+        }
         Map<String, Wrapper> matrix = Matrix.createMatrix(firstContentMapper, secondContentMapper);
         TreeMap<String, Wrapper> sortedMatrixMapper = new TreeMap<>(matrix);
         return ContentFormatter.makeFormat(sortedMatrixMapper, format);
     }
-    static String getDataFormat(String filePath) {
+    private static String getDataFormat(String filePath) throws Exception {
         int index = filePath.lastIndexOf('.');
         return index > 0 ? filePath.substring(index + 1) : "";
+    }
+    private static boolean isExist (String filePath) throws Exception {
+        if (!Files.exists(Path.of(filePath))) {
+            throw new Exception("File '" + filePath + "' does not exist");
+        }
+        return true;
     }
 }
