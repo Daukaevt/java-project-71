@@ -7,11 +7,12 @@ import org.junit.jupiter.api.Test;
 import java.util.TreeMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 class ContentFormatterTest {
 
-    private TreeMap<String, Wrapper> testMap = new TreeMap<>();
+    private final TreeMap<String, Wrapper> testMap = new TreeMap<>();
     private String expected;
     @BeforeEach
     void setUp() {
@@ -44,5 +45,9 @@ class ContentFormatterTest {
                   + testKey: value2
                 }""";
         assertEquals(expected, ContentFormatter.makeFormat(testMap, "stylish"));
+    }
+    @Test
+    void testDefault() {
+        assertThrows(java.lang.Exception.class, () -> ContentFormatter.makeFormat(testMap, "wrong"));
     }
 }
