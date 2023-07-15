@@ -7,9 +7,12 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DifferTest {
     private final String expected = """
@@ -17,14 +20,14 @@ class DifferTest {
                   - host: jd.com
                   + host: tencentcloud.com
                 }""";
-    private final String testFilePath1 = "testFile1.txt";
-    private final String testFilePath2 = "testFile2.txt";
-    private final String testFilePathEmpty = "testFileEmpty.txt";
+    private final String testFilePath1 = "testFile1.json";
+    private final String testFilePath2 = "testFile2.json";
+    private final String testFilePathEmpty = "testFileEmpty.json";
 
 
     @BeforeEach
     void setUp() {
-        String testFilePath1Content = "{\"host\": \"jd.com\"}";
+        String testFilePath1Content = "[{\"host\": \"jd.com\"}]";
         createNewTestFile(testFilePath1, testFilePath1Content);
         String testFilePath2Content = "{\"host\": \"tencentcloud.com\"}";
         createNewTestFile(testFilePath2, testFilePath2Content);
@@ -62,24 +65,14 @@ class DifferTest {
     @Test
     void generate() throws Exception {
         String testStr;
-        testStr = Differ.generate(testFilePath1, testFilePath2, "styish");
+        testStr = Differ.generate(testFilePath1, testFilePath2, "stylish");
         assertEquals(expected, testStr);
-    }
-    @Test
-    void generateFileNullContent() {
-        String testStr;
-        try {
-            testStr = Differ.generate(testFilePath1, testFilePath2, "styish");
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        assertNotNull(testStr);
     }
     @Test
     void generateFileEmptyContent() {
         String testStrNull;
         try {
-            testStrNull = Differ.generate(testFilePath1, testFilePathEmpty, "styish");
+            testStrNull = Differ.generate(testFilePath1, testFilePathEmpty, "stylish");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -91,10 +84,11 @@ class DifferTest {
     }
 
     @Test
-    void isNotExist() throws Exception {
-        assertEquals("File does not exist", Differ.generate(
-                "/home/timur/IdeaProjects/java-project-71/app/src/test/resources/file1new.json",
-                "not exist file"));
+    void isExist() {
+        assertThrows(java.lang.Exception.class, () -> {
+                    Differ.generate("/home/timur/IdeaProjects/java-project-71/app/src/test/resources/file1.json",
+                            "notExist.txt");
+                });
     }
 
     @AfterEach
