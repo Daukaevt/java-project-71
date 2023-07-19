@@ -1,15 +1,13 @@
 package hexlet.code;
 
-import com.puppycrawl.tools.checkstyle.gui.Main;
+
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import picocli.CommandLine;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class AppTest {
 
@@ -19,8 +17,8 @@ class AppTest {
         System.out.println("main");
         String[] args = null;
         final InputStream original = System.in;
-        final FileInputStream fips = new FileInputStream(new File(
-                "/home/timur/IdeaProjects/java-project-71/app/src/test/resources/file1.json"));
+        final FileInputStream fips = new FileInputStream(
+                "/home/timur/IdeaProjects/java-project-71/app/src/test/resources/file1.json");
         System.setIn(fips);
         App.main(args);
         System.setIn(original);
@@ -28,10 +26,10 @@ class AppTest {
 
     @Test
     void testCall() {
-        assertEquals(0, new CommandLine(new App()).execute(
+        Assertions.assertEquals(0, new CommandLine(new App()).execute(
                 "/home/timur/IdeaProjects/java-project-71/app/src/test/resources/file1.yml",
                 "/home/timur/IdeaProjects/java-project-71/app/src/test/resources/file2.yml"));
-        assertEquals(1, new CommandLine(new App()).execute(
+        Assertions.assertEquals(1, new CommandLine(new App()).execute(
                 "/home/timur/IdeaProjects/java-project-71/app/src/test/resources/file1.yml",
                 "notExist.txt"));
     }
