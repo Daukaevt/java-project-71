@@ -4,8 +4,6 @@ package hexlet.code;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -13,8 +11,6 @@ class ParserTest {
 
     @Test
     void parse() {
-        String filePath = "/home/timur/IdeaProjects"
-                + "/java-project-71/app/src/test/resources/nestedFile1.json";
         String jsonContent = """
                 {
                   "posts": [
@@ -34,10 +30,8 @@ class ParserTest {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        assertThrows(java.lang.Exception.class, () -> {
-            Parser.parse(jsonContent,
-                    "txt");
-        });
+        assertThrows(java.lang.Exception.class, () -> Parser.parse(jsonContent,
+                "txt"));
     }
 
     @Test
