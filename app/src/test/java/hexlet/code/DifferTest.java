@@ -7,12 +7,9 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DifferTest {
     private final String expected = """
@@ -85,10 +82,9 @@ class DifferTest {
 
     @Test
     void isExist() {
-        assertThrows(java.lang.Exception.class, () -> {
-                    Differ.generate("/home/timur/IdeaProjects/java-project-71/app/src/test/resources/file1.json",
-                            "notExist.txt");
-                });
+        assertThrows(java.lang.Exception.class, () -> Differ.generate(
+                "/home/timur/IdeaProjects/java-project-71/app/src/test/resources/file1.json",
+                "notExist.txt"));
     }
 
     @AfterEach
