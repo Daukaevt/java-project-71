@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TreeMap;
 
 public class Differ {
@@ -15,8 +16,8 @@ public class Differ {
         return Differ.generate(firstFilePath, secondFilePath, "stylish");
     }
     public static String generate(String filePath1, String filePath2, String format) throws Exception {
-        Map firstContentMapper = null;
-        Map secondContentMapper = null;
+        Map <String, Wrapper> firstContentMapper = null;
+        Map <String, Wrapper> secondContentMapper = null;
         if (isExist(filePath1)) {
             firstContentMapper = Parser.parse(
                     Files.readString(Paths.get(filePath1).toAbsolutePath()),
@@ -27,11 +28,13 @@ public class Differ {
                     Files.readString(Paths.get(filePath2).toAbsolutePath()),
                     getDataFormat(filePath2));
         }
-        Map<String, Wrapper> matrix = Matrix.createMatrix(firstContentMapper, secondContentMapper);
+        Map<String, Wrapper> matrix = Matrix.createMatrix(
+                Objects.requireNonNull(firstContentMapper),
+                Objects.requireNonNull(secondContentMapper));
         TreeMap<String, Wrapper> sortedMatrixMapper = new TreeMap<>(matrix);
         return ContentFormatter.makeFormat(sortedMatrixMapper, format);
     }
-    private static String getDataFormat(String filePath) throws Exception {
+    private static String getDataFormat(String filePath) {
         int index = filePath.lastIndexOf('.');
         return index > 0 ? filePath.substring(index + 1) : "";
     }
