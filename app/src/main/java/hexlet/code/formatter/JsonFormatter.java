@@ -11,28 +11,28 @@ public class JsonFormatter {
         stringBuilder.append("{\n");
         for (Object key : unitMap.keySet()) {
             Wrapper values = unitMap.get(key);
-            String value1 = values.getValue1();
-            String tempPlus = "  \"+ " + key + "\": \""
-                    + value1.replaceAll("\"", "")
+            String matrixFirstValue = values.getValue1();
+            String tempPlusLine = "  \"+ " + key + "\": \""
+                    + matrixFirstValue.replaceAll("\"", "")
                     .replaceAll(",\\S", ",\s") + "\",\n";
-            String value2 = values.getValue2();
-            String tempMinus = "  \"- " + key + "\": \""
-                    + value2.replaceAll("\"", "")
+            String matrixSecondValue = values.getValue2();
+            String tempMinusLine = "  \"- " + key + "\": \""
+                    + matrixSecondValue.replaceAll("\"", "")
                     .replaceAll(",\\S", ",\s") + "\",\n";
-            if (value1.equals("-absent-")) {
-                stringBuilder.append(tempMinus);
+            if (matrixFirstValue.equals("-absent-")) {
+                stringBuilder.append(tempMinusLine);
                 continue;
             }
-            if (value2.equals("-absent-")) {
-                stringBuilder.append(tempPlus);
+            if (matrixSecondValue.equals("-absent-")) {
+                stringBuilder.append(tempPlusLine);
                 continue;
             }
-            if (value1.equals(value2)) {
-                stringBuilder.append(tempMinus
+            if (matrixFirstValue.equals(matrixSecondValue)) {
+                stringBuilder.append(tempMinusLine
                         .replaceAll("\s{2}\"- ", "  \"  "));
             } else {
-                stringBuilder.append(tempMinus);
-                stringBuilder.append(tempPlus);
+                stringBuilder.append(tempMinusLine);
+                stringBuilder.append(tempPlusLine);
             }
         }
         return stringBuilder.toString().replaceAll(",$", "\n}");
