@@ -12,20 +12,20 @@ public class PlainFormatter {
         StringBuilder stringBuilder = new StringBuilder();
         unitMap.keySet().forEach(key -> {
             Wrapper values = unitMap.get(key);
-            String value1 = values.getValue1();
-            String value2 = values.getValue2();
-            if (value1.equals("-absent-")) {
+            String matrixFirstValue = values.getValue1();
+            String matrixSecondValue = values.getValue2();
+            if (matrixFirstValue.equals("-absent-")) {
                 stringBuilder.append("Property '").append(key)
                         .append("' was added with value: ")
-                        .append(getSingleQuotes3(value2)).append("\n");
-            } else if (value2.equals("-absent-")) {
+                        .append(getSingleQuotes3(matrixSecondValue)).append("\n");
+            } else if (matrixSecondValue.equals("-absent-")) {
                 stringBuilder.append("Property '").append(key)
                         .append("' was removed").append("\n");
-            } else if (!value1.equals(value2)) {
+            } else if (!matrixFirstValue.equals(matrixSecondValue)) {
                 stringBuilder.append("Property '").append(key)
                         .append("' was updated. From ")
-                        .append(getSingleQuotes3(value1)).append(" to ")
-                        .append(getSingleQuotes3(value2)).append("\n");
+                        .append(getSingleQuotes3(matrixFirstValue)).append(" to ")
+                        .append(getSingleQuotes3(matrixSecondValue)).append("\n");
             }
         });
         return stringBuilder.toString().replaceAll("\n$", "");
