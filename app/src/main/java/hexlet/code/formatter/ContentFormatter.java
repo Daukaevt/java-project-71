@@ -8,18 +8,18 @@ import java.util.TreeMap;
 
 public class ContentFormatter {
     public static String makeFormat(
-            final TreeMap<String, Wrapper> unitMap,
+            final TreeMap<String, Wrapper> matrix,
             final String format
     ) throws Exception {
         switch (format) {
             case ("plain") -> {
-                return PlainFormatter.plainFormat(unitMap);
+                return PlainFormatter.plainFormat(matrix);
             }
             case ("json") -> {
-                return JsonFormatter.jsonFormat(unitMap);
+                return JsonFormatter.jsonFormat(matrix);
             }
             case ("stylish") -> {
-                return StylishFormatter.stylishFormat(unitMap);
+                return StylishFormatter.stylishFormat(matrix);
             }
             default -> throw new Exception("Unknown format: " + format);
         }
