@@ -5,11 +5,11 @@ import hexlet.code.utils.Wrapper;
 import java.util.TreeMap;
 
 public class StylishFormatter {
-    public static String stylishFormat(final TreeMap<String, Wrapper> unitMap) {
+    public static String stylishFormat(final TreeMap<String, Wrapper> matrix) {
         StringBuilder stringBuilder = new StringBuilder();
-        unitMap.keySet().forEach(key -> {
-            String matrixFirstValue = unitMap.get(key).getValue1();
-            String matrixSecondValue = unitMap.get(key).getValue2();
+        matrix.keySet().forEach(key -> {
+            String matrixFirstValue = matrix.get(key).getValue1();
+            String matrixSecondValue = matrix.get(key).getValue2();
             if ("-absent-".equals(matrixFirstValue)) {
                 stringBuilder.append("  + ").append(key).append(": ").append(matrixSecondValue).append("\n"); return;
             }
