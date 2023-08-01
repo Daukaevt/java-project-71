@@ -2,20 +2,18 @@
 About:
 
 
-	The program compares two configuration files.
+	- The program compares two configuration files.
 
-	The result of file comparison can be displayed in different formats.
+	- The result of file comparison can be displayed in different formats.
 
-	The diff is built based on how the files have changed relative to each other, the keys are displayed in alphabetical order. Below is an example of what should be the result of this step:
-
-	asciinema link:
-		https://asciinema.org/a/wy6Sif66IPMaML0Bzl6e2uz9Q
+	- The diff is built based on how the files have changed relative to each other, the keys are displayed in alphabetical order. Below is an example of what should be the result of this step: 
+    asciinema link: https://asciinema.org/a/wy6Sif66IPMaML0Bzl6e2uz9Q
 
 -------------------------
 System requirements:
 
 
-	JDK 17
+	JDK 20
 
 -------------------------
 SETUP:
