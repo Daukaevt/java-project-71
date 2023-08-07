@@ -16,8 +16,8 @@ public class Differ {
         return Differ.generate(firstFilePath, secondFilePath, "stylish");
     }
     public static String generate(String filePath1, String filePath2, String format) throws Exception {
-        Map <String, Wrapper> firstContentMapper = null;
-        Map <String, Wrapper> secondContentMapper = null;
+        Map<String, Wrapper> firstContentMapper = null;
+        Map<String, Wrapper> secondContentMapper = null;
         if (isExist(filePath1)) {
             firstContentMapper = Parser.parse(
                     Files.readString(Paths.get(filePath1).toAbsolutePath()),
@@ -38,7 +38,7 @@ public class Differ {
         int index = filePath.lastIndexOf('.');
         return index > 0 ? filePath.substring(index + 1) : "";
     }
-    private static boolean isExist (String filePath) throws Exception {
+    private static boolean isExist(String filePath) throws Exception {
         if (!Files.exists(Path.of(filePath))) {
             throw new Exception("File '" + filePath + "' does not exist");
         }
