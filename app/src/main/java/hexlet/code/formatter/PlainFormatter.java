@@ -12,8 +12,8 @@ public class PlainFormatter {
         StringBuilder stringBuilder = new StringBuilder();
         unitMap.keySet().forEach(key -> {
             Wrapper values = unitMap.get(key);
-            String matrixFirstValue = values.getValue1();
-            String matrixSecondValue = values.getValue2();
+            String matrixFirstValue = values.value1();
+            String matrixSecondValue = values.value2();
             if (matrixFirstValue.equals("-absent-")) {
                 stringBuilder.append("Property '").append(key)
                         .append("' was added with value: ")
