@@ -11,14 +11,14 @@ public class JsonFormatter {
         stringBuilder.append("{\n");
         for (Object key : unitMap.keySet()) {
             Wrapper values = unitMap.get(key);
-            String matrixFirstValue = values.getValue1();
+            String matrixFirstValue = values.value1();
             String tempPlusLine = "  \"+ " + key + "\": \""
                     + matrixFirstValue.replaceAll("\"", "")
-                    .replaceAll(",\\S", ",\s") + "\",\n";
-            String matrixSecondValue = values.getValue2();
+                    .replaceAll(",\\S", ", ") + "\",\n";
+            String matrixSecondValue = values.value2();
             String tempMinusLine = "  \"- " + key + "\": \""
                     + matrixSecondValue.replaceAll("\"", "")
-                    .replaceAll(",\\S", ",\s") + "\",\n";
+                    .replaceAll(",\\S", ", ") + "\",\n";
             if (matrixFirstValue.equals("-absent-")) {
                 stringBuilder.append(tempMinusLine);
                 continue;
@@ -29,7 +29,7 @@ public class JsonFormatter {
             }
             if (matrixFirstValue.equals(matrixSecondValue)) {
                 stringBuilder.append(tempMinusLine
-                        .replaceAll("\s{2}\"- ", "  \"  "));
+                        .replaceAll(" {2}\"- ", "  \"  "));
             } else {
                 stringBuilder.append(tempMinusLine);
                 stringBuilder.append(tempPlusLine);
