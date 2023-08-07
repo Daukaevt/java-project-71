@@ -8,8 +8,8 @@ public class StylishFormatter {
     public static String stylishFormat(final TreeMap<String, Wrapper> matrix) {
         StringBuilder stringBuilder = new StringBuilder();
         matrix.keySet().forEach(key -> {
-            String matrixFirstValue = matrix.get(key).getValue1();
-            String matrixSecondValue = matrix.get(key).getValue2();
+            String matrixFirstValue = matrix.get(key).value1();
+            String matrixSecondValue = matrix.get(key).value2();
             if ("-absent-".equals(matrixFirstValue)) {
                 stringBuilder.append("  + ").append(key).append(": ").append(matrixSecondValue).append("\n"); return;
             }
