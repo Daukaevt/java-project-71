@@ -25,9 +25,8 @@ class MatrixTest {
     }
 
     @Test
-    void unite()
-    {
-        assertEquals(expected, String.valueOf(unitedData.get("posts").getValue2()));
+    void unite() {
+        assertEquals(expected, String.valueOf(unitedData.get("posts").value2()));
     }
 
 }
