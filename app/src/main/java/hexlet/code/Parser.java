@@ -13,7 +13,9 @@ import java.util.Map;
 
 public class Parser {
     public static String convertYamlToJson(final String yaml) throws JsonProcessingException {
-        if (yaml.isEmpty()) return "";
+        if (yaml.isEmpty()) {
+            return "";
+        }
         ObjectMapper yamlReader = new ObjectMapper(new YAMLFactory());
         Object obj;
         obj = yamlReader.readValue(yaml, Object.class);
@@ -24,7 +26,7 @@ public class Parser {
         JsonNode jsonNodeTree = new ObjectMapper().readTree(jsonString);
         return new YAMLMapper().writeValueAsString(jsonNodeTree);
     }
-    private static String replaceSquareBrackets (String content) {
+    private static String replaceSquareBrackets(String content) {
         return content.replaceAll("^\\[", "").replaceAll("]$", "");
     }
     private static Map parseYaml(String content) throws Exception  {
