@@ -1,56 +1,41 @@
 plugins {
     id 'application'
     id 'checkstyle'
+    id 'com.adarshr.test-logger' version '3.0.0'
+    id 'com.github.ben-manes.versions' version '0.39.0'
     id 'jacoco'
 }
 
-group 'hexlet.code'
-version '1.0-SNAPSHOT'
+group = 'hexlet.code'
+version = '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
 }
 
+compileJava {
+    options.release = 20
+}
+
+application {
+    mainClass = 'hexlet.code.App'
+}
 
 dependencies {
-
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
-
+    implementation 'com.google.guava:guava:31.0.1-jre'
     implementation 'info.picocli:picocli:4.7.0'
     annotationProcessor 'info.picocli:picocli-codegen:4.7.0'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.0'
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.13.0'
 
-    // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.0'
-    // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
-    implementation 'com.fasterxml.jackson.core:jackson-core:2.15.0'
-    // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations
-    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.15.0'
-    // https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jdk8
-    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.15.0'
-    // https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-yaml
-    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.15.0'
-
-    // https://mvnrepository.com/artifact/org.yaml/snakeyaml
-    implementation 'org.yaml:snakeyaml:2.0'
-
-    // https://mvnrepository.com/artifact/com.puppycrawl.tools/checkstyle
-    implementation 'com.puppycrawl.tools:checkstyle:10.7.0'
-
-    // https://mvnrepository.com/artifact/com.google.code.gson/gson
-    implementation group: 'com.google.code.gson', name: 'gson', version: '2.10'
-
-    // https://mvnrepository.com/artifact/com.googlecode.json-simple/json-simple
-    implementation 'com.googlecode.json-simple:json-simple:1.1.1'
-
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.8.1'
+    testImplementation 'org.assertj:assertj-core:3.21.0'
+    testImplementation 'org.skyscreamer:jsonassert:1.5.0'
 }
 
 test {
     useJUnitPlatform()
-}
-test {
-    useJUnitPlatform()
-    finalizedBy jacocoTestReport
 }
 
 jacocoTestReport {
@@ -59,19 +44,12 @@ jacocoTestReport {
     }
 }
 
-application {
-    mainClass = 'hexlet.code.App'
+checkstyle {
+    toolVersion '10.12.1'
 }
 
-compileJava {
-    options.release = 20
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(20)
+    }
 }
-compileJava {
-    options.compilerArgs += ["-Aproject=${project.group}/${project.name}"]
-}
-
-run {
-    standardInput = System.in
-}
-
-
